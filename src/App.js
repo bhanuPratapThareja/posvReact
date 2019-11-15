@@ -1,25 +1,25 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
+
+import {Header} from './components/Header/Header';
+import Generate_Otp from './components/Generate_Otp/Generate_Otp';
+import Screenshot from './components/Screenshot/Screenshot';
+import Declaration from './components/Declaration/Declaration';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Header />
+      <BrowserRouter>
+        <Switch>
+          <Redirect exact path='/' to='/generate_otp' />
+          <Route path='/generate_otp' component={Generate_Otp} />
+          <Route path='/screenshot' component={Screenshot} />
+          <Route path='/declaration' component={Declaration} />
+        </Switch>
+      </BrowserRouter>
+    </>
   );
 }
 
