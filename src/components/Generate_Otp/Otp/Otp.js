@@ -1,0 +1,35 @@
+import React from 'react';
+import './Otp.css';
+
+const Otp = props => {
+
+    const onInputChange = (event, val) => {
+        event.persist();
+        const keyCode = event.keyCode;
+        if(keyCode === 37 || keyCode === 39){
+            return
+        }
+        let inputs = document.getElementsByClassName('input_otp');
+        inputs[val].value = '';
+        setTimeout(() => {
+            if (val < 3 && keyCode !== 8) {
+                inputs[val].value = event.target.value;
+                inputs[val + 1].focus();
+            }
+            if(val > 0 && keyCode === 8) {
+                inputs[val].value = '';
+            }
+        }, 100)
+    }
+
+        return (
+            <>
+                <input type="text" maxLength="1" size="1" min="0" max="9" pattern="[0-9]{1}" disabled={props.submitting} className="input_otp" onKeyDown={event => onInputChange(event, 0)} />
+                <input type="text" maxLength="1" size="1" min="0" max="9" pattern="[0-9]{1}" disabled={props.submitting} className="input_otp" onKeyDown={event => onInputChange(event, 1)} />
+                <input type="text" maxLength="1" size="1" min="0" max="9" pattern="[0-9]{1}" disabled={props.submitting} className="input_otp" onKeyDown={event => onInputChange(event, 2)} />
+                <input type="text" maxLength="1" size="1" min="0" max="9" pattern="[0-9]{1}" disabled={props.submitting} className="input_otp" onKeyDown={event => onInputChange(event, 3)} />
+            </>
+        )
+}
+
+export default Otp;

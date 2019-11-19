@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import './Screenshot.css';
 import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 
 export default class Screenshot extends Component {
 
@@ -27,24 +30,26 @@ export default class Screenshot extends Component {
 
         let that = this;
 
-        navigator.getMedia({
-            video: true,
-            audio: false
-        }, function (stream) {
-            video.srcObject = stream;
-            video.play();
-            that.setState({ video })
-        }, function (error) {
+        // navigator.getMedia({
+        //     video: true,
+        //     audio: false
+        // }, function (stream) {
+        //     video.srcObject = stream;
+        //     video.play();
+        //     that.setState({ video })
+        // }, function (error) {
 
-        })
+        // })
     }
 
     takeScreenshot = () => {
-        let canvas = document.getElementById('canvas');
-        let context = canvas.getContext('2d');
-        context.drawImage(this.state.video, 0, 0, 400, 300);
-        let photo = document.getElementById('photo');
-        photo.setAttribute('src', canvas.toDataURL('image/png'))
+        // console.log(context)
+        this.setState({ pictureTaken: true }, () => {
+            let canvas = document.getElementById('canvas');
+            let context = canvas.getContext('2d');
+            context.drawImage(this.state.video, 0, 0, 400, 300);
+        })
+
     }
 
     render() {
@@ -52,15 +57,23 @@ export default class Screenshot extends Component {
         const imgStyles = { width: '400', height: '300' };
 
         return (
-            <>
-                <div className="booth" style={boothStyles}>
-                    <video id="video" {...imgStyles}></video>
-                    <canvas id="canvas" {...imgStyles} ></canvas>
-                    <Button onClick={this.takeScreenshot} variant="contained" className="default_button" style={{ width: '100%' }}>
-                        Capture
-                    </Button>
-                </div>
-            </>
+            <Grid container justify="center" alignItems="center">
+                <Grid item xs={6}>
+                    <div className="booth" style={boothStyles}>
+                        {!this.state.pictureTaken ? <video id="video" {...imgStyles}></video> : null}
+                        {this.state.pictureTaken ? <canvas id="canvas" {...imgStyles}></canvas> : null}
+                        <Button onClick={this.takeScreenshot} variant="contained" className="default_button" style={{ width: '100%' }}>
+                            Take Selfie
+                        </Button>
+                    </div>
+                    <br />
+                    <Paper>
+                        <Typography variant="h6" component="h6" style={{textAlign: 'center'}}>
+                            Position your face inside the frame and click on Take Selfie button
+                        </Typography>
+                    </Paper>
+                </Grid>
+            </Grid>
         )
     }
 }
