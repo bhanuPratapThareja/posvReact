@@ -1,0 +1,19 @@
+.thank_you {
+    border: 3px solid #ee5c00;
+    padding: 100px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.thank_you > p {
+    color: #00236e;
+    font-weight: 700;
+}
+
+.checkbox_circle {
+    background-color: #00236e;
+    color: white;
+    padding: 8px;
+    border-radius: 50%;
+    font-weight: 900;
+}
