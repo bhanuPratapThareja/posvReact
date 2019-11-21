@@ -25,3 +25,7 @@ body {
     background-color: white !important;
     color: var(--main-color) !important;
 }
+
+button:disabled {
+    background-color: red !important;
+}
