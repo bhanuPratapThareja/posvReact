@@ -1,0 +1,27 @@
+body {
+    padding: 0;
+    margin: 0;
+}
+
+:root {
+    --main-color: #00236e; 
+}
+
+.header {
+    background-color: #fefefe !important;
+    width: 100%;
+}
+
+.default_text {
+    color: var(--main-color) !important;
+}
+
+.default_button {
+    background-color: var(--main-color) !important;
+    color: white !important; 
+}
+
+.MuiSnackbarContent-root {
+    background-color: white !important;
+    color: var(--main-color) !important;
+}

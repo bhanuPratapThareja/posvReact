@@ -1,0 +1,15 @@
+.input_otp {
+    height: 40px;
+    width: 40px;
+    margin: auto 10px;
+    text-align: center;
+    border: none;
+    border-bottom: 2px solid grey;
+    font-size: 18px;
+    font-weight: 900;
+    color: #00236e;
+}
+
+.input_otp:focus {
+    border-bottom: 2px solid lightblue;
+}
