@@ -4,7 +4,7 @@ import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 
 import {Header} from './components/Header/Header';
 import Generate_Otp from './components/Generate_Otp/Generate_Otp';
-import Screenshot from './components/Screenshot/Screenshot';
+import Selfie from './components/Selfie/Selfie';
 import Declaration from './components/Declaration/Declaration';
 import Thankyou from './components/Thankyou/Thankyou';
 
@@ -16,7 +16,7 @@ function App() {
         <Switch>
           <Redirect exact path='/' to='/generate_otp' />
           <Route path='/generate_otp' component={Generate_Otp} />
-          <Route path='/screenshot' component={Screenshot} />
+          <Route path='/selfie' component={Selfie} />
           <Route path='/declaration' component={Declaration} />
           <Route path='/thankyou' component={Thankyou} />
         </Switch>
