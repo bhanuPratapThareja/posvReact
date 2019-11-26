@@ -17,16 +17,37 @@ class Generate_Otp extends Component {
             generatingOtp: false,
             showMessage: false,
             submitting: false,
-            otp: undefined
+            otp: undefined,
+            otpButtonText: 'Genrate Otp',
+            showCallButton: false,
+            otpTime: 5
         }
     }
 
     generateOtp = async () => {
-        this.setState({ generatingOtp: true });
-        const { url, data } = getApiData('getotp');
+        this.setState({ 
+            generatingOtp: true,
+            showCallButton: true,
+            otpButtonText: 'Regenerate'
+        });
+
+        console.log(document.getElementById('call_button'))
+       
+        setTimeout(() => {
+            // document.getElementById('call_button').classList.remove('call_button');
+            let interval = setInterval(() => {
+                this.setState({ otpTime: this.state.otpTime-1 });
+                if(this.state.otpTime === 0){
+                    clearInterval(interval);
+                    this.setState({ generatingOtp: false })
+                }
+            }, 1000);
+        }, 500);
+
+        const { url, body } = getApiData('getotp');
 
         try {
-            const response = await axios.post(url, data, { headers })
+            const response = await axios.post(url, body, { headers })
             console.log('reaponse: ', response)
         } catch (err) {
             console.log('err: ', err)
@@ -39,15 +60,26 @@ class Generate_Otp extends Component {
     SubmitOtp = () => {
         // this.setState({ submitting: true })
         const inps = document.getElementsByClassName('input_otp');
+        let otp = '';
         for (let inp of inps) {
-            console.log(inp.value)
+            otp += inp.value
         }
+        console.log(otp)
+    }
+
+    callForOtp = () => {
+        this.setState({ 
+            generatingOtp: true
+        })
+        
     }
 
     render() {
+        let callButtonStyle = { display: this.showCallButton ? 'block' : 'none' }
         return (
-            <Grid container justify="center" alignItems="center" className="generate-otp__grid">
-                <Grid item xs={12} sm={8}>
+            // <Grid container justify="center" alignItems="center" className="generate-otp__grid">
+            //     <Grid item xs={12} sm={8}>
+            <div className="generate-otp__grid">
                     <LinearProgress style={{ visibility: this.state.generatingOtp || this.state.submitting ? 'visible' : 'hidden' }} />
                     <Paper className="paper">
                         <div >
@@ -63,15 +95,25 @@ class Generate_Otp extends Component {
 
                         </div>
 
-                        <div>
+                        <div className="buttons_div__otp">
                             <Button
                                 variant="contained"
                                 disabled={this.state.generatingOtp || this.state.submitting}
                                 className="default_button"
-                                style={{ marginTop: '16px' }}
+                                
                                 onClick={this.generateOtp}>
-                                Generate OTP
+                                {this.state.otpButtonText}
                             </Button>
+
+                            {this.state.showCallButton ? <Button
+                                variant="contained"
+                                disabled={this.state.generatingOtp || this.state.submitting}
+                                className="default_button"
+                                id="call_button"
+                                onClick={this.callForOtp}>
+                                Call
+                            </Button> : null}
+                            {this.state.generatingOtp ? <span className="otpTime">{this.state.otpTime}</span> : null}
                         </div>
 
                         <h5 className="default_text" style={{ textDecoration: 'underline' }}>Did'nt recieve the code?</h5>
@@ -79,9 +121,10 @@ class Generate_Otp extends Component {
                             Submit
                         </Button>
                     </Paper>
-                    {this.state.generatingOtp ? <PositionedSnackbar messageInfo={'my message'} /> : null}
-                </Grid>
-            </Grid>
+                    {/* {this.state.generatingOtp ? <PositionedSnackbar messageInfo={'my message'} /> : null} */}
+                {/* </Grid> */}
+            {/* </Grid> */}
+            </div>
         )
     }
 }

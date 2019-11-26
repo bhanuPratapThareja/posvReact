@@ -1,7 +1,13 @@
 body {
-    padding: 0;
     margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
 }
+
 
 :root {
     --main-color: #00236e; 
@@ -9,7 +15,8 @@ body {
 
 .header {
     background-color: #fefefe !important;
-    width: 100%;
+    width: 100% !important;
+    
 }
 
 .default_text {
@@ -24,4 +31,8 @@ body {
 .MuiSnackbarContent-root {
     background-color: white !important;
     color: var(--main-color) !important;
+}
+
+button:disabled {
+    background-color: red !important;
 }

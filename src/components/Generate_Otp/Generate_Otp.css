@@ -1,5 +1,6 @@
 .generate-otp__grid {
-    padding-top: 16px;
+    text-align: center;
+    width: 100vw;
 }
 
 .paper {
@@ -17,109 +18,21 @@
     border-bottom: 1px solid grey;
 }
 
-#partitioned {
-    padding-left: 15px;
-    letter-spacing: 42px;
-    border: 0;
-    background-image: linear-gradient(to left, black 70%, rgba(255, 255, 255, 0) 0%);
-    background-position: bottom;
-    background-size: 50px 1px;
-    background-repeat: repeat-x;
-    background-position-x: 35px;
-    width: 220px;
-    min-width: 220px;
-  }
-  
-  #divInner{
-    left: 0;
-    position: sticky;
-  }
-  
-  #divOuter{
-    width: 190px; 
-    overflow: hidden;
-  }
-
-
-
-
-
-  /* #wrapper {
-    font-family: Lato;
-    font-size: 1.5rem;
-    text-align: center;
-    box-sizing: border-box;
-    color: #333;
-  }
-
-  #dialog {
-    border: solid 1px #ccc;
-    margin: 10px auto;
-    padding: 20px 30px;
-    display: inline-block;
-    box-shadow: 0 0 4px #ccc;
-    background-color: #faf8f8;
-    overflow: hidden;
-    position: relative;
-    max-width: 450px;
-
-  }
-  
-  #form {
-    max-width: 500px;
-    margin: 25px auto 0;
-  }
-
-  input {
-    margin: 0 5px;
-    text-align: center;
-    line-height: 80px;
-    font-size: 50px;
-    border: solid 1px #ccc;
-    box-shadow: 0 0 5px #ccc inset;
-    outline: none;
-    width: 20%;
-    transition: all 0.2s ease-in-out;
-    border-radius: 3px;
+.buttons_div__otp {
+  margin-top: 16px;
+  margin-left: 30%;
+  width: 40%;
+  display: flex;
+  flex: 1;
+  justify-content: space-evenly;
+  align-items: center;
 }
 
-  input:focus {
-    border-color: purple;
-    box-shadow: 0 0 5px purple inset;
-  }
+.call_button {
+  display: none !important;
+}
 
-  input::selection {
-    background: transparent;
-  }
-
-
-
-  h3 {
-    margin: 0 0 10px;
-    padding: 0;
-    line-height: 1.25;
-  }
-
-  span {
-    font-size: 90%;
-  }
-
-  button {
-    margin: 30px 0 50px;
-    width: 100%;
-    padding: 6px;
-    background-color: #b85fc6;
-    border: none;
-    text-transform: uppercase;
-  }
-
-  div {
-    position: relative;
-    z-index: 1;
-  }
-
-  img {
-    position: absolute;
-    bottom: -70px;
-    right: -63px;
-  } */
+.otpTime {
+  font-weight: 700;
+  color: #00236e;
+}
