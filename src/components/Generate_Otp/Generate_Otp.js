@@ -44,16 +44,16 @@ class Generate_Otp extends Component {
             }, 1000);
         }, 500);
 
-        const { url, data } = getApiData('getotp');
+        const { url, body } = getApiData('getotp');
 
-        // try {
-        //     const response = await axios.post(url, data, { headers })
-        //     console.log('reaponse: ', response)
-        // } catch (err) {
-        //     console.log('err: ', err)
-        // } finally {
-        //     this.setState({ generatingOtp: false });
-        // }
+        try {
+            const response = await axios.post(url, body, { headers })
+            console.log('reaponse: ', response)
+        } catch (err) {
+            console.log('err: ', err)
+        } finally {
+            this.setState({ generatingOtp: false });
+        }
 
     }
 
@@ -77,8 +77,9 @@ class Generate_Otp extends Component {
     render() {
         let callButtonStyle = { display: this.showCallButton ? 'block' : 'none' }
         return (
-            <Grid container justify="center" alignItems="center" className="generate-otp__grid">
-                <Grid item xs={12} sm={8}>
+            // <Grid container justify="center" alignItems="center" className="generate-otp__grid">
+            //     <Grid item xs={12} sm={8}>
+            <div className="generate-otp__grid">
                     <LinearProgress style={{ visibility: this.state.generatingOtp || this.state.submitting ? 'visible' : 'hidden' }} />
                     <Paper className="paper">
                         <div >
@@ -121,8 +122,9 @@ class Generate_Otp extends Component {
                         </Button>
                     </Paper>
                     {/* {this.state.generatingOtp ? <PositionedSnackbar messageInfo={'my message'} /> : null} */}
-                </Grid>
-            </Grid>
+                {/* </Grid> */}
+            {/* </Grid> */}
+            </div>
         )
     }
 }

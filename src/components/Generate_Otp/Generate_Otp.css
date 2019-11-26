@@ -1,5 +1,6 @@
 .generate-otp__grid {
-    padding-top: 16px;
+    text-align: center;
+    width: 100vw;
 }
 
 .paper {
