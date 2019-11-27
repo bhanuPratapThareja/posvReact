@@ -35,7 +35,7 @@ class Verify extends Component {
             console.log('reaponse: ', response)
             if(response.data.response.payload.isLinkValid){
                 localStorage.setItem('posvRefNumber', response.data.response.payload.posvRefNumber)
-                this.props.history.push('/selfie')
+                // this.props.history.push('/selfie')
             } else {
                 this.setState({ verificationError: true })    
             }
