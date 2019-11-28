@@ -10,12 +10,6 @@ body {
     --main-color: #00236e; 
 }
 
-.header {
-    background-color: #fefefe !important;
-    width: 100% !important;
-    
-}
-
 .default_text {
     color: var(--main-color) !important;
 }
@@ -31,5 +25,5 @@ body {
 }
 
 button:disabled {
-    background-color: red !important;
+    opacity: 0.7;
 }

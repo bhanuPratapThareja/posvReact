@@ -16,7 +16,12 @@ const api = {
         getotp: {
             uatUrl: 'Stage/getotp',
             prodUrl: 'prod/getotp',
-            body: { "request": { "header": { "correlationId": "25478965874", "appId": "ABC" }, "payload": { "posvRefNumber": "", "mobile": "7428453608", "email": "adit.kumar@qualtechedge.com", "productName": "Max Term Plan", "sumAssured": "2000", "initialPremiumPaid": "32000", "policyTerm": "Test policy", "modeOfPayment": "NEFT", "authToken": "wtewe834jwe" } } },
+            body: { "request": { "header": { "correlationId": "25478965874", "appId": "ABC" }, "payload": { "posvRefNumber": "", "mobile": "9717509425", "email": "adit.kumar@qualtechedge.com", "productName": "Max Term Plan", "sumAssured": "2000", "initialPremiumPaid": "32000", "policyTerm": "Test policy", "modeOfPayment": "NEFT", "authToken": "" } } },
+        },
+        validateOtp: {
+            uatUrl: 'Stage/validateotp',
+            prodUrl: 'prod/validateotp',
+            body: { "request": { "header": { "correlationId": "25478965874", "appId": "ABC" }, "payload": { "posvRefNumber": "", "otp": "", "authToken": "" } } },
         }
     }
 }

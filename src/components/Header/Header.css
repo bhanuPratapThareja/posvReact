@@ -1,0 +1,9 @@
+.appbar {
+    position: fixed;
+    top: 0;
+    /* margin-bottom: 70px; */
+}
+
+.header {
+    background-color: #fefefe;
+}

@@ -6,7 +6,7 @@ import Icon from '@material-ui/core/Icon';
 const Thankyou = () => {
     
     return (
-        <Grid container justify="center" alignItems="center">
+        <Grid container justify="center" alignItems="center" className="cstm-wrap">
             <Grid item>
                 <div className="thank_you">
                 <Icon className="checkbox_circle">checkbox-marked-circle</Icon>

@@ -2,6 +2,7 @@ import React from 'react';
 import Snackbar from '@material-ui/core/Snackbar';
 
 export default function PositionedSnackbar(props) {
+  
   const [state, setState] = React.useState({
     open: true,
     vertical: 'top',
@@ -12,8 +13,30 @@ export default function PositionedSnackbar(props) {
 
 
   const handleClose = () => {
-    setState({ ...state, open: false });
+    setState({ ...state, open: props.showSnackbar });
+    setTimeout(() => {
+      props.closeSnackbar();
+    }, 500);
   };
+
+  const getTextColor = () => {
+    switch (props.snackbarMsgType){
+      case 'error':
+        return '#e3000c';
+      case 'success':
+        return '#00a73e';
+      case 'warning':
+        return '#ff9f00'
+      default: 
+        return '#e3000c';
+    }
+  } 
+
+  const snackbarStyles = {
+    fontWeight: '700',
+    fontSize: '0.8rem',
+    color: getTextColor()
+  }
 
   return (
     <div>
@@ -25,7 +48,7 @@ export default function PositionedSnackbar(props) {
         ContentProps={{
           'aria-describedby': 'message-id',
         }}
-        message={<span id="message-id">{props.messageInfo}</span>}
+        message={<span id="message-id" style={snackbarStyles}>{props.snackbarMsg}</span>}
       />
     </div>
   );
