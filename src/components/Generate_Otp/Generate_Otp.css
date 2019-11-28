@@ -1,6 +1,15 @@
-.generate-otp__grid {
+/* .generate-otp__grid {
     text-align: center;
     width: 100vw;
+} */
+
+.generate-otp__grid {
+  width: 400px;
+  height: 300px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .paper {
@@ -20,13 +29,12 @@
 
 .buttons_div__otp {
   margin-top: 16px;
-  margin-left: 30%;
-  width: 40%;
-  display: flex;
-  flex: 1;
-  justify-content: space-evenly;
-  align-items: center;
 }
+
+.buttons_div__otp button {
+  margin: 0 10px;
+}
+
 
 .call_button {
   display: none !important;
@@ -35,4 +43,23 @@
 .otpTime {
   font-weight: 700;
   color: #00236e;
+}
+
+@media(max-width: 640px){
+    .generate-otp__grid {
+        width: 90%;
+    }
+
+    p.default_text {
+        font-size: 14px;
+        line-height: 20px;
+        margin: 0;
+        padding: 0 20px;
+    }
+    
+    .MuiButton-label {
+        font-size: 11px;
+    }
+
+
 }

@@ -8,6 +8,7 @@ import Button from '@material-ui/core/Button';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
+import './Declaration.css';
 
 class Declaration extends Component {
 
@@ -50,7 +51,7 @@ class Declaration extends Component {
                             I confirm that all the content / information therein are truea and correct to the best of my knowledge and belief.`;
 
         return (
-            <Grid container justify="center">
+            <Grid container justify="center" className="cstm-wrap">
                 <Grid item xs={12} sm={8}>
                     <LinearProgress  style={{ visibility: this.state.proceeding ? 'visible': 'hidden' }} />
                     <Card style={{padding: '8px'}}>

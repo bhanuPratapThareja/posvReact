@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { headers } from './../../api/headers';
+import { verifyHeader, appHeaders } from './../../api/headers';
 import './Verify.css';
 import Loader from './../Loader/Loader';
 import { getApiData } from './../../api/api';
@@ -14,6 +14,7 @@ class Verify extends Component {
             verificationError: false,
             errorMsg: undefined
         }
+        localStorage.clear();
     }
 
     componentDidMount() {
@@ -29,43 +30,47 @@ class Verify extends Component {
 
     verifyUser = async txnId => {
         const { url, body } = getApiData('verifyUser');
-        // body.request.payload.posvRefNumber = txnId;
         try {
-            const response = await axios.post(url, body, { headers })
-            console.log('reaponse: ', response)
-            if(response.data.response.payload.isLinkValid){
-                localStorage.setItem('posvRefNumber', response.data.response.payload.posvRefNumber)
-                this.props.history.push('/selfie')
+            const response = await axios.post(url, body, { headers: verifyHeader })
+            const { posvRefNumber, authToken, businessMsg, isLinkValid } = response.data.response.payload;
+
+            if (isLinkValid) {
+                localStorage.setItem('posvRefNumber', posvRefNumber)
+                localStorage.setItem('authToken', authToken)
+                appHeaders.headers = authToken;
+                this.props.history.push('/generate_otp');
             } else {
-                this.setState({ verificationError: true })    
+                this.setState({ verificationError: true, errorMsg: businessMsg })
             }
-            
         } catch (err) {
+            console.log(err)
             this.setState({ verificationError: true })
         }
     }
 
     retryVerification = () => {
-        this.setState({ verificationError: false })  
+        this.setState({ verificationError: false })
         this.startLoad();
     }
 
     render() {
         return (
-            <div className="verify_user">
-                {!this.state.verificationError ? <div>
-                    <Loader />
-                    <div>
-                        Please wait ...
-                    </div>
-                </div>: null}
-                {this.state.verificationError ? <div>
-                    <Error
-                        errorMsg={"Error"}
-                        errorFunction={this.retryVerification}
-                        buttonText={"Retry"}
-                    />
-                </div> : null}
+            <div className="cstm-wrap">
+                <div className="verify_user">
+                    {!this.state.verificationError ? <div>
+                        <Loader />
+                        <div className="loading_text">
+                            Please wait ...
+                        </div>
+                    </div> : null}
+                    {this.state.verificationError ? <div>
+                        <Error
+                            errorMsg={this.state.errorMsg}
+                            errorFunction={this.retryVerification}
+                            buttonText={"Retry"}
+                        />
+                    </div> : null}
+                </div>
             </div>
         )
     }

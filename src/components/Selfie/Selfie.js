@@ -43,8 +43,10 @@ export default class Selfie extends Component {
         video.addEventListener('play', () => {
             console.log('here')
             const canvas = faceapi.createCanvasFromMedia(video);
+            const booth = document.getElementById('booth');
             const selfie_page = document.getElementById('selfie_page');
-            selfie_page.append(canvas)
+            const video = document.getElementById('video')
+            video.insertBefore(canvas, video)
             const displaySize = { width: video.width, height: video.height };
             faceapi.matchDimensions(canvas, displaySize)
             setInterval(async () => {
@@ -106,19 +108,21 @@ export default class Selfie extends Component {
                     <div className="canvas">
                         {this.state.pictureTaken ? <canvas id="canvas" {...imgStyles}></canvas> : null}
                     </div>
-                    <div style={{ width: '320px' }}>
-                        {!this.state.pictureTaken ? <Button onClick={(event) => this.takeSelfie(event)} variant="contained" id="selfie_button" className="default_button" style={{ width: '320px' }}>
+                    <div>
+                        {!this.state.pictureTaken ? <Button onClick={(event) => this.takeSelfie(event)} variant="contained" id="selfie_button" className="cstm-btn">
                             {buttonText}
                         </Button> : null}
-                        {this.state.pictureTaken ? <Button onClick={this.submitSelfie} variant="contained" className="default_button" style={{ width: '320px' }}>
+                        {this.state.pictureTaken ? <Button onClick={this.submitSelfie} variant="contained" className="cstm-btn" style={{ width: '320px' }}>
                             Submit
                     </Button> : null}
                     </div>
-                    
-                    
                         
                 </div>
-
+                <div className="cstm-txt">
+                    What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesetting industry Lorem Ipsum has been the industry's 
+                    standard dummy text ever since the 1500s when an unknown printer took a galley of type and scrambled it to make a type specimen
+                    book it has
+                </div>
                 
                
             </div>

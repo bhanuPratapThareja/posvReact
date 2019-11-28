@@ -1,17 +1,28 @@
 .selfie_page {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    max-width: 100%;
+    text-align: center;
     position: absolute;
+    height: 100vh;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 20%;
+    bottom: 0;
 }
 
-.booth {
-   margin-top: 70px;
-   border: 8px solid lightgray;
+.selfie_page .booth {
+    max-width: 320px;
+    border-radius:  5px;
+    margin:  0 auto;
+    border: 3px solid #ccc;
+}
+
+.cstm-txt {
+    font-size: 13px;
+    line-height: 19px;
+    padding: 0 10px;
+    max-width: 600px;
+    margin: 20px auto;
 }
 
 .selfie_button {
@@ -20,4 +31,30 @@
 
 canvas {
     position: absolute;
+}
+
+button.cstm-btn {
+    margin: 15px 0;
+    transition: all ease 0.5s;
+}
+
+button.cstm-btn:hover {
+    background: #0c2d52;
+    color: #fff;
+}
+
+@media(max-width: 640px){
+
+    .selfie_page .booth {
+        max-width: 80%;
+    }
+
+    video#video {
+        width:  100%;
+    }
+
+    .cstm-txt {
+        max-width: 90%;
+    }
+
 }

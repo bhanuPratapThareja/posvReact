@@ -1,10 +1,16 @@
 import React from 'react';
+import Button from '@material-ui/core/Button';
 
 export default Error = props => {
     return (
-        <div style={{ marginTop: '70px' }}>
+        <div className="cstm-wrap">
             {props.errorMsg}
-            <button onClick={props.errorFunction}>{props.buttonText}</button>
+            <Button
+                variant="contained"
+                onClick={props.errorFunction}
+                className="default_button">
+                {props.buttonText}
+            </Button>
         </div>
     )
 }
