@@ -22,9 +22,7 @@ class App extends Component {
   }
 
   showMessageInScackbar = ({showSnackbar, snackbarMsgType, snackbarMsg}) => {
-    this.setState({ showSnackbar, snackbarMsgType, snackbarMsg }, () => {
-
-    })
+    this.setState({ showSnackbar, snackbarMsgType, snackbarMsg })
   }
 
   closeSnackbar = () => {
@@ -50,7 +48,7 @@ class App extends Component {
           <Route path='/generate_otp' render={props => <Generate_Otp {...props} showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />} />
           <Route path='/selfie' component={Selfie} />
           <Route path='/declaration' render={props => <Declaration {...props}  />} showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />
-          <Route path='/thankyou' component={Thankyou} />
+          <Route path='/thankyou' render={props => <Thankyou {...props } showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />} />
           <Route path='/error' component={Error} />
         </Switch>
       </BrowserRouter>

@@ -14,7 +14,6 @@ class Verify extends Component {
             verificationError: false,
             errorMsg: undefined
         }
-        localStorage.clear();
     }
 
     componentDidMount() {
@@ -30,10 +29,15 @@ class Verify extends Component {
 
     verifyUser = async txnId => {
         const { url, body } = getApiData('verifyUser');
+        body.request.payload.posvRefNumber = txnId;
         try {
             const response = await axios.post(url, body, { headers: verifyHeader })
+            console.log(response)
+            if(response.data.errorMessage){
+                this.setState({ verificationError: true, errorMsg: 'Invalid Transaction ID' })
+                return
+            }
             const { posvRefNumber, authToken, businessMsg, isLinkValid } = response.data.response.payload;
-
             if (isLinkValid) {
                 localStorage.setItem('posvRefNumber', posvRefNumber)
                 localStorage.setItem('authToken', authToken)
