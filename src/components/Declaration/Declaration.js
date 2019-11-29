@@ -9,6 +9,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
 import './Declaration.css';
+import { appHeaders } from './../../api/headers';
 
 class Declaration extends Component {
 
@@ -26,22 +27,27 @@ class Declaration extends Component {
 
     proceed = async () => {
         this.setState({ proceeding: true });
-        const { url, data } = getApiData('getotp');
-        const headers = { 'x-api-key': 'U8eL0A3syl3wPN0U1tMuN7OJH66cXw0llUlC4deg' }
-
-        console.log(url)
-        console.log(data)
-        console.log(headers)
+        const { url, body } = getApiData('declaration');
+        body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
+        body.request.payload.authToken = localStorage.getItem('authToken');
+        body.request.payload.customerDisclaimer = 'Agreed';
+        const headers = { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
 
         try {
-            const response = await axios.post(url, data, { headers })
+            await axios.post(url, body, { headers });
+            this.props.history.push('/thankyou');
         } catch (err) {
-            console.log('err: ', err)
+            this.handleSnackbar(true, 'error', 'Something went wrong. Please try again')
         } finally {
             setTimeout(() => {
                 this.setState({ proceeding: false });
             }, 4000);
         }
+    }
+
+    handleSnackbar = (showSnackbar, snackbarMsgType, snackbarMsg) => {
+        const options = { showSnackbar, snackbarMsgType, snackbarMsg }
+        this.props.showMessageInScackbar(options)
     }
 
     render() {
@@ -51,38 +57,40 @@ class Declaration extends Component {
                             I confirm that all the content / information therein are truea and correct to the best of my knowledge and belief.`;
 
         return (
-            <Grid container justify="center" className="cstm-wrap">
-                <Grid item xs={12} sm={8}>
-                    <LinearProgress  style={{ visibility: this.state.proceeding ? 'visible': 'hidden' }} />
-                    <Card style={{padding: '8px'}}>
-                        <CardContent>
-                            <h4 style={{ textAlign: 'center' }}>Declaration</h4>
-                            <Typography variant="body2" color="textSecondary" component="p">
-                                {declaration}
-                            </Typography>
+            <>
+                <LinearProgress style={{ visibility: this.state.proceeding ? 'visible' : 'hidden' }} />
+                <Grid container justify="center" className="cstm-wrap">
+                    <Grid item xs={12} sm={8}>
+                        <Card style={{ padding: '8px' }}>
+                            <CardContent>
+                                <h4 style={{ textAlign: 'center' }}>Declaration</h4>
+                                <Typography variant="body2" color="textSecondary" component="p">
+                                    {declaration}
+                                </Typography>
 
-                            <Checkbox
-                                value={this.state.checked}
-                                onChange={event => this.handleChange(event.target.checked)}
-                                color="default"
-                                disabled={this.state.proceeding}
-                            />
-                            <label>I agree</label>
+                                <Checkbox
+                                    value={this.state.checked}
+                                    onChange={event => this.handleChange(event.target.checked)}
+                                    color="default"
+                                    disabled={this.state.proceeding}
+                                />
+                                <label>I agree</label>
 
-                            <div style={{ textAlign: 'center' }}>
-                                <Button 
-                                    variant="contained" 
-                                    onClick={this.proceed} 
-                                    className="default_button" 
-                                    disabled={!this.state.checked || this.state.proceeding}>
-                                    Proceed
+                                <div style={{ textAlign: 'center' }}>
+                                    <Button
+                                        variant="contained"
+                                        onClick={this.proceed}
+                                        className="default_button"
+                                        disabled={!this.state.checked || this.state.proceeding}>
+                                        Proceed
                                 </Button>
-                                {/* <CircularProgress style={{ display: this.state.proceeding ? 'inline-block': 'none' }} /> */}                           
+                                    {/* <CircularProgress style={{ display: this.state.proceeding ? 'inline-block': 'none' }} /> */}
                                 </div>
-                        </CardContent>
-                    </Card>
+                            </CardContent>
+                        </Card>
+                    </Grid>
                 </Grid>
-            </Grid>
+            </>
         )
     }
 }

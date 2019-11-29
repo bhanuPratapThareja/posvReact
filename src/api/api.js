@@ -21,7 +21,12 @@ const api = {
         validateOtp: {
             uatUrl: 'Stage/validateotp',
             prodUrl: 'prod/validateotp',
-            body: { "request": { "header": { "correlationId": "25478965874", "appId": "ABC" }, "payload": { "posvRefNumber": "", "otp": "", "authToken": "" } } },
+            body: { "request": { "header": { "correlationId": "25478965874", "appId": "ABC" }, "payload": { "posvRefNumber": "", "otp": "", "authToken": "" } } }
+        },
+        declaration: {
+            uatUrl: 'Stage/customer-disclaimer',
+            prodUrl: 'prod/customer-disclaimer',
+            body: { "request": { "header": { "correlationId": "25478965874", "appId": "ABC" }, "payload": { "posvRefNumber": "", "customerDisclaimer": "", "authToken": "" } } }
         }
     }
 }

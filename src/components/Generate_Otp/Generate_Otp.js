@@ -25,7 +25,8 @@ class Generate_Otp extends Component {
     }
 
     componentDidMount() {
-        document.addEventListener('keyup', this.inputFunction)
+        document.addEventListener('keyup', this.inputFunction);
+        document.getElementsByClassName('input_otp')[0].focus();
     }
 
     inputFunction = () => {
@@ -55,7 +56,7 @@ class Generate_Otp extends Component {
         const { url, body } = getApiData('getotp');
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
-        const headers = appHeaders.headers;
+        const headers = { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
         try {
             const response = await axios.post(url, body, { headers })
             console.log('reaponse: ', response)
@@ -88,22 +89,20 @@ class Generate_Otp extends Component {
         body.request.payload.otp = otp;
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
-        console.log(body)
-        const headers = appHeaders.headers;
-        console.log(headers)
+        const headers = { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+        
         try {
             const response = await axios.post(url, body, { headers })
-            console.log(response)
             if(response.data.response.messageInfo.msgCode == 700){
                 this.handleSnackbar(true, 'error', response.data.response.messageInfo.msgDescription)
                 return
             }
-            this.props.history.push('/thankyou')
+            this.props.history.push('/declaration')
         } catch (err) {
             console.log(err)
+            this.setState({ submitting: false })
             this.handleSnackbar(true, 'error', 'Something went wrong. Please check otp and try again')
-        }
-        finally {
+        } finally {
             this.setState({ submitting: false })
         }
     }
