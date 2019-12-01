@@ -39,6 +39,10 @@ class Generate_Otp extends Component {
     }
 
     generateOtp = async (type) => {
+
+        var CancelToken = axios.CancelToken;
+        var call1 = CancelToken.source();
+
         this.setState({ generatingOtp: true, otpButtonText: 'Regenerate' }, () => {
             if (this.state.callAttemptsSuccess <= 3) {
                 this.setState({ showCallButton: true })
@@ -58,8 +62,9 @@ class Generate_Otp extends Component {
         body.request.payload.authToken = localStorage.getItem('authToken');
         const headers = { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
         try {
-            const response = await axios.post(url, body, { headers })
+            const response = await axios.post(url, body, { headers, cancelToken: call1.token })
             console.log('reaponse: ', response)
+            call1.cancel();
             if (type === 'call') {
                 this.setState({ callAttemptsSuccess: this.state.callAttemptsSuccess + 1 }, () => {
                     if (this.state.callAttemptsSuccess >= 3) {
@@ -90,13 +95,14 @@ class Generate_Otp extends Component {
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
         const headers = { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
-        
+
         try {
             const response = await axios.post(url, body, { headers })
-            if(response.data.response.messageInfo.msgCode == 700){
+            if (response.data.response.messageInfo.msgCode == 700) {
                 this.handleSnackbar(true, 'error', response.data.response.messageInfo.msgDescription)
                 return
             }
+            document.removeEventListener('keyup', this.inputFunction)
             this.props.history.push('/declaration')
         } catch (err) {
             console.log(err)
@@ -112,12 +118,8 @@ class Generate_Otp extends Component {
     }
 
     handleSnackbar = (showSnackbar, snackbarMsgType, snackbarMsg) => {
-        const options ={ showSnackbar, snackbarMsgType, snackbarMsg }
+        const options = { showSnackbar, snackbarMsgType, snackbarMsg }
         this.props.showMessageInScackbar(options)
-    }
-
-    componentWillUnmount() {
-        document.removeEventListener('keyup', this.inputFunction)
     }
 
     render() {
