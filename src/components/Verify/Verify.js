@@ -21,7 +21,12 @@ class Verify extends Component {
     }
 
     startLoad = () => {
-        const txnId = window.location.search.split("=")[1];
+        const txnId = this.props.txnId;
+        if(!txnId){
+            this.props.history.push('/customer_feedback/health');
+            // this.setState({ verificationError: true, errorMsg: 'No transaction ID found' })
+            return
+        }
         this.setState({ txnId }, () => {
             this.verifyUser(txnId);
         })
@@ -53,6 +58,7 @@ class Verify extends Component {
     }
 
     retryVerification = () => {
+        console.log('test')
         this.setState({ verificationError: false })
         this.startLoad();
     }
