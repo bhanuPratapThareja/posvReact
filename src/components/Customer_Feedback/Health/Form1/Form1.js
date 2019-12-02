@@ -4,9 +4,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormHelperText from '@material-ui/core/FormHelperText';
+import FormGroup from '@material-ui/core/FormGroup';
 import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
 
 const useStyles = makeStyles(theme => ({
     formControl: {
@@ -20,14 +23,12 @@ const useStyles = makeStyles(theme => ({
 
 export default function (props) {
     const classes = useStyles();
-    const [age, setAge] = React.useState('');
-    const handleChange = event => {
-        setAge(event.target.value);
-        props.handleChange(event, 'something')
-        setTimeout(() => {
-            console.log(React.state)
-        }, 500);
+
+    const handleChange = (event, tag) => {
+        event.stopPropagation();
+        props.handleChange(event, tag)
     };
+
     return (
         <form id="healthForm">
             <fieldset onChange={event => props.handleChange(event, 'diabetes')}>
@@ -41,7 +42,7 @@ export default function (props) {
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
                             value=""
-                            onChange={handleChange}
+                            onChange={(event) => handleChange(event, 'managingDiabetesThrough')}
                         >
                             <MenuItem value={1}>Oral medication</MenuItem>
                             <MenuItem value={2}>Insulin</MenuItem>
@@ -55,7 +56,7 @@ export default function (props) {
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
                             value=""
-                            onChange={handleChange}
+                            onChange={(event) => handleChange(event, 'diabeticSince')}
                         >
                             <MenuItem value={1}>{"< 5yrs"}</MenuItem>
                             <MenuItem value={2}>5-10 yrs</MenuItem>
@@ -63,11 +64,16 @@ export default function (props) {
                         </Select>
                     </FormControl>
 
-                    <p>Any history of diabetes related complications?<span>*</span></p>
-                    <input type="radio" name="complications" value="yes" /> Yes
-                    <input type="radio" name="complications" value="no" /> No
+                    <FormControl className={classes.formControl} onChange={(event) => handleChange(event, 'complications')}>
+                        <p>Any history of diabetes related complications?<span>*</span></p>
+                        <input type="radio" name="complications" value="yes" /> Yes
+                        <input type="radio" name="complications" value="no" /> No
+                    </FormControl>
 
-                    <TextField id="standard-basic" label="Anything else please specify" />
+                    <FormControl className={classes.formControl} onChange={(event) => handleChange(event, 'specify')}>
+                        <TextField id="standard-basic" label="Anything else please specify" />
+                    </FormControl>
+
                 </div> : null}
             </fieldset>
 
@@ -75,6 +81,19 @@ export default function (props) {
                 <p>Hypertension/ High Blood Pressure, High Cholesterol or Thyroid disorder<span>*</span></p>
                 <input type="radio" name="hypertension" value="yes" /> Yes
                 <input type="radio" name="hypertension" value="no" /> No
+                {props.showHypertentionExtraQuestions ? <div>
+                    <FormGroup row>
+                        <FormControlLabel control={
+                            <Checkbox
+                                onChange={handleChange('checkedB')}
+                                value="checkedB"
+                                color="primary"
+                            />
+                        }
+                            label="HTN/high Blood pressure but under control through medication."
+                        />
+                    </FormGroup>
+                </div> : null}
             </fieldset>
 
             <fieldset onChange={event => props.handleChange(event, 'vascularDisorder')}>
