@@ -13,8 +13,9 @@ class Health extends Component {
         super();
         this.state = {
             showForm: 'form1',
-            diabetes: undefined,
-            showDiabetesExtraQuestions: false
+            showDiabetesExtraQuestions: false,
+            showHypertentionExtraQuestions: false,
+             
         }
     }
 
@@ -27,6 +28,7 @@ class Health extends Component {
     }
 
     handleChange = (e, tag) => {
+        console.log(tag)
         this.setState({
             [tag]: e.target.value
         }, () => {
@@ -34,8 +36,11 @@ class Health extends Component {
             if(this.state.diabetes === "yes"){
                 this.setState({showDiabetesExtraQuestions: true })
             }
-            if(this.state.diabetes === "no"){
+            if(this.state.diabetes === "no" || this.state.diabetes === undefined){
                 this.setState({showDiabetesExtraQuestions: false })
+            }
+            if(this.state.hypertension === "yes"){
+                this.setState({showHypertentionExtraQuestions: true })
             }
         })
     }
@@ -60,6 +65,7 @@ class Health extends Component {
 
                 {this.state.showForm == 'form1' ? <Form1
                     showDiabetesExtraQuestions={this.state.showDiabetesExtraQuestions}
+                    showHypertentionExtraQuestions={this.state.showHypertentionExtraQuestions}
                     handleChange={this.handleChange} 
                 /> : null}
                 

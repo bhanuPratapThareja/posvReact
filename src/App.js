@@ -11,6 +11,8 @@ import Thankyou from './components/Thankyou/Thankyou';
 import Error from './components/Error/Error';
 import Snackbar from './components/Snackbar/Snackbar';
 import Customer_Feedback from './components/Customer_Feedback/Customer_Feedback';
+// import Health from './components/Customer_Feedback/Health/Health';
+import Pdf from './components/Pdf/Pdf';
 
 class App extends Component {
   constructor() {
@@ -35,7 +37,12 @@ class App extends Component {
   }
 
   render() {
-    const txnId = window.location.search.split("=")[1];
+    let [param, txnId] = window.location.search.split("=");
+    param = param.substr(1)
+    let redirectRoute = '/verify_user';
+    if(param === 'pdf'){
+      redirectRoute = '/pdf'
+    }
     return (
       <BrowserRouter>
         <Header />
@@ -45,8 +52,9 @@ class App extends Component {
           snackbarMsg={this.state.snackbarMsg}
         /> : null}
         <Switch>
-          <Redirect exact path='/' to='/verify_user' />
+          <Redirect exact path='/' to={redirectRoute} />
           <Route path='/verify_user' render={props => <Verify {...props} txnId={txnId} params={window.location.search} />} />
+          <Route path='/pdf' component={Pdf} />
           <Route path='/generate_otp' render={props => <Generate_Otp {...props} showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />} />
           <Route path='/selfie' component={Selfie} />
           <Route path='/declaration' render={props => <Declaration {...props}  />} showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />
