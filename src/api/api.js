@@ -36,7 +36,12 @@ const api = {
         getQuestions: {
             uatUrl: 'Stage/get-questions',
             prodUrl: 'prod/get-questions',
-            body: { "request": { "header": { "appId": "mpro", "correlationId": "25478965874" }, "payload": { "qstCatName": "PRODUCT", "qstSubCatName": null, "posvRefNumber": "4000052249", "qstCatNameNext": null, "qstCatNamePrevious": null, "LANG": "ENG", "authToken": "wtewe834jwe", "planCode": "EFGEP8" } } }
+            body: { "request": { "header": { "appId": "mpro", "correlationId": "25478965874" }, "payload": { "qstCatName": "", "qstSubCatName": null, "posvRefNumber": "4000052249", "qstCatNameNext": null, "qstCatNamePrevious": null, "LANG": "ENG", "authToken": "wtewe834jwe", "planCode": "EFGEP8" } } }
+        },
+        saveCustomerResponse: {
+            uatUrl: 'Stage/save-customer-response',
+            prodUrl: 'prod/save-customer-response',
+            body: { "request": { "header": { "appId": "mpro", "correlationId": "25478965874" }, "payload": { "customerResponse": { "qst": [] }, "qstCatName": "", "qstSubCatName": null, "posvRefNumber": "4000052249", "lang": "EN", "planCode": "EFGEP8", "qstCatNameNext": null, "qstSubCatNameNext": null, "qstCatNamePrevious": null, "qstSubCatNamePrevious": null, "authToken": "wtewe834jwe" } } }
         }
     }
 }

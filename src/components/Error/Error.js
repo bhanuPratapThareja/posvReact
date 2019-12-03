@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 // import RefreshIcon from '@material-ui/icons/Refresh';
 
-export default Error = props => {
+export default function Error(props) {
     const textStyles = {
         color: '#00236e',
         fontSize: '16px',

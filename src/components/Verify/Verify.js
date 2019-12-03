@@ -23,7 +23,6 @@ class Verify extends Component {
     startLoad = () => {
         const txnId = this.props.txnId;
         if(!txnId){
-            // this.props.history.push('/customer_feedback/health');
             this.setState({ verificationError: true, errorMsg: 'No transaction ID found' })
             return
         }
@@ -37,17 +36,25 @@ class Verify extends Component {
         body.request.payload.posvRefNumber = txnId;
         try {
             const response = await axios.post(url, body, { headers: verifyHeader })
-            console.log(response)
             if(response.data.errorMessage){
                 this.setState({ verificationError: true, errorMsg: 'Invalid Transaction ID' })
                 return
             }
-            const { posvRefNumber, authToken, businessMsg, isLinkValid } = response.data.response.payload;
+            const { posvRefNumber, authToken, businessMsg, isLinkValid, category } = response.data.response.payload;
             if (isLinkValid) {
                 localStorage.setItem('posvRefNumber', posvRefNumber)
                 localStorage.setItem('authToken', authToken)
                 appHeaders.headers = authToken;
-                this.props.history.push('/generate_otp');
+
+                if(category === 'selfie'){
+                    // this.props.history.push('/selfie');
+                    this.props.history.push('/customer_feedback/product');
+                } else if(category === 'product'){
+                    this.props.history.push('/customer_feedback/product');
+                } else {
+                    this.props.history.push('/pdf');
+                }
+
             } else {
                 this.setState({ verificationError: true, errorMsg: businessMsg })
             }
@@ -57,7 +64,6 @@ class Verify extends Component {
     }
 
     retryVerification = () => {
-        console.log('test')
         this.setState({ verificationError: false })
         this.startLoad();
     }
