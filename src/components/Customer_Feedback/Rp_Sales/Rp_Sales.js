@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form';
 import createInput from './../../../utils/createInputs';
 
-class Product extends Component {
+class RpSales extends Component {
     
     componentDidMount() {
         document.addEventListener('emitted', this.updateFunction)
@@ -18,14 +18,14 @@ class Product extends Component {
     }
 
     render() {
-        if (!this.props.productQuestions || this.props.productQuestions.length == '0') {
+        if (!this.props.rpSalesQuestions || this.props.rpSalesQuestions.length == '0') {
             return (
                 <div>Please wait</div>
             )
         }
         return (
             <form>
-                {this.props.productQuestions.map(question => {
+                {this.props.rpSalesQuestions.map(question => {
                     return (
                         <Field
                             label="Label"
@@ -44,5 +44,5 @@ class Product extends Component {
 }
 
 export default reduxForm({
-    form: 'productForm'
-})(Product);
+    form: 'rpSalesForm'
+})(RpSales);

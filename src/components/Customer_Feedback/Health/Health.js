@@ -12,7 +12,7 @@ class Health extends Component {
     constructor() {
         super();
         this.state = {
-            showForm: 'form1',
+            showForm: 'form3',
             showDiabetesExtraQuestions: false,
             showHypertentionExtraQuestions: false,
              

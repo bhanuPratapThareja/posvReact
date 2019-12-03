@@ -59,7 +59,7 @@ class App extends Component {
           <Route path='/selfie' component={Selfie} />
           <Route path='/declaration' render={props => <Declaration {...props}  />} showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />
           <Route path='/thankyou' render={props => <Thankyou {...props } showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />} />
-          <Route path='/customer_feedback/health' component={Customer_Feedback} />
+          <Route path='/customer_feedback' component={Customer_Feedback} />
           <Route path='/error' component={Error} />
         </Switch>
       </BrowserRouter>
