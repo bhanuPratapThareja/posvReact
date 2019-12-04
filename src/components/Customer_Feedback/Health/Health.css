@@ -1,6 +1,67 @@
+body {
+    background: #f9f9f9;
+}
+
 .health_page {
-    width: 100vw;
-    height: 100vh;
-    background-color: #f9f9f9;
+    padding: 20px 25px;
+    max-width: 900px;
+    margin: 20px auto;
+}
+
+.health_page .heading {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 22px;
     text-align: center;
+}
+
+.health_page .heading.one {
+    padding: 10px 0 0;
+}
+
+.health_page .heading.two {
+    padding:  0 0 20px;
+}
+
+.health_page form fieldset {
+    border:  none;
+    padding: 5px 0;
+}
+
+.health_page .default_button {
+    margin: 0 10px 0 0;
+}
+
+.health_page form fieldset label{
+    margin:0 10px 0 0;
+    cursor: pointer;
+}
+
+
+@media(max-width: 767px) {
+    .health_page {
+        padding: 0 15px;
+    }
+    
+    .health_page .heading {
+        font-size: 14px;
+        line-height: 20px;
+    }
+    
+    .health_page .heading.two {
+        padding: 0 0 10px;
+    }
+    
+    .health_page form fieldset {
+        font-size: 14px;
+    }
+    
+    .health_page form fieldset p {
+        margin: 10px 0;
+    }
+
+    .health_page p {
+        font-size: 14px;
+    }
+
 }

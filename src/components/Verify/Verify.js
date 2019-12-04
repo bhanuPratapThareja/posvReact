@@ -48,7 +48,7 @@ class Verify extends Component {
 
                 if(category === 'selfie'){
                     // this.props.history.push('/selfie');
-                    this.props.history.push('/customer_feedback/product');
+                    this.props.history.push('/customer_feedback/health');
                 } else if(category === 'product'){
                     this.props.history.push('/customer_feedback/product');
                 } else {
