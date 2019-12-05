@@ -1,28 +1,49 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { Field, reduxForm } from 'redux-form';
+import createInput from './../../../../utils/createInputs';
 
-export default function (props) {
-    return (
-        <form id="healthForm">
-            <fieldset onChange={event => props.handleChange(event, 'breathing')}>
-                <p>Breathing or lung disorders including asthma, emphysema, tuberculosis<span>*</span></p>
-                <input type="radio" name="breathing" value="yes" /> Yes
-                <input type="radio" name="breathing" value="no" /> No
-            </fieldset>
+class Form2 extends Component  {
 
-            <fieldset onChange={event => props.handleChange(event, 'jaundice')}>
-                <p>Liver or digestive system related disorder including jaundice ,gall bladder, pancreas. or Hepatitis B/C.<span>*</span></p>
-                <input type="radio" name="jaundice" value="yes" /> Yes
-                <input type="radio" name="jaundice" value="no" /> No
-            </fieldset>
+    componentDidMount() {
+        document.addEventListener('emitted', this.updateFunction)
+    }
 
-            <fieldset onChange={event => props.handleChange(event, 'std')}>
-                <p>Any abnormal growth like tumour,lump,cancer or blood disorder, including anemia or thalassaemia or Sexually transmitted disease ( STD ) including HIV or AIDS<span>*</span></p>
-                <input type="radio" name="std" value="yes" /> Yes
-                <input type="radio" name="std" value="no" /> No
-            </fieldset>
+    componentWillUnmount() {
+        document.removeEventListener('emitted', this.updateFunction)
+    }
 
+    updateFunction = (event) => {
+        const { qstId, value } = event.detail;
+        this.props.onUserAnswer(qstId, value)
+    }
 
+    render() {
+        if (!this.props.healthQuestions || this.props.healthQuestions.length == '0') {
+            return (
+                <div>Please wait</div>
+            )
+        }
 
-        </form>
-    )
+        return (
+            <form>
+                {this.props.healthQuestions.map(question => {
+                    return (
+                        <Field
+                            label="Label"
+                            name={question.qstId}
+                            type={question.qstOptType}
+                            key={question.qstId}
+                            question={question}
+                            component={createInput}
+                            customProps={this.props.onUserAnswer}
+                        />
+                    )
+                })}
+            </form>
+        )
+    }
 }
+
+export default reduxForm({
+    form: 'healthForm2'
+})(Form2);

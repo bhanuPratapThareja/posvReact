@@ -1,11 +1,11 @@
 import { combineReducers } from 'redux';
 import { UserReducer } from './user/reducer_user';
-import HealthReducer from './health/reducer_health';
+import { QuestionnairReducer } from './questionnair/reducer_questionair';
 import { reducer as formReducer } from 'redux-form';
 
 const rootReducer = combineReducers({
     user: UserReducer,
-    healthQuestions: HealthReducer,
+    questionnair: QuestionnairReducer,
     form: formReducer
 });
 

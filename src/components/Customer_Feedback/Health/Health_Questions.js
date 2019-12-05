@@ -57,7 +57,7 @@ export const healthQuestions = [
         "qstOpt": [
 
         ],
-        "qstOptType": "Text Field",
+        "qstOptType": "text",
         "qstPrtId": "H1",
         "qstSeq": "4-1",
         "qstText": "Any other, details",
@@ -83,7 +83,7 @@ export const healthQuestions = [
             "Yes",
             "No"
         ],
-        "qstOptType": "radio",
+        "qstOptType": "checkbox",
         "qstPrtId": "H2",
         "qstSeq": "1-2",
         "qstText": "HTN/high Blood pressure but under control through medication",
@@ -96,7 +96,7 @@ export const healthQuestions = [
             "Yes",
             "No"
         ],
-        "qstOptType": "radio",
+        "qstOptType": "checkbox",
         "qstPrtId": "H2",
         "qstSeq": "2-2",
         "qstText": "History high cholesterol but under control through medication",
@@ -109,7 +109,7 @@ export const healthQuestions = [
             "Yes",
             "No"
         ],
-        "qstOptType": "radio",
+        "qstOptType": "checkbox",
         "qstPrtId": "H2",
         "qstSeq": "3-2",
         "qstText": "History of Thyroid disorder but under control through medication",
@@ -121,7 +121,7 @@ export const healthQuestions = [
         "qstOpt": [
 
         ],
-        "qstOptType": "Text Field",
+        "qstOptType": "text",
         "qstPrtId": "H2",
         "qstSeq": "4-2",
         "qstText": "Any other, details",
@@ -160,7 +160,7 @@ export const healthQuestions = [
         "qstOpt": [
 
         ],
-        "qstOptType": "Text Field",
+        "qstOptType": "text",
         "qstPrtId": "H3",
         "qstSeq": "2-3",
         "qstText": "Any other, details",
@@ -225,7 +225,7 @@ export const healthQuestions = [
         "qstOpt": [
 
         ],
-        "qstOptType": "Text Field",
+        "qstOptType": "text",
         "qstPrtId": "H4",
         "qstSeq": "4-4",
         "qstText": "Any other, details",

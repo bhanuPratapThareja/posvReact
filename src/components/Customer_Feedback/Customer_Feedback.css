@@ -4,9 +4,15 @@
 
 .button_div {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
+    margin-bottom: 2rem;
 }
 
 .button_div > button {
     width: 25%;
+}
+
+.chevron {
+    font-size: 40px !important;
+    font-weight: 900 !important;
 }
