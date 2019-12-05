@@ -13,6 +13,7 @@ import Snackbar from './components/Snackbar/Snackbar';
 import Customer_Feedback from './components/Customer_Feedback/Customer_Feedback';
 import Health from './components/Customer_Feedback/Health/Health';
 import Pdf from './components/Pdf/Pdf';
+import Questionnair from './components/Questionnair/Questionnair';
 
 class App extends Component {
   constructor() {
@@ -60,7 +61,6 @@ class App extends Component {
           <Route path='/declaration' render={props => <Declaration {...props}  />} showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />
           <Route path='/thankyou' render={props => <Thankyou {...props } showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />} />
           <Route path='/customer_feedback' component={Customer_Feedback} />
-          <Route path='/customer_feedback/health' component={Health} />
           <Route path='/error' component={Error} />
         </Switch>
       </BrowserRouter>

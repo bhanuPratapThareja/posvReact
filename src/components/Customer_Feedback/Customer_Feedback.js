@@ -6,8 +6,9 @@ import Product from './Product/Product';
 import Psm from './Psm/Psm';
 import RpSales from './Rp_Sales/Rp_Sales';
 import Button from '@material-ui/core/Button';
-import { healthQuestions } from './Health/Health_Questions';
 import './Customer_Feedback.css';
+import { headers } from './../../api/headers';
+import Icon from '@material-ui/core/Icon';
 
 export default class Customer_Feedback extends Component {
     constructor() {
@@ -16,17 +17,15 @@ export default class Customer_Feedback extends Component {
             questions: [],
             parentQuestions: [],
             childQuestions: [],
-            currentPath: '',
-            healthForm: undefined
+            qstCatName: 'PRODUCT',
+            qstCatNameNext: '',
+            qstCatNamePrevious: '',
+            healthForm: 'form1'
         }
     }
     componentDidMount() {
-        this.startLoad()
-    }
-
-    startLoad = () => {
-        const currentPath = (this.props.history.location.pathname.split('/')[2]).toUpperCase();
-        this.setState({ currentPath }, () => {
+        let { state } = this.props.location;
+        this.setState({ qstCatName: 'product'.toUpperCase() }, () => {
             this.getQuestions();
         })
     }
@@ -39,44 +38,12 @@ export default class Customer_Feedback extends Component {
                 this.setState({
                     questions
                 }, () => {
-                    if (qstId.length === 2) {
+                    if (option.qstType === 'Primary') {
                         this.manageChildren(qstId, option.customerResponse)
                     }
                 })
             }
         })
-    }
-
-    getQuestions = async () => {
-        if (this.state.currentPath === 'HEALTH') {
-            const questions = [...healthQuestions];
-            let parentQuestions = [];
-            let childQuestions = [];
-            questions.forEach(question => {
-                if (question.qstId.length === 2) {
-                    parentQuestions.push(question)
-                }
-                if (question.qstId.length === 3) {
-                    childQuestions.push(question)
-                }
-            })
-            this.setState({ questions: parentQuestions, parentQuestions, childQuestions }, () => {
-                this.setState({ healthForm: 'form1' })
-            })
-        } else {
-            const { url, body } = getApiData('getQuestions');
-            body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
-            body.request.payload.authToken = localStorage.getItem('authToken');
-            body.request.payload.qstCatName = this.state.currentPath;
-            const headers = { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
-            try {
-                const response = await axios.post(url, body, { headers })
-                const questions = response.data.response.payload.customerResponse[0].qst;
-                this.setState({ questions })
-            } catch (err) {
-                console.log(err)
-            }
-        }
     }
 
     manageChildren = (qstId, custResponse) => {
@@ -104,87 +71,148 @@ export default class Customer_Feedback extends Component {
         }
     }
 
-    submitAnswers = async () => {
-        const { url, body } = getApiData('saveCustomerResponse')
-        const currentPath = this.state.currentPath;
+    getQuestions = async () => {
+        const { url, body } = getApiData('getQuestions');
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
-        body.request.payload.customerResponse.qst = [...this.state.questions]
-        body.request.payload.qstCatName = currentPath;
-        const headers = { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
-        console.log(body)
+        body.request.payload.qstCatName = this.state.qstCatName;
         try {
-            await axios.post(url, body, { headers })
-            if (currentPath === 'HEALTH') {
-                this.props.history.push('/customer_feedback/product');
-                this.loadNextPath()
-            }
-            if (currentPath === 'PRODUCT') {
-                this.props.history.push('/customer_feedback/psm');
-                this.loadNextPath()
-            } else if (currentPath === 'PSM') {
-                this.props.history.push('/customer_feedback/rpsales');
-                this.loadNextPath()
-            } else if (currentPath === 'RPSALES') {
-                this.props.history.push('/generate_otp');
-            }
+            const response = await axios.post(url, body, { headers })
+            const res = JSON.parse(JSON.stringify(response))
+            this.handleRsponse(res)
+        } catch (err) {
+            console.log(err)
+        }
+    }
 
+    handleRsponse = (response) => {
+        console.log('response: ', response.data.response.payload.customerResponse)
+        if (response && !response.data.response.payload.customerResponse) {
+            console.log('testing')
+            this.props.history.push('/generate_otp')
+            return;
+        }
+        const questions = [...response.data.response.payload.customerResponse[0].qst];
+        let parentQuestions = [];
+        let childQuestions = [];
+        questions.forEach(question => {
+            if (question.qstType === 'Primary') {
+                parentQuestions.push(question)
+            }
+            if (question.qstType === 'Secondary') {
+                childQuestions.push(question)
+            }
+        })
+        const { qstCatNamePrevious, qstCatName, qstCatNameNext } = response.data.response.payload;
+        const path = qstCatName;
+
+        let url = '';
+        if (path === 'HEALTH-1') {
+            url = '/customer_feedback/health';
+            this.setState({ healthForm: 'form1' })
+        } else if (path === 'PRODUCT') {
+            url = '/customer_feedback/product';
+        } else if (path === 'PSM') {
+            url = '/customer_feedback/psm';
+        } else if (path === 'RPSALES') {
+            url = '/customer_feedback/rpsales';
+        } else if (path === 'HEALTH-2') {
+            url = '/customer_feedback/health';
+            this.setState({ healthForm: 'form2' })
+        }
+        this.props.history.push(url);
+        this.setState({
+            questions: [...parentQuestions],
+            parentQuestions,
+            childQuestions,
+            qstCatNamePrevious,
+            qstCatName,
+            qstCatNameNext,
+        })
+    }
+
+    submitAnswers = async () => {
+        const { url, body } = getApiData('saveCustomerResponse')
+        const { qstCatName } = this.state;
+        body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
+        body.request.payload.authToken = localStorage.getItem('authToken');
+        body.request.payload.qstCatName = qstCatName;
+        body.request.payload.customerResponse.qstCatName = qstCatName;
+        body.request.payload.customerResponse.qst = [...this.state.questions]
+        try {
+            const response = await axios.post(url, body, { headers })
+            this.handleRsponse(response)
         } catch (err) {
             console.log(err)
         }
     }
 
     loadNextPath = () => {
-        this.setState({ questions: [] }, () => {
-            this.startLoad();
-        })
+        const path = this.state.qstCatName;
+        let url = '';
+        if (path === 'HEALTH-1') {
+            url = '/customer_feedback/health';
+        } else if (path === 'PRODUCT') {
+            url = '/customer_feedback/product';
+        } else if (path === 'PSM') {
+            url = '/customer_feedback/psm';
+        } else if (path === 'RPSALES') {
+            url = '/customer_feedback/rpsales';
+        } else if (path === 'GENERATE_OTP') {
+            url = '/generate_otp';
+        }
+        this.props.history.push(url);
+    }
+
+    gotToPage = (direction) => {
+        console.log(direction)
     }
 
     render() {
         return (
             <div className="cust_feedback--page">
                 <div style={{ textAlign: 'center' }}>
-                    {this.state.currentPath}
+                    {this.state.qstCatName}
                 </div>
 
-                {this.state.currentPath === 'HEALTH' ? <Health
+                {this.state.qstCatName === 'HEALTH-1' || this.state.qstCatName === 'HEALTH-2' ? <Health
                     healthQuestions={this.state.questions}
-                    healthForm={this.state.healthForm}
+                    healthForm={this.state.qstCatName}
                     onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
                 /> : null}
 
-                {this.state.currentPath === 'PRODUCT' ? <Product
+                {this.state.qstCatName === 'PRODUCT' ? <Product
                     productQuestions={this.state.questions}
                     onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
                 /> : null}
-                {this.state.currentPath === 'PSM' ? <Psm
+                {this.state.qstCatName === 'PSM' ? <Psm
                     psmQuestions={this.state.questions}
                     onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
                 /> : null}
-                {this.state.currentPath === 'RPSALES' ? <RpSales
+                {this.state.qstCatName === 'RPSALES' ? <RpSales
                     rpSalesQuestions={this.state.questions}
                     onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
                 /> : null}
 
                 <div className="button_div">
-                    <Button
-                        variant="contained"
+                    {this.state.qstCatNamePrevious ? <Icon
+                        color="primary"
+                        className="chevron"
+                        onClick={() => this.gotToPage('previous')}
+                    >chevron_left</Icon> : null}
 
-                        className="default_button">
-                        Prev
-                </Button>
-                <Button
+                    <Button
                         variant="contained"
                         onClick={this.submitAnswers}
                         className="default_button">
                         Submit
-                </Button>
-                    <Button
-                        variant="contained"
+                    </Button>
 
-                        className="default_button">
-                        Next
-                </Button>
+                    {this.state.qstCatNameNext ? <Icon
+                        color="primary"
+                        className="chevron"
+                        onClick={() => this.gotToPage('next')}
+                    >chevron_right</Icon> : null}
                 </div>
             </div>
         )

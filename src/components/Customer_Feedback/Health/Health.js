@@ -6,6 +6,7 @@ import Form2 from './Form2/Form2';
 
 class Health extends Component {
     render() {
+        console.log(this.props)
         if (!this.props.healthQuestions || this.props.healthQuestions.length == '0') {
             return (
                 <div>Please wait</div>
@@ -22,12 +23,14 @@ class Health extends Component {
                 </div>
 
                 {this.props.healthQuestions && this.props.healthQuestions.length > 0 ? <>
-                    {this.props.healthForm === 'form1' ? <Form1
+                    {this.props.healthForm === 'HEALTH-1' ? <Form1
                         healthQuestions={this.props.healthQuestions}
                         onUserAnswer={(value, qstId) => this.props.onUserAnswer(value, qstId)}
                     /> : null}
 
-                    {this.props.healthForm === 'form2' ? <Form2
+                    {this.props.healthForm === 'HEALTH-2' ? <Form2
+                        healthQuestions={this.props.healthQuestions}
+                        onUserAnswer={(value, qstId) => this.props.onUserAnswer(value, qstId)}
                     /> : null}
                 </> : null}
 

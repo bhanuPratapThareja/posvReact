@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { verifyHeader, appHeaders } from './../../api/headers';
+import { headers } from './../../api/headers';
 import './Verify.css';
 import Loader from './../Loader/Loader';
 import { getApiData } from './../../api/api';
@@ -22,7 +22,7 @@ class Verify extends Component {
 
     startLoad = () => {
         const txnId = this.props.txnId;
-        if(!txnId){
+        if (!txnId) {
             this.setState({ verificationError: true, errorMsg: 'No transaction ID found' })
             return
         }
@@ -35,8 +35,8 @@ class Verify extends Component {
         const { url, body } = getApiData('verifyUser');
         body.request.payload.posvRefNumber = txnId;
         try {
-            const response = await axios.post(url, body, { headers: verifyHeader })
-            if(response.data.errorMessage){
+            const response = await axios.post(url, body, { headers })
+            if (response.data.errorMessage) {
                 this.setState({ verificationError: true, errorMsg: 'Invalid Transaction ID' })
                 return
             }
@@ -44,23 +44,38 @@ class Verify extends Component {
             if (isLinkValid) {
                 localStorage.setItem('posvRefNumber', posvRefNumber)
                 localStorage.setItem('authToken', authToken)
-                appHeaders.headers = authToken;
-
-                if(category === 'selfie'){
-                    // this.props.history.push('/selfie');
-                    this.props.history.push('/customer_feedback/health');
-                } else if(category === 'product'){
-                    this.props.history.push('/customer_feedback/product');
-                } else {
-                    this.props.history.push('/pdf');
-                }
-
+                this.goToPage(category);
             } else {
                 this.setState({ verificationError: true, errorMsg: businessMsg })
             }
         } catch (err) {
             this.setState({ verificationError: true })
         }
+    }
+
+    goToPage = category => {
+        let url = '';
+        switch (category) {
+            case 'product':
+                url = '/customer_feedback/product';
+                break;
+            case 'health':
+                url = '/customer_feedback/health';
+                break;
+            case 'psm':
+                url = '/customer_feedback/psm';
+                break;
+            case 'rpsales':
+                url = '/customer_feedback/rpsales';
+                break;
+            case 'selfie':
+                url = '/customer_feedback/product';
+                break;
+            case 'pdf':
+                url = '/pdf';
+                break;
+        }
+        this.props.history.push(`${url}`, { category });
     }
 
     retryVerification = () => {
