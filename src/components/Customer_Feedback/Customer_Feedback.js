@@ -5,6 +5,7 @@ import Health from './Health/Health';
 import Product from './Product/Product';
 import Psm from './Psm/Psm';
 import RpSales from './Rp_Sales/Rp_Sales';
+import Cancer from './Cancer/Cancer';
 import Button from '@material-ui/core/Button';
 import './Customer_Feedback.css';
 import { headers } from './../../api/headers';
@@ -119,6 +120,8 @@ export default class Customer_Feedback extends Component {
         } else if (path === 'HEALTH-2') {
             url = '/customer_feedback/health';
             this.setState({ healthForm: 'form2' })
+        } else if(path === 'CANCER'){
+            url = '/customer_feedback/cancer';
         }
         this.props.history.push(url);
         this.setState({
@@ -169,6 +172,7 @@ export default class Customer_Feedback extends Component {
     }
 
     render() {
+        console.log(this.state)
         return (
             <div className="cust_feedback--page">
                 <div style={{ textAlign: 'center' }}>
@@ -191,6 +195,11 @@ export default class Customer_Feedback extends Component {
                 /> : null}
                 {this.state.qstCatName === 'RPSALES' ? <RpSales
                     rpSalesQuestions={this.state.questions}
+                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                /> : null}
+
+                {this.state.qstCatName === 'CANCER' ? <Cancer
+                    cancerQuestions={this.state.questions}
                     onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
                 /> : null}
 

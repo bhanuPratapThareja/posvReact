@@ -9,7 +9,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
 import './Declaration.css';
-import { appHeaders } from './../../api/headers';
+import { headers } from './../../api/headers';
 
 class Declaration extends Component {
 
@@ -31,7 +31,6 @@ class Declaration extends Component {
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
         body.request.payload.customerDisclaimer = 'Agreed';
-        const headers = { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
 
         try {
             await axios.post(url, body, { headers });

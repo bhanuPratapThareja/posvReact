@@ -5,7 +5,7 @@ import './Generate_Otp.css';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
-import { appHeaders } from './../../api/headers';
+import { headers } from './../../api/headers';
 import Otp from './Otp/Otp';
 
 class Generate_Otp extends Component {
@@ -39,10 +39,7 @@ class Generate_Otp extends Component {
     }
 
     generateOtp = async (type) => {
-
-        var CancelToken = axios.CancelToken;
-        var call1 = CancelToken.source();
-
+        console.log(type)
         this.setState({ generatingOtp: true, otpButtonText: 'Regenerate' }, () => {
             if (this.state.callAttemptsSuccess <= 3) {
                 this.setState({ showCallButton: true })
@@ -57,14 +54,16 @@ class Generate_Otp extends Component {
             }
         }, 1000);
 
-        const { url, body } = getApiData('getotp');
+        let { url, body } = getApiData('getotp');
+        body = JSON.parse(JSON.stringify(body))
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
-        const headers = { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+        if(type === 'call'){
+            body.request.payload.onCallOTP = 'Yes';
+        }
+
         try {
-            const response = await axios.post(url, body, { headers, cancelToken: call1.token })
-            console.log('reaponse: ', response)
-            call1.cancel();
+            const response = await axios.post(url, body, { headers })
             if (type === 'call') {
                 this.setState({ callAttemptsSuccess: this.state.callAttemptsSuccess + 1 }, () => {
                     if (this.state.callAttemptsSuccess >= 3) {
@@ -94,7 +93,6 @@ class Generate_Otp extends Component {
         body.request.payload.otp = otp;
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
-        const headers = { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
 
         try {
             const response = await axios.post(url, body, { headers })
@@ -105,7 +103,6 @@ class Generate_Otp extends Component {
             document.removeEventListener('keyup', this.inputFunction)
             this.props.history.push('/declaration')
         } catch (err) {
-            console.log(err)
             this.setState({ submitting: false })
             this.handleSnackbar(true, 'error', 'Something went wrong. Please check otp and try again')
         } finally {

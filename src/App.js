@@ -13,7 +13,7 @@ import Snackbar from './components/Snackbar/Snackbar';
 import Customer_Feedback from './components/Customer_Feedback/Customer_Feedback';
 import Health from './components/Customer_Feedback/Health/Health';
 import Pdf from './components/Pdf/Pdf';
-import Questionnair from './components/Questionnair/Questionnair';
+// import Questionnair from './components/Questionnair/Questionnair';
 
 class App extends Component {
   constructor() {
