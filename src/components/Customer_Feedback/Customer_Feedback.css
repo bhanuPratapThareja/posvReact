@@ -1,0 +1,12 @@
+.cust_feedback--page {
+    margin-top: 2rem;
+}
+
+.button_div {
+    display: flex;
+    justify-content: space-around;
+}
+
+.button_div > button {
+    width: 25%;
+}
