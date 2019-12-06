@@ -33,8 +33,8 @@ export default function createInput(field) {
 
                 <fieldset onChange={(event) => handleChange(event.target.value, qstId)}>
                     <p>{qstText}<span>*</span></p>
-                    <input type="radio" name={qstId} value="Yes" /> Yes
-                    <input type="radio" name={qstId} value="No" /> No
+                    <input type="radio" name={qstId} value="Yes" /> <label>Yes</label>
+                    <input type="radio" name={qstId} value="No" /> <label>No</label>
                 </fieldset>
             )
         case 'text':
@@ -59,8 +59,8 @@ export default function createInput(field) {
         case 'checkbox':
             return (
                     <fieldset onChange={(event) => handleChange(event.target.checked, qstId, 'checkbox')}>
-                        <p>{qstText}<span>*</span></p>
-                        <input type="checkbox" name={qstId}  />
+                        <p className="check-sec">{qstText}<span>*</span></p>
+                        <input type="checkbox" name={qstId} className="regular-checkbox" />
                     </fieldset>
                 )
         case 'textarea':

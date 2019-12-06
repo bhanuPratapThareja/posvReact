@@ -5,7 +5,6 @@ import createInput from './../../../utils/createInputs';
 class Cancer extends Component {
     
     componentDidMount() {
-        console.log('cancer mounter')
         document.addEventListener('emitted', this.updateFunction)
     }
 

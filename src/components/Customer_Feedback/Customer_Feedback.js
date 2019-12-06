@@ -9,7 +9,7 @@ import Cancer from './Cancer/Cancer';
 import Button from '@material-ui/core/Button';
 import './Customer_Feedback.css';
 import { headers } from './../../api/headers';
-import Icon from '@material-ui/core/Icon';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 export default class Customer_Feedback extends Component {
     constructor() {
@@ -21,10 +21,12 @@ export default class Customer_Feedback extends Component {
             qstCatName: 'PRODUCT',
             qstCatNameNext: '',
             qstCatNamePrevious: '',
-            healthForm: 'form1'
+            healthForm: 'form1',
+            proceeding: false
         }
     }
     componentDidMount() {
+        this.setState({ proceeding: true })
         let { state } = this.props.location;
         this.setState({ qstCatName: 'product'.toUpperCase() }, () => {
             this.getQuestions();
@@ -72,24 +74,24 @@ export default class Customer_Feedback extends Component {
         }
     }
 
-    getQuestions = async () => {
+    getQuestions = async (qstCatNamePrevious) => {
         const { url, body } = getApiData('getQuestions');
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
-        body.request.payload.qstCatName = this.state.qstCatName;
+        qstCatNamePrevious ? body.request.payload.qstCatName = qstCatNamePrevious : body.request.payload.qstCatName = this.state.qstCatName;
         try {
+            this.setState({ proceeding: false })
             const response = await axios.post(url, body, { headers })
             const res = JSON.parse(JSON.stringify(response))
             this.handleRsponse(res)
         } catch (err) {
+            this.setState({ proceeding: false })
             console.log(err)
         }
     }
 
     handleRsponse = (response) => {
-        console.log('response: ', response.data.response.payload.customerResponse)
         if (response && !response.data.response.payload.customerResponse) {
-            console.log('testing')
             this.props.history.push('/generate_otp')
             return;
         }
@@ -120,9 +122,10 @@ export default class Customer_Feedback extends Component {
         } else if (path === 'HEALTH-2') {
             url = '/customer_feedback/health';
             this.setState({ healthForm: 'form2' })
-        } else if(path === 'CANCER'){
-            url = '/customer_feedback/cancer';
+        } else if (path === 'CANCER') {
+            url = '/customer_feedback/cancer'
         }
+
         this.props.history.push(url);
         this.setState({
             questions: [...parentQuestions],
@@ -135,6 +138,7 @@ export default class Customer_Feedback extends Component {
     }
 
     submitAnswers = async () => {
+        this.setState({ proceeding: true })
         const { url, body } = getApiData('saveCustomerResponse')
         const { qstCatName } = this.state;
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
@@ -143,9 +147,11 @@ export default class Customer_Feedback extends Component {
         body.request.payload.customerResponse.qstCatName = qstCatName;
         body.request.payload.customerResponse.qst = [...this.state.questions]
         try {
+            this.setState({ proceeding: false })
             const response = await axios.post(url, body, { headers })
             this.handleRsponse(response)
         } catch (err) {
+            this.setState({ proceeding: false })
             console.log(err)
         }
     }
@@ -163,67 +169,77 @@ export default class Customer_Feedback extends Component {
             url = '/customer_feedback/rpsales';
         } else if (path === 'GENERATE_OTP') {
             url = '/generate_otp';
+        } else if (path === 'CANCER') {
+            url = '/customer_feedback/cancer'
         }
         this.props.history.push(url);
     }
 
     gotToPage = (direction) => {
-        console.log(direction)
+        if (direction === 'previous') {
+            this.getQuestions(this.state.qstCatNamePrevious)
+        } else {
+            this.submitAnswers()
+        }
+    }
+
+    getPageName(tag) {
+        if (tag === 'HEALTH-1' || tag === 'HEALTH-2') {
+            return 'Health'
+        }
+        return tag.toLowerCase();
     }
 
     render() {
-        console.log(this.state)
         return (
-            <div className="cust_feedback--page">
-                <div style={{ textAlign: 'center' }}>
-                    {this.state.qstCatName}
+            <>
+                <LinearProgress style={{ visibility: this.state.proceeding ? 'visible' : 'hidden' }} />
+                <div className="cust_feedback--page">
+                    <div style={{ textAlign: 'center', textTransform: 'capitalize' }}>
+                        {this.getPageName(this.state.qstCatName)} Related Questions
+                    </div>
+
+                    {this.state.qstCatName === 'HEALTH-1' || this.state.qstCatName === 'HEALTH-2' ? <Health
+                        healthQuestions={this.state.questions}
+                        healthForm={this.state.qstCatName}
+                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                    /> : null}
+
+                    {this.state.qstCatName === 'PRODUCT' ? <Product
+                        productQuestions={this.state.questions}
+                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                    /> : null}
+                    {this.state.qstCatName === 'PSM' ? <Psm
+                        psmQuestions={this.state.questions}
+                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                    /> : null}
+                    {this.state.qstCatName === 'RPSALES' ? <RpSales
+                        rpSalesQuestions={this.state.questions}
+                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                    /> : null}
+                    {this.state.qstCatName === 'CANCER' ? <Cancer
+                        cancerQuestions={this.state.questions}
+                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                    /> : null}
+
+                    <div className="button_div">
+
+                        {this.state.qstCatNamePrevious ? <Button
+                            variant="contained"
+                            onClick={() => this.gotToPage('previous')}
+                            className="default_button">
+                            Previous
+                    </Button> : null}
+
+                        <Button
+                            variant="contained"
+                            onClick={() => this.gotToPage('next')}
+                            className="default_button">
+                            Next
+                        </Button>
+                    </div>
                 </div>
-
-                {this.state.qstCatName === 'HEALTH-1' || this.state.qstCatName === 'HEALTH-2' ? <Health
-                    healthQuestions={this.state.questions}
-                    healthForm={this.state.qstCatName}
-                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                /> : null}
-
-                {this.state.qstCatName === 'PRODUCT' ? <Product
-                    productQuestions={this.state.questions}
-                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                /> : null}
-                {this.state.qstCatName === 'PSM' ? <Psm
-                    psmQuestions={this.state.questions}
-                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                /> : null}
-                {this.state.qstCatName === 'RPSALES' ? <RpSales
-                    rpSalesQuestions={this.state.questions}
-                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                /> : null}
-
-                {this.state.qstCatName === 'CANCER' ? <Cancer
-                    cancerQuestions={this.state.questions}
-                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                /> : null}
-
-                <div className="button_div">
-                    {this.state.qstCatNamePrevious ? <Icon
-                        color="primary"
-                        className="chevron"
-                        onClick={() => this.gotToPage('previous')}
-                    >chevron_left</Icon> : null}
-
-                    <Button
-                        variant="contained"
-                        onClick={this.submitAnswers}
-                        className="default_button">
-                        Submit
-                    </Button>
-
-                    {this.state.qstCatNameNext ? <Icon
-                        color="primary"
-                        className="chevron"
-                        onClick={() => this.gotToPage('next')}
-                    >chevron_right</Icon> : null}
-                </div>
-            </div>
+            </>
         )
     }
 }

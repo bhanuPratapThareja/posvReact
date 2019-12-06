@@ -42,10 +42,8 @@ export default class Selfie extends Component {
 
         video.addEventListener('play', () => {
             console.log('here')
-            const canvas = faceapi.createCanvasFromMedia(video);
-            const booth = document.getElementById('booth');
-            const selfie_page = document.getElementById('selfie_page');
             const video = document.getElementById('video')
+            const canvas = faceapi.createCanvasFromMedia(video);
             video.insertBefore(canvas, video)
             const displaySize = { width: video.width, height: video.height };
             faceapi.matchDimensions(canvas, displaySize)

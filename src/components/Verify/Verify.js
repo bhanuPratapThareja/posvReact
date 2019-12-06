@@ -18,7 +18,6 @@ class Verify extends Component {
 
     componentDidMount() {
         this.startLoad();
-        // this.props.history.push({ pathname: 'verify_user', search: '?color=blue'})
     }
 
     startLoad = () => {
@@ -55,33 +54,32 @@ class Verify extends Component {
     }
 
     goToPage = category => {
-        let path = '/customer_feedback/';
-        let url;
+        let url = '';
         switch (category) {
+            case 'product':
+                url = '/customer_feedback/product';
+                break;
+            case 'health':
+                url = '/customer_feedback/health';
+                break;
+            case 'psm':
+                url = '/customer_feedback/psm';
+                break;
+            case 'rpsales':
+                url = '/customer_feedback/rpsales';
+                break;
+            case 'cancer':
+                 url = '/customer_feedback/cancer';
+                 break;
+            case 'selfie':
+                url = '/customer_feedback/product';
+                break;
             case 'pdf':
                 url = '/pdf';
                 break;
-            default:
-                url = `/customer_feedback/product`
-
         }
         this.props.history.push(`${url}`, { category });
     }
-
-    // goToUrl = category => {
-    //     let path = '/customer_feedback';
-    //     let url;
-    //     switch (category) {
-    //         case 'pdf':
-    //             url = '/pdf';
-    //             break;
-    //         default:
-    //             const product = 'product'
-    //             url = `${path}?questionnair=${product}`
-
-    //     }
-    //     this.props.history.push(url);
-    // }
 
     retryVerification = () => {
         this.setState({ verificationError: false })

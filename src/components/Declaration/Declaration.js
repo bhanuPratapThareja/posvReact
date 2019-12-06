@@ -31,7 +31,6 @@ class Declaration extends Component {
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
         body.request.payload.customerDisclaimer = 'Agreed';
-
         try {
             await axios.post(url, body, { headers });
             this.props.history.push('/thankyou');

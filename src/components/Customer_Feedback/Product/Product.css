@@ -1,0 +1,34 @@
+
+.cust_feedback--page fieldset {
+    border:  none;
+    padding: 5px 0;
+}
+
+.cust_feedback--page {
+    max-width: 900px;
+    margin-right: auto;
+    margin-left: auto;
+    padding: 0 10px;
+}
+
+form fieldset label{
+    margin:0 10px 0 0;
+    cursor: pointer;
+}
+
+.cust_feedback--page > div:first-child {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 22px;
+}
+
+@media(max-width: 767px){
+    .cust_feedback--page fieldset {
+        font-size: 14px;
+    }
+    
+    .cust_feedback--page .button_div {
+        margin: 15px 0;
+    }
+
+}
