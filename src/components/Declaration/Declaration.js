@@ -26,20 +26,18 @@ class Declaration extends Component {
     }
 
     proceed = async () => {
-        this.setState({ proceeding: true });
+        await this.setState({ proceeding: true });
         const { url, body } = getApiData('declaration');
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
         body.request.payload.customerDisclaimer = 'Agreed';
         try {
             await axios.post(url, body, { headers });
+            this.setState({ proceeding: false });
             this.props.history.push('/thankyou');
         } catch (err) {
+            this.setState({ proceeding: false });
             this.handleSnackbar(true, 'error', 'Something went wrong. Please try again')
-        } finally {
-            setTimeout(() => {
-                this.setState({ proceeding: false });
-            }, 4000);
         }
     }
 

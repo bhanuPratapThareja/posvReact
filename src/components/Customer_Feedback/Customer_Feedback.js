@@ -10,6 +10,7 @@ import Button from '@material-ui/core/Button';
 import './Customer_Feedback.css';
 import { headers } from './../../api/headers';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import Loader from './../Loader/Loader';
 
 export default class Customer_Feedback extends Component {
     constructor() {
@@ -22,11 +23,11 @@ export default class Customer_Feedback extends Component {
             qstCatNameNext: '',
             qstCatNamePrevious: '',
             healthForm: 'form1',
-            proceeding: false
+            proceeding: false,
+            allFieldsMandatoryError: false
         }
     }
     componentDidMount() {
-        this.setState({ proceeding: true })
         let { state } = this.props.location;
         this.setState({ qstCatName: 'product'.toUpperCase() }, () => {
             this.getQuestions();
@@ -75,14 +76,15 @@ export default class Customer_Feedback extends Component {
     }
 
     getQuestions = async (qstCatNamePrevious) => {
+        await this.setState({ proceeding: true })
         const { url, body } = getApiData('getQuestions');
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
         qstCatNamePrevious ? body.request.payload.qstCatName = qstCatNamePrevious : body.request.payload.qstCatName = this.state.qstCatName;
         try {
-            this.setState({ proceeding: false })
             const response = await axios.post(url, body, { headers })
             const res = JSON.parse(JSON.stringify(response))
+            await this.setState({ proceeding: false })
             this.handleRsponse(res)
         } catch (err) {
             this.setState({ proceeding: false })
@@ -138,7 +140,16 @@ export default class Customer_Feedback extends Component {
     }
 
     submitAnswers = async () => {
-        this.setState({ proceeding: true })
+        const mandatoryArray = [];
+        this.state.questions.forEach(question => {
+            if(question.customerResponse) mandatoryArray.push(question.customerResponse)
+        })
+        console.log(this.state.questions)
+        console.log(mandatoryArray)
+        if(mandatoryArray.length < this.state.questions.length){
+            this.setState({ allFieldsMandatoryError: true })
+        }
+        await this.setState({ proceeding: true })
         const { url, body } = getApiData('saveCustomerResponse')
         const { qstCatName } = this.state;
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
@@ -147,11 +158,11 @@ export default class Customer_Feedback extends Component {
         body.request.payload.customerResponse.qstCatName = qstCatName;
         body.request.payload.customerResponse.qst = [...this.state.questions]
         try {
-            this.setState({ proceeding: false })
             const response = await axios.post(url, body, { headers })
+            await this.setState({ proceeding: false, allFieldsMandatoryError: false })
             this.handleRsponse(response)
         } catch (err) {
-            this.setState({ proceeding: false })
+            this.setState({ proceeding: false, allFieldsMandatoryError: false })
             console.log(err)
         }
     }
@@ -191,55 +202,61 @@ export default class Customer_Feedback extends Component {
     }
 
     render() {
+        if (this.state.proceeding) {
+            return <Loader />
+        }
+
+
         return (
-            <>
-                <LinearProgress style={{ visibility: this.state.proceeding ? 'visible' : 'hidden' }} />
-                <div className="cust_feedback--page">
-                    <div style={{ textAlign: 'center', textTransform: 'capitalize' }}>
-                        {this.getPageName(this.state.qstCatName)} Related Questions
+            <div className="cust_feedback--page">
+                <div style={{ textAlign: 'center', textTransform: 'capitalize' }}>
+                    {this.getPageName(this.state.qstCatName)} Related Questions
                     </div>
 
-                    {this.state.qstCatName === 'HEALTH-1' || this.state.qstCatName === 'HEALTH-2' ? <Health
-                        healthQuestions={this.state.questions}
-                        healthForm={this.state.qstCatName}
-                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                    /> : null}
+                {this.state.qstCatName === 'HEALTH-1' || this.state.qstCatName === 'HEALTH-2' ? <Health
+                    healthQuestions={this.state.questions}
+                    healthForm={this.state.qstCatName}
+                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                /> : null}
 
-                    {this.state.qstCatName === 'PRODUCT' ? <Product
-                        productQuestions={this.state.questions}
-                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                    /> : null}
-                    {this.state.qstCatName === 'PSM' ? <Psm
-                        psmQuestions={this.state.questions}
-                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                    /> : null}
-                    {this.state.qstCatName === 'RPSALES' ? <RpSales
-                        rpSalesQuestions={this.state.questions}
-                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                    /> : null}
-                    {this.state.qstCatName === 'CANCER' ? <Cancer
-                        cancerQuestions={this.state.questions}
-                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                    /> : null}
+                {this.state.qstCatName === 'PRODUCT' ? <Product
+                    productQuestions={this.state.questions}
+                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                /> : null}
+                {this.state.qstCatName === 'PSM' ? <Psm
+                    psmQuestions={this.state.questions}
+                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                /> : null}
+                {this.state.qstCatName === 'RPSALES' ? <RpSales
+                    rpSalesQuestions={this.state.questions}
+                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                /> : null}
+                {this.state.qstCatName === 'CANCER' ? <Cancer
+                    cancerQuestions={this.state.questions}
+                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                /> : null}
 
-                    <div className="button_div">
+                {this.state.allFieldsMandatoryError ? <div 
+                    className="required" 
+                    style={{textAlign: 'center'}}
+                    >All fields are mandatory.</div> : null}
 
-                        {this.state.qstCatNamePrevious ? <Button
-                            variant="contained"
-                            onClick={() => this.gotToPage('previous')}
-                            className="default_button">
-                            Previous
+                <div className="button_div">
+                    {this.state.qstCatNamePrevious ? <Button
+                        variant="contained"
+                        onClick={() => this.gotToPage('previous')}
+                        className="default_button">
+                        Previous
                     </Button> : null}
 
-                        <Button
-                            variant="contained"
-                            onClick={() => this.gotToPage('next')}
-                            className="default_button">
-                            Next
+                    <Button
+                        variant="contained"
+                        onClick={() => this.gotToPage('next')}
+                        className="default_button">
+                        Next
                         </Button>
-                    </div>
                 </div>
-            </>
+            </div>
         )
     }
 }

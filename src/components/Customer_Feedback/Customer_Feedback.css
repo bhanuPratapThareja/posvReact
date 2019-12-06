@@ -66,14 +66,14 @@
 /*-- Radio Styling Ends Here --*/
 
 /*-- Checkboxes Styling --*/
-[type="checkbox"]:checked, 
-[type="checkbox"]:not(:checked) {
+.cust_feedback--page [type="checkbox"]:checked, 
+.cust_feedback--page [type="checkbox"]:not(:checked) {
     position: relative;
     cursor: pointer;
 }
 
-[type="checkbox"]:checked:after, 
-[type="checkbox"]:not(:checked):after {
+.cust_feedback--page [type="checkbox"]:checked:after, 
+.cust_feedback--page [type="checkbox"]:not(:checked):after {
     position: relative;
     background: #fff;
     border: 1px solid #f37920;
@@ -89,11 +89,11 @@
     -o-transition: all ease 0.5s;
 }
 
-[type="checkbox"]:checked:after {
+.cust_feedback--page [type="checkbox"]:checked:after {
     background: #f37920;
 }
 
-form fieldset input[type="checkbox"] {
+.cust_feedback--page form fieldset input[type="checkbox"] {
     float: left;
     margin: 0 15px 0 5px;
     position: relative;
@@ -151,5 +151,7 @@ select{
     width: 100%;
 }
 
-
+.required {
+    color: red;
+}
 /*-- Checkbox Styling ends Here --*/ 

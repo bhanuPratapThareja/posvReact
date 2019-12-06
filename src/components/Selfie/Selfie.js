@@ -5,6 +5,7 @@ import * as faceapi from 'face-api.js';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
 import { headers } from './../../api/headers';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 export default class Selfie extends Component {
 
@@ -12,7 +13,8 @@ export default class Selfie extends Component {
         super();
         this.state = {
             video: undefined,
-            pictureTaken: false
+            pictureTaken: false,
+            submitting: false
         }
     }
 
@@ -41,10 +43,9 @@ export default class Selfie extends Component {
         )
 
         video.addEventListener('play', () => {
-            console.log('here')
-            const video = document.getElementById('video')
             const canvas = faceapi.createCanvasFromMedia(video);
-            video.insertBefore(canvas, video)
+            const selfie_page = document.getElementById('selfie_page');
+            selfie_page.append(canvas)
             const displaySize = { width: video.width, height: video.height };
             faceapi.matchDimensions(canvas, displaySize)
             setInterval(async () => {
@@ -73,6 +74,7 @@ export default class Selfie extends Component {
     }
 
     submitSelfie = async () => {
+        await this.setState({ submitting: true })
         const canvas = document.getElementById('canvas');
         const base64 = canvas.toDataURL();
         const { url, body } = getApiData('verifyCustomerImage');
@@ -80,17 +82,17 @@ export default class Selfie extends Component {
         const imgString = base64.split(",")[1]
 
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber')
-        body.request.payload.authToken = "wtewe834jwe";
+        body.request.payload.authToken = localStorage.getItem('authToken')
         body.request.payload.imageFile = imgString;
         body.request.payload.fileExtension = type;
 
         try {
             const response = await axios.post(url, body, { headers })
-            console.log('reaponse: ', response)
+            this.setState({ submitting: false })
+            const path = response.data.response.payload.qstCatName.toLowerCase();
+            this.props.history.push(`/customer_feedback/${path}`)
         } catch (err) {
-            console.log('err: ', err)
-        } finally {
-            this.setState({ generatingOtp: false });
+            this.setState({ submitting: false })
         }
     }
 
@@ -100,30 +102,28 @@ export default class Selfie extends Component {
         const buttonText = !this.state.pictureTaken ? 'Take Selfie' : 'Submit';
 
         return (
+            <>
+            <LinearProgress style={{ visibility: this.state.submitting ? 'visible' : 'hidden' }} />
             <div className="selfie_page" id="selfie_page">
                 <div className="booth" id="booth">
                     <video id="video" autoPlay muted {...imgStyles}></video>
                     <div className="canvas">
                         {this.state.pictureTaken ? <canvas id="canvas" {...imgStyles}></canvas> : null}
                     </div>
-                    <div>
-                        {!this.state.pictureTaken ? <Button onClick={(event) => this.takeSelfie(event)} variant="contained" id="selfie_button" className="cstm-btn">
-                            {buttonText}
-                        </Button> : null}
-                        {this.state.pictureTaken ? <Button onClick={this.submitSelfie} variant="contained" className="cstm-btn" style={{ width: '320px' }}>
-                            Submit
-                    </Button> : null}
-                    </div>
                         
                 </div>
-                <div className="cstm-txt">
-                    What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesetting industry Lorem Ipsum has been the industry's 
-                    standard dummy text ever since the 1500s when an unknown printer took a galley of type and scrambled it to make a type specimen
-                    book it has
+                <div>
+                    {!this.state.pictureTaken ? <Button onClick={(event) => this.takeSelfie(event)} variant="contained" id="selfie_button" className="default_button" style={{ width: '320px' }}>
+                        {buttonText}
+                    </Button> : null}
+                    {this.state.pictureTaken ? <Button disabled={this.state.submitting} onClick={this.submitSelfie} variant="contained" className="default_button" style={{ width: '320px' }}>
+                        Submit
+                </Button> : null}
                 </div>
                 
-               
+               <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
             </div>
+            </>
         )
     }
 }

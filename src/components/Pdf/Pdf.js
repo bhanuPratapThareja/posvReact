@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
-import { appHeaders } from './../../api/headers';
+import { headers } from './../../api/headers';
 import Loader from '../Loader/Loader';
 import './Pdf.css';
 
@@ -21,9 +21,8 @@ export default class Pdf extends Component {
     getPdf = async () => {
         const { url, body } = getApiData('pdf');
         console.log(url, body)
-        body.request.payload.posvRefNumber = '1234567';
+        body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
-        const headers = { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
         try {
             const response = await axios.post(url, body, { headers })
             console.log(response)

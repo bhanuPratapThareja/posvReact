@@ -32,24 +32,24 @@ export default function createInput(field) {
 
 
                 <fieldset onChange={(event) => handleChange(event.target.value, qstId)}>
-                    <p>{qstText}<span>*</span></p>
-                    <input type="radio" name={qstId} value="Yes" /> <label>Yes</label>
+                    <p>{qstText}<span className="required"> *</span></p>
+                    <input type="radio" name={qstId} value="Yes" required /> <label>Yes</label>
                     <input type="radio" name={qstId} value="No" /> <label>No</label>
                 </fieldset>
             )
         case 'text':
             return (
                 <fieldset onChange={(event) => handleChange(event.target.value, qstId)}>
-                    <p>{qstText}<span>*</span></p>
-                    <input type="text" name={qstId} />
+                    <p>{qstText}<span className="required"> *</span></p>
+                    <input type="text" name={qstId} required />
                 </fieldset>
             )
         case 'dropdown':
             return (
                 <fieldset onChange={(event) => handleChange(event.target.value, qstId)}>
-                    <p>{qstText}<span>*</span></p>
+                    <p>{qstText}<span className="required"> *</span></p>
                     <select name={qstId} selected={'default'}>
-                        <option value={'default'}>Please select one</option>
+                        <option disabled>Please select one</option>
                         {qstOpt.map((el, i) => {
                             return <option key={i} value={qstOpt[i]}>{qstOpt[i]}</option>
                         })}
@@ -59,14 +59,14 @@ export default function createInput(field) {
         case 'checkbox':
             return (
                     <fieldset onChange={(event) => handleChange(event.target.checked, qstId, 'checkbox')}>
-                        <p className="check-sec">{qstText}<span>*</span></p>
+                        <p className="check-sec">{qstText}<span className="required"> *</span></p>
                         <input type="checkbox" name={qstId} className="regular-checkbox" />
                     </fieldset>
                 )
         case 'textarea':
             return (
                 <fieldset onChange={(event) => handleChange(event.target.value, qstId)}>
-                    <p>{qstText}<span>*</span></p>
+                    <p>{qstText}<span className="required"> *</span></p>
                     <textarea rows={5} cols={30}></textarea>
                 </fieldset>
             )
