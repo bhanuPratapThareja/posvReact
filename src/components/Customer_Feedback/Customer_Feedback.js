@@ -145,9 +145,10 @@ export default class Customer_Feedback extends Component {
             if(question.customerResponse) mandatoryArray.push(question.customerResponse)
         })
         console.log(this.state.questions)
-        console.log(mandatoryArray)
+        console.log(mandatoryArray)       
         if(mandatoryArray.length < this.state.questions.length){
             this.setState({ allFieldsMandatoryError: true })
+            return
         }
         await this.setState({ proceeding: true })
         const { url, body } = getApiData('saveCustomerResponse')
