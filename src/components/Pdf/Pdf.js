@@ -21,12 +21,10 @@ export default class Pdf extends Component {
 
     getPdf = async () => {
         const { url, body } = getApiData('pdf');
-        console.log(url, body)
         body.request.payload.posvRefNumber = '99998888814'
         body.request.payload.authToken = localStorage.getItem('authToken');
         try {
             const res = await axios.post(url, body, { headers })
-            console.log(res)
             const { transcriptFile } = res.data.response.payload;
             const opened = window.open('', '_self')
             opened.document.write(transcriptFile)
