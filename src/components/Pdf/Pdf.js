@@ -1,36 +1,37 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
-import { appHeaders } from './../../api/headers';
+import { headers } from './../../api/headers';
 import Loader from '../Loader/Loader';
 import './Pdf.css';
+import jsPDF from 'jspdf';
 
 export default class Pdf extends Component {
     constructor() {
         super();
-        this.state = { 
+        this.state = {
             loading: true,
-            pdfFile: undefined 
+            pdfFile: undefined
         }
     }
 
     componentDidMount() {
-         this.getPdf();
+        this.getPdf();
     }
 
     getPdf = async () => {
         const { url, body } = getApiData('pdf');
         console.log(url, body)
-        body.request.payload.posvRefNumber = '1234567';
+        body.request.payload.posvRefNumber = '99998888814'
         body.request.payload.authToken = localStorage.getItem('authToken');
-        const headers = { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
         try {
-            const response = await axios.post(url, body, { headers })
-            console.log(response)
-            let { transcriptFile: pdfFile, extension: ext } = response.data.response.payload
-            pdfFile = `data:image/png;base64,${pdfFile}.jpg`;
-            console.log(pdfFile);
-            this.setState({ loading: false, pdfFile })
+            const res = await axios.post(url, body, { headers })
+            console.log(res)
+            const { transcriptFile } = res.data.response.payload;
+            const opened = window.open('', '_self')
+            opened.document.write(transcriptFile)
+
+            // document.getElementById('pdf').append(img)
         } catch (err) {
             console.log(err)
             this.setState({ loading: false })
@@ -45,9 +46,12 @@ export default class Pdf extends Component {
                     <div className="loading_text">
                         Please wait ...
                     </div>
+                    <div id="pdf"></div>
+
                 </> : null}
                 {this.state.pdfFile ? <>
-                    <img src={this.state.pdfFile} alt="PDF" width="300" height="200" />
+                    {/* <img src={this.state.pdfFile} alt="PDF" width="300" height="200" />
+                    <embed src={this.state.pdfFile} width="800px" height="2100px" /> */}
                 </> : null}
             </div>
         )

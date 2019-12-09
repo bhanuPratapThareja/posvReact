@@ -9,7 +9,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
 import './Declaration.css';
-import { appHeaders } from './../../api/headers';
+import { headers } from './../../api/headers';
 
 class Declaration extends Component {
 
@@ -26,22 +26,18 @@ class Declaration extends Component {
     }
 
     proceed = async () => {
-        this.setState({ proceeding: true });
+        await this.setState({ proceeding: true });
         const { url, body } = getApiData('declaration');
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
         body.request.payload.customerDisclaimer = 'Agreed';
-        const headers = { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
-
         try {
             await axios.post(url, body, { headers });
+            this.setState({ proceeding: false });
             this.props.history.push('/thankyou');
         } catch (err) {
+            this.setState({ proceeding: false });
             this.handleSnackbar(true, 'error', 'Something went wrong. Please try again')
-        } finally {
-            setTimeout(() => {
-                this.setState({ proceeding: false });
-            }, 4000);
         }
     }
 

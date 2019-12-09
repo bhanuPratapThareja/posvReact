@@ -13,7 +13,7 @@ import Snackbar from './components/Snackbar/Snackbar';
 import Customer_Feedback from './components/Customer_Feedback/Customer_Feedback';
 import Health from './components/Customer_Feedback/Health/Health';
 import Pdf from './components/Pdf/Pdf';
-import Questionnair from './components/Questionnair/Questionnair';
+// import Questionnair from './components/Questionnair/Questionnair';
 
 class App extends Component {
   constructor() {
@@ -53,7 +53,7 @@ class App extends Component {
           snackbarMsg={this.state.snackbarMsg}
         /> : null}
         <Switch>
-          <Redirect exact path='/' to={redirectRoute} />
+          <Redirect exact path='/' to={'/verify_user'} />
           <Route path='/verify_user' render={props => <Verify {...props} txnId={txnId} params={window.location.search} />} />
           <Route path='/pdf' component={Pdf} />
           <Route path='/generate_otp' render={props => <Generate_Otp {...props} showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />} />

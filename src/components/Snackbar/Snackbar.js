@@ -4,13 +4,13 @@ import Snackbar from '@material-ui/core/Snackbar';
 export default function PositionedSnackbar(props) {
 
   setTimeout(() => {
-    handleClose()
+    // handleClose()
   }, 2000);
   
   const [state, setState] = React.useState({
     open: true,
     vertical: 'top',
-    horizontal: 'right',
+    horizontal: 'center',
   });
 
   const { vertical, horizontal, open } = state;
@@ -40,7 +40,7 @@ export default function PositionedSnackbar(props) {
   }
 
   return (
-    <div>
+    <div className="snackbar">
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
         key={`${vertical},${horizontal}`}

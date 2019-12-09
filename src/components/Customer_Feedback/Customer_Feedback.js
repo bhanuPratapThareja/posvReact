@@ -5,10 +5,12 @@ import Health from './Health/Health';
 import Product from './Product/Product';
 import Psm from './Psm/Psm';
 import RpSales from './Rp_Sales/Rp_Sales';
+import Cancer from './Cancer/Cancer';
 import Button from '@material-ui/core/Button';
 import './Customer_Feedback.css';
 import { headers } from './../../api/headers';
-import Icon from '@material-ui/core/Icon';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Loader from './../Loader/Loader';
 
 export default class Customer_Feedback extends Component {
     constructor() {
@@ -20,7 +22,9 @@ export default class Customer_Feedback extends Component {
             qstCatName: 'PRODUCT',
             qstCatNameNext: '',
             qstCatNamePrevious: '',
-            healthForm: 'form1'
+            healthForm: 'form1',
+            proceeding: false,
+            allFieldsMandatoryError: false
         }
     }
     componentDidMount() {
@@ -71,24 +75,25 @@ export default class Customer_Feedback extends Component {
         }
     }
 
-    getQuestions = async () => {
+    getQuestions = async (qstCatNamePrevious) => {
+        await this.setState({ proceeding: true })
         const { url, body } = getApiData('getQuestions');
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
-        body.request.payload.qstCatName = this.state.qstCatName;
+        qstCatNamePrevious ? body.request.payload.qstCatName = qstCatNamePrevious : body.request.payload.qstCatName = this.state.qstCatName;
         try {
             const response = await axios.post(url, body, { headers })
             const res = JSON.parse(JSON.stringify(response))
+            await this.setState({ proceeding: false })
             this.handleRsponse(res)
         } catch (err) {
+            this.setState({ proceeding: false })
             console.log(err)
         }
     }
 
     handleRsponse = (response) => {
-        console.log('response: ', response.data.response.payload.customerResponse)
         if (response && !response.data.response.payload.customerResponse) {
-            console.log('testing')
             this.props.history.push('/generate_otp')
             return;
         }
@@ -119,7 +124,10 @@ export default class Customer_Feedback extends Component {
         } else if (path === 'HEALTH-2') {
             url = '/customer_feedback/health';
             this.setState({ healthForm: 'form2' })
+        } else if (path === 'CANCER') {
+            url = '/customer_feedback/cancer'
         }
+
         this.props.history.push(url);
         this.setState({
             questions: [...parentQuestions],
@@ -132,6 +140,16 @@ export default class Customer_Feedback extends Component {
     }
 
     submitAnswers = async () => {
+        const mandatoryArray = [];
+        this.state.questions.forEach(question => {
+            if(question.customerResponse) mandatoryArray.push(question.customerResponse)
+        })
+        console.log(this.state.questions)
+        console.log(mandatoryArray)
+        if(mandatoryArray.length < this.state.questions.length){
+            this.setState({ allFieldsMandatoryError: true })
+        }
+        await this.setState({ proceeding: true })
         const { url, body } = getApiData('saveCustomerResponse')
         const { qstCatName } = this.state;
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
@@ -141,8 +159,10 @@ export default class Customer_Feedback extends Component {
         body.request.payload.customerResponse.qst = [...this.state.questions]
         try {
             const response = await axios.post(url, body, { headers })
+            await this.setState({ proceeding: false, allFieldsMandatoryError: false })
             this.handleRsponse(response)
         } catch (err) {
+            this.setState({ proceeding: false, allFieldsMandatoryError: false })
             console.log(err)
         }
     }
@@ -160,20 +180,38 @@ export default class Customer_Feedback extends Component {
             url = '/customer_feedback/rpsales';
         } else if (path === 'GENERATE_OTP') {
             url = '/generate_otp';
+        } else if (path === 'CANCER') {
+            url = '/customer_feedback/cancer'
         }
         this.props.history.push(url);
     }
 
     gotToPage = (direction) => {
-        console.log(direction)
+        if (direction === 'previous') {
+            this.getQuestions(this.state.qstCatNamePrevious)
+        } else {
+            this.submitAnswers()
+        }
+    }
+
+    getPageName(tag) {
+        if (tag === 'HEALTH-1' || tag === 'HEALTH-2') {
+            return 'Health'
+        }
+        return tag.toLowerCase();
     }
 
     render() {
+        if (this.state.proceeding) {
+            return <Loader />
+        }
+
+
         return (
             <div className="cust_feedback--page">
-                <div style={{ textAlign: 'center' }}>
-                    {this.state.qstCatName}
-                </div>
+                <div style={{ textAlign: 'center', textTransform: 'capitalize' }}>
+                    {this.getPageName(this.state.qstCatName)} Related Questions
+                    </div>
 
                 {this.state.qstCatName === 'HEALTH-1' || this.state.qstCatName === 'HEALTH-2' ? <Health
                     healthQuestions={this.state.questions}
@@ -193,26 +231,30 @@ export default class Customer_Feedback extends Component {
                     rpSalesQuestions={this.state.questions}
                     onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
                 /> : null}
+                {this.state.qstCatName === 'CANCER' ? <Cancer
+                    cancerQuestions={this.state.questions}
+                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                /> : null}
+
+                {this.state.allFieldsMandatoryError ? <div 
+                    className="required" 
+                    style={{textAlign: 'center'}}
+                    >All fields are mandatory.</div> : null}
 
                 <div className="button_div">
-                    {this.state.qstCatNamePrevious ? <Icon
-                        color="primary"
-                        className="chevron"
+                    {this.state.qstCatNamePrevious ? <Button
+                        variant="contained"
                         onClick={() => this.gotToPage('previous')}
-                    >chevron_left</Icon> : null}
+                        className="default_button">
+                        Previous
+                    </Button> : null}
 
                     <Button
                         variant="contained"
-                        onClick={this.submitAnswers}
-                        className="default_button">
-                        Submit
-                    </Button>
-
-                    {this.state.qstCatNameNext ? <Icon
-                        color="primary"
-                        className="chevron"
                         onClick={() => this.gotToPage('next')}
-                    >chevron_right</Icon> : null}
+                        className="default_button">
+                        Next
+                        </Button>
                 </div>
             </div>
         )

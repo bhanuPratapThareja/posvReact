@@ -16,7 +16,7 @@ const api = {
         getotp: {
             uatUrl: 'Stage/getotp',
             prodUrl: 'prod/getotp',
-            body: { "request": { "header": { "correlationId": "25478965874", "appId": "ABC" }, "payload": { "posvRefNumber": "", "mobile": "9717509425", "email": "adit.kumar@qualtechedge.com", "productName": "Max Term Plan", "sumAssured": "2000", "initialPremiumPaid": "32000", "policyTerm": "Test policy", "modeOfPayment": "NEFT", "authToken": "" } } },
+            body: { "request": { "header": { "correlationId": "25478965874", "appId": "ABC" }, "payload": { "posvRefNumber": "", "authToken": "", "onCallOTP":"No" } } },
         },
         validateOtp: {
             uatUrl: 'Stage/validateotp',

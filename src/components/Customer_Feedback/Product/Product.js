@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form';
 import createInput from './../../../utils/createInputs';
+import './Product.css';
 
 class Product extends Component {
     
@@ -20,7 +21,7 @@ class Product extends Component {
     render() {
         if (!this.props.productQuestions || this.props.productQuestions.length == '0') {
             return (
-                <div>Please wait</div>
+                <div></div>
             )
         }
         return (

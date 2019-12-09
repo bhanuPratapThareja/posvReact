@@ -68,6 +68,9 @@ class Verify extends Component {
             case 'rpsales':
                 url = '/customer_feedback/rpsales';
                 break;
+            case 'cancer':
+                 url = '/customer_feedback/cancer';
+                 break;
             case 'selfie':
                 url = '/customer_feedback/product';
                 break;
