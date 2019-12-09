@@ -16,25 +16,16 @@ const handleChange = (value, qstId, type) => {
 
 
 export default function createInput(field) {
-
+    console.log(field)
     const { qstOptType, qstText, qstId, qstOpt, rows, cols } = field.question;
 
     switch (qstOptType) {
         case 'radio':
             return (
-
-                // <FormControl component="fieldset" onChange={(event) => handleChange(event.target.value, qstId)}>
-                //     <FormLabel component="legend">{qstText}</FormLabel>
-                //         Yes <Radio name={qstId} value="Yes" />
-                //         No <Radio  name={qstId} value="No" />
-                // </FormControl>
-
-
-
-                <fieldset onChange={(event) => handleChange(event.target.value, qstId)}>
+                <fieldset>
                     <p>{qstText}<span className="required"> *</span></p>
-                    <input type="radio" name={qstId} value="Yes" required /> <label>Yes</label>
-                    <input type="radio" name={qstId} value="No" /> <label>No</label>
+                    <input type="radio" name={qstId} value="Yes" required checked={field.question.customerResponse === 'Yes' ? true : false} onChange={(event) => handleChange(event.target.value, qstId)} /> <label>Yes</label>
+                    <input type="radio" name={qstId} value="No" checked={field.question.customerResponse === 'No' ? true : false}  onChange={(event) => handleChange(event.target.value, qstId)}/> <label>No</label>
                 </fieldset>
             )
         case 'text':
