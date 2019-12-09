@@ -53,9 +53,9 @@ class App extends Component {
           snackbarMsg={this.state.snackbarMsg}
         /> : null}
         <Switch>
-          <Redirect exact path='/' to={'/verify_user'} />
+          <Redirect exact path='/' to={redirectRoute} />
           <Route path='/verify_user' render={props => <Verify {...props} txnId={txnId} params={window.location.search} />} />
-          <Route path='/pdf' component={Pdf} />
+          <Route path='/pdf'render={props => <Pdf {...props} txnId={txnId} />} />
           <Route path='/generate_otp' render={props => <Generate_Otp {...props} showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />} />
           <Route path='/selfie' component={Selfie} />
           <Route path='/declaration' render={props => <Declaration {...props}  />} showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />

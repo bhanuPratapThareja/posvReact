@@ -4,7 +4,6 @@ import { getApiData } from './../../api/api';
 import { headers } from './../../api/headers';
 import Loader from '../Loader/Loader';
 import './Pdf.css';
-import jsPDF from 'jspdf';
 
 export default class Pdf extends Component {
     constructor() {
@@ -21,17 +20,13 @@ export default class Pdf extends Component {
 
     getPdf = async () => {
         const { url, body } = getApiData('pdf');
-        console.log(url, body)
-        body.request.payload.posvRefNumber = '99998888814'
+        body.request.payload.posvRefNumber = this.props.txnId;
         body.request.payload.authToken = localStorage.getItem('authToken');
         try {
             const res = await axios.post(url, body, { headers })
-            console.log(res)
             const { transcriptFile } = res.data.response.payload;
-            const opened = window.open('', '_self')
-            opened.document.write(transcriptFile)
-
-            // document.getElementById('pdf').append(img)
+            const opened = window.open('', '_self');
+            opened.document.write(transcriptFile);
         } catch (err) {
             console.log(err)
             this.setState({ loading: false })

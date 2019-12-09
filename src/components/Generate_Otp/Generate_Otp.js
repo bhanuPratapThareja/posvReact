@@ -20,7 +20,7 @@ class Generate_Otp extends Component {
             otpButtonText: 'Genrate Otp',
             showCallButton: false,
             callAttemptsSuccess: 0,
-            otpTime: 5
+            otpTime: 15
         }
     }
 
@@ -158,7 +158,6 @@ class Generate_Otp extends Component {
                             {this.state.generatingOtp ? <span className="otpTime">{this.state.otpTime}</span> : null}
                         </div>
 
-                        <h5 onClick={this.onDidntGetOtp} className="default_text" style={{ textDecoration: 'underline', cursor: 'pointer' }}>Did'nt recieve the code?</h5>
                         <Button variant="contained" className="default_button" onClick={this.SubmitOtp} disabled={this.state.generatingOtp || this.state.submitting || !this.state.submitButtonEnabled}>
                             Submit
                     </Button>
