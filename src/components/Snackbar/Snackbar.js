@@ -3,10 +3,6 @@ import Snackbar from '@material-ui/core/Snackbar';
 
 export default function PositionedSnackbar(props) {
 
-  setTimeout(() => {
-    // handleClose()
-  }, 2000);
-  
   const [state, setState] = React.useState({
     open: true,
     vertical: 'top',
