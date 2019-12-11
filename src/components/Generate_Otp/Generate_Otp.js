@@ -19,11 +19,13 @@ class Generate_Otp extends Component {
             otp: undefined,
             otpButtonText: 'Genrate Otp',
             showCallButton: false,
+            disableCallButton: false,
             callAttemptsSuccess: 0,
             otpTime: 15,
             showSnackbar: false,
             snackbarMsgType: '',
-            snackbarMsg: ''
+            snackbarMsg: '',
+            displayMessage: 'Please click on Generate OTP button to get the otp.'
         }
     }
 
@@ -46,17 +48,13 @@ class Generate_Otp extends Component {
     }
 
     generateOtp = async (type) => {
-        this.setState({ generatingOtp: true, otpButtonText: 'Regenerate' }, () => {
-            if (this.state.callAttemptsSuccess <= 3) {
-                this.setState({ showCallButton: true })
-            }
-        });
+        this.setState({ generatingOtp: true, otpButtonText: 'Regenerate' });
         let interval;
         interval = setInterval(() => {
             this.setState({ otpTime: --this.state.otpTime });
             if (this.state.otpTime === 0) {
                 clearInterval(interval);
-                this.setState({ generatingOtp: false, otpTime: 5 })
+                // this.setState({ generatingOtp: false, otpTime: 15 })
             }
         }, 1000);
 
@@ -70,20 +68,23 @@ class Generate_Otp extends Component {
 
         try {
             const response = await axios.post(url, body, { headers })
+            this.setState({ displayMessage: response.data.response.payload.levelMessage })
             if (type === 'call') {
                 this.setState({ callAttemptsSuccess: this.state.callAttemptsSuccess + 1 }, () => {
                     if (this.state.callAttemptsSuccess >= 3) {
-                        this.setState({ showCallButton: false })
+                        // this.setState({ showCallButton: false })
+                        this.setState({ disableCallButton: true })
                     }
                 })
             }
             const msg = response.data.response.msgInfo.msgDescription
             this.handleSnackbar(true, 'success', msg)
         } catch (err) {
+            console.log('err: ', err)
             this.handleSnackbar(true, 'error', 'Please try again')
         } finally {
             clearInterval(interval);
-            this.setState({ generatingOtp: false, otpTime: 15 });
+            this.setState({ showCallButton: true, generatingOtp: false, otpTime: 15 });
         }
 
     }
@@ -100,6 +101,7 @@ class Generate_Otp extends Component {
         body.request.payload.otp = otp;
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
+        body.request.payload.planCode = localStorage.getItem('planCode');
 
         try {
             const response = await axios.post(url, body, { headers })
@@ -132,21 +134,21 @@ class Generate_Otp extends Component {
 
     closeSnackbar = () => {
         this.setState({
-          showSnackbar: false,
-          snackbarMsgType: '',
-          snackbarMsg: ''
+            showSnackbar: false,
+            snackbarMsgType: '',
+            snackbarMsg: ''
         })
-      }
+    }
 
     render() {
         return (
             <div>
                 <LinearProgress style={{ visibility: this.state.generatingOtp || this.state.submitting ? 'visible' : 'hidden' }} />
                 {this.state.showSnackbar ? <Snackbar
-                        closeSnackbar={this.closeSnackbar}
-                        snackbarMsgType={this.state.snackbarMsgType}
-                        snackbarMsg={this.state.snackbarMsg}
-                    /> : null}
+                    closeSnackbar={this.closeSnackbar}
+                    snackbarMsgType={this.state.snackbarMsgType}
+                    snackbarMsg={this.state.snackbarMsg}
+                /> : null}
                 <div className="generate-otp__grid">
 
                     <Paper className="paper">
@@ -154,7 +156,7 @@ class Generate_Otp extends Component {
                             <img src="" atl="image" className="phone_image" />
                         </div>
                         <div>
-                            <p className="default_text">Please click on Generate OTP button to get the otp.</p>
+                            <p className="default_text">{this.state.displayMessage}</p>
                             <h4 className="default_text">Enter 4 - Digit code</h4>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -174,7 +176,7 @@ class Generate_Otp extends Component {
 
                             {this.state.showCallButton ? <Button
                                 variant="contained"
-                                disabled={this.state.generatingOtp || this.state.submitting}
+                                disabled={this.state.generatingOtp || this.state.submitting || this.state.disableCallButton}
                                 className="default_button"
                                 id="call_button"
                                 onClick={() => this.generateOtp('call')}>

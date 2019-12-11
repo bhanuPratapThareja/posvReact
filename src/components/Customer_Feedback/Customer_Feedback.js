@@ -32,7 +32,9 @@ export default class Customer_Feedback extends Component {
     }
 
     componentDidMount() {
+        console.log('component mounted')
         const qstCatName = this.props.location.pathname.split('/')[2].toUpperCase();
+        console.log('qstCatName: ', qstCatName)
         this.setState({ qstCatName }, () => {
             this.getQuestions();
         })
@@ -52,6 +54,9 @@ export default class Customer_Feedback extends Component {
                 })
             }
         })
+        // setTimeout(() => {
+        //     console.log(this.state)
+        // }, 1000);
     }
 
     manageChildren = (qstId, custResponse) => {
@@ -109,7 +114,7 @@ export default class Customer_Feedback extends Component {
                 parentQuestions.push(question)
             }
             if (question.qstType === 'Secondary') {
-                if (!question.qstOptType && question.qstOptType === 'checkbox') {
+                if (question.qstOptType && question.qstOptType === 'checkbox') {
                     question.customerResponse = 'No'
                 }
                 childQuestions.push(question)
@@ -146,13 +151,13 @@ export default class Customer_Feedback extends Component {
             this.setState({ allFieldsMandatoryError: true })
             return
         }
-        console.log('state check: ', this.state)
         await this.setState({ proceeding: true })
         const { url, body } = getApiData('saveCustomerResponse')
         const { qstCatName } = this.state;
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
-        body.request.payload.qstCatName = qstCatNameNext;
+        body.request.payload.planCode = localStorage.getItem('planCode');
+        body.request.payload.qstCatName = qstCatName;
         body.request.payload.customerResponse.qstCatName = qstCatName;
         body.request.payload.customerResponse.qst = [...this.state.questions]
         try {

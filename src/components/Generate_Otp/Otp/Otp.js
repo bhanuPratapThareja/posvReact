@@ -6,6 +6,7 @@ const Otp = props => {
     
     const onInputChange = (event, val) => {
         const keyCode = event.keyCode;
+        console.log('keyCode: ', keyCode)
         if(!allowedOtpKeys.includes(keyCode)){
             return
         }
@@ -29,7 +30,7 @@ const Otp = props => {
 
         return (
             <>
-                <input type="number" maxLength="1" size="1" min="0" max="9" pattern="^[0-9]*$" disabled={props.submitting} className="input_otp" onKeyDown={event => onInputChange(event, 0)} />
+                <input type="number" maxLength="1" size="1" min="0" max="9" pattern="[0-9]{1}" disabled={props.submitting} className="input_otp" onKeyDown={event => onInputChange(event, 0)} />
                 <input type="number" maxLength="1" size="1" min="0" max="9" pattern="[0-9]{1}" disabled={props.submitting} className="input_otp" onKeyDown={event => onInputChange(event, 1)} />
                 <input type="number" maxLength="1" size="1" min="0" max="9" pattern="[0-9]{1}" disabled={props.submitting} className="input_otp" onKeyDown={event => onInputChange(event, 2)} />
                 <input type="number" maxLength="1" size="1" min="0" max="9" pattern="[0-9]{1}" disabled={props.submitting} className="input_otp" onKeyDown={event => onInputChange(event, 3)} />
