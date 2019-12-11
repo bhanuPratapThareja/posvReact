@@ -29,7 +29,7 @@ class Form1 extends Component  {
                 {this.props.healthQuestions.map(question => {
                     return (
                         <Field
-                            label="Label"
+                            customerResponse={question.customerResponse}
                             name={question.qstId}
                             type={question.qstOptType}
                             key={question.qstId}

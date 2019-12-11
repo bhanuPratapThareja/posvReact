@@ -36,7 +36,7 @@ const api = {
         getQuestions: {
             uatUrl: 'Stage/get-questions',
             prodUrl: 'prod/get-questions',
-            body: { "request": { "header": { "appId": "mpro", "correlationId": "25478965874" }, "payload": { "qstCatName": "", "qstSubCatName": null, "posvRefNumber": "4000052249", "qstCatNameNext": null, "qstCatNamePrevious": null, "LANG": "ENG", "authToken": "wtewe834jwe", "planCode": "EFGEP8" } } }
+            body: { "request": { "header": { "appId": "mpro", "correlationId": "25478965874" }, "payload": { "qstCatName": "", "qstSubCatName": null, "posvRefNumber": "", "qstCatNameNext": null, "qstCatNamePrevious": null, "LANG": "ENG", "authToken": "", "planCode": "" } } }
         },
         saveCustomerResponse: {
             uatUrl: 'Stage/save-customer-response',

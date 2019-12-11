@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import { mli_logo } from './../../images/images';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import './Header.css';
 
 export default class Header extends Component {

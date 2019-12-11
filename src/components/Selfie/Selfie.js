@@ -8,6 +8,7 @@ import { headers } from './../../api/headers';
 import LinearProgress from '@material-ui/core/LinearProgress';
 
 export default class Selfie extends Component {
+    localStream;
 
     constructor() {
         super();
@@ -20,11 +21,8 @@ export default class Selfie extends Component {
 
     componentDidMount() {
         Promise.all([
-            faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
-            // faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
-            // faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+            faceapi.nets.tinyFaceDetector.loadFromUri('/models')
         ]).then(() => {
-            console.log('face api model loaded');
             this.startVideo()
         })
     }
@@ -43,6 +41,7 @@ export default class Selfie extends Component {
         )
 
         video.addEventListener('play', () => {
+            this.localStream = video.srcObject;
             const canvas = faceapi.createCanvasFromMedia(video);
             const selfie_page = document.getElementById('selfie_page');
             selfie_page.append(canvas)
@@ -57,7 +56,7 @@ export default class Selfie extends Component {
         })
     }
 
-    takeSelfie = (event) => {
+    takeSelfie = () => {
         const video = document.getElementById('video');
         let canvas = document.querySelector('canvas');
         const height = video.height;
@@ -89,6 +88,11 @@ export default class Selfie extends Component {
         try {
             const response = await axios.post(url, body, { headers })
             this.setState({ submitting: false })
+            if (this.localStream != null) {
+                this.localStream.getTracks().map(function (val) {
+                    val.stop();
+                });
+            }
             const path = response.data.response.payload.qstCatName.toLowerCase();
             this.props.history.push(`/customer_feedback/${path}`)
         } catch (err) {
@@ -103,26 +107,26 @@ export default class Selfie extends Component {
 
         return (
             <>
-            <LinearProgress style={{ visibility: this.state.submitting ? 'visible' : 'hidden' }} />
-            <div className="selfie_page" id="selfie_page">
-                <div className="booth" id="booth">
-                    <video id="video" autoPlay muted {...imgStyles}></video>
-                    <div className="canvas">
-                        {this.state.pictureTaken ? <canvas id="canvas" {...imgStyles}></canvas> : null}
+                <LinearProgress style={{ visibility: this.state.submitting ? 'visible' : 'hidden' }} />
+                <div className="selfie_page" id="selfie_page">
+                    <div className="booth" id="booth">
+                        <video id="video" autoPlay muted {...imgStyles}></video>
+                        <div className="canvas">
+                            {this.state.pictureTaken ? <canvas id="canvas" {...imgStyles}></canvas> : null}
+                        </div>
+
                     </div>
-                        
-                </div>
-                <div>
-                    {!this.state.pictureTaken ? <Button onClick={(event) => this.takeSelfie(event)} variant="contained" id="selfie_button" className="default_button" style={{ width: '320px' }}>
-                        {buttonText}
-                    </Button> : null}
-                    {this.state.pictureTaken ? <Button disabled={this.state.submitting} onClick={this.submitSelfie} variant="contained" className="default_button" style={{ width: '320px' }}>
-                        Submit
+                    <div>
+                        {!this.state.pictureTaken ? <Button onClick={(event) => this.takeSelfie(event)} variant="contained" id="selfie_button" className="default_button" style={{ width: '320px' }}>
+                            {buttonText}
+                        </Button> : null}
+                        {this.state.pictureTaken ? <Button disabled={this.state.submitting} onClick={this.submitSelfie} variant="contained" className="default_button" style={{ width: '320px' }}>
+                            Submit
                 </Button> : null}
+                    </div>
+
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
                 </div>
-                
-               <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
-            </div>
             </>
         )
     }

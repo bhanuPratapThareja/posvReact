@@ -28,7 +28,7 @@
 }
 
 .buttons_div__otp {
-  margin-top: 16px;
+  margin-top: 24px;
 }
 
 .buttons_div__otp button {
@@ -38,6 +38,10 @@
 
 .call_button {
   display: none !important;
+}
+
+.submit_button--generate_otp {
+  margin-top: 16px !important;
 }
 
 .otpTime {
@@ -60,6 +64,4 @@
     .MuiButton-label {
         font-size: 11px;
     }
-
-
 }

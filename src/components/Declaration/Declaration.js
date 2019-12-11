@@ -30,11 +30,12 @@ class Declaration extends Component {
         const { url, body } = getApiData('declaration');
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
+        body.request.payload.planCode = localStorage.getItem('planCode');
         body.request.payload.customerDisclaimer = 'Agreed';
         try {
             await axios.post(url, body, { headers });
             this.setState({ proceeding: false });
-            this.props.history.push('/thankyou');
+            this.props.history.push('/generate_otp');
         } catch (err) {
             this.setState({ proceeding: false });
             this.handleSnackbar(true, 'error', 'Something went wrong. Please try again')
@@ -48,7 +49,7 @@ class Declaration extends Component {
 
     render() {
 
-        const declaration = `I have recieved, seen and understood the benefil illustration and proposal form sent on my mobile number and email.
+        const declaration = `I have recieved, seen and understood the benefit illustration and proposal form sent on my mobile number and email.
                             I have also filled up the verification and health and habit questions on my mobile which will also for part of the proposal form.
                             I confirm that all the content / information therein are truea and correct to the best of my knowledge and belief.`;
 
