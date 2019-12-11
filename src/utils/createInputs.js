@@ -32,9 +32,9 @@ export default function createInput(field) {
         case 'dropdown':
             return (
                 <fieldset>
-                    <p>{qstText}<span className="required"> *</span></p>
-                    <select name={qstId} value={customerResponse} onChange={(event) => handleChange(event.target.value, qstId)}>
-                        <option disabled value={null}>Please select one</option>
+                    {/* <p>{qstText}<span className="required"> *</span></p> */}
+                    <select name={qstId} style={{marginTop: '16px'}} value={customerResponse} onChange={(event) => handleChange(event.target.value, qstId)}>
+                        <option value={null}>{qstText}</option>
                         {qstOpt.map((el, i) => {
                             return <option key={i} value={qstOpt[i]}>{qstOpt[i]}</option>
                         })}

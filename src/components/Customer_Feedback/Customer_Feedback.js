@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
-import Health from './Health/Health';
+import Health1 from './Health-1/Health-1';
+import Health2 from './Health-2/Health-2';
 import Product from './Product/Product';
 import Psm from './Psm/Psm';
 import RpSales from './Rp_Sales/Rp_Sales';
@@ -18,18 +19,17 @@ export default class Customer_Feedback extends Component {
             questions: [],
             parentQuestions: [],
             childQuestions: [],
-            qstCatName: 'PRODUCT',
+            qstCatName: '',
             qstCatNameNext: '',
             qstCatNamePrevious: '',
-            healthForm: 'form1',
             proceeding: false,
             allFieldsMandatoryError: false
         }
     }
 
     componentDidMount() {
-        let { state } = this.props.location;
-        this.setState({ qstCatName: 'product'.toUpperCase() }, () => {
+        const qstCatName = this.props.location.pathname.split('/')[2].toUpperCase();
+        this.setState({ qstCatName }, () => {
             this.getQuestions();
         })
     }
@@ -59,7 +59,7 @@ export default class Customer_Feedback extends Component {
                     childArray.push(question)
                 }
             })
-           
+
             questions.forEach(question => {
                 if (question.qstId === qstId) {
                     const index = questions.indexOf(question)
@@ -86,17 +86,15 @@ export default class Customer_Feedback extends Component {
         try {
             const response = await axios.post(url, body, { headers })
             const res = JSON.parse(JSON.stringify(response))
-            // await this.setState({ proceeding: false })
             this.handleRsponse(res)
         } catch (err) {
-            // this.setState({ proceeding: false })
             console.log(err)
         }
     }
 
     handleRsponse = (response) => {
         if (response && !response.data.response.payload.customerResponse) {
-            this.props.history.push('/generate_otp')
+            this.props.history.push('/declaration')
             return;
         }
         const questions = [...response.data.response.payload.customerResponse[0].qst];
@@ -107,30 +105,16 @@ export default class Customer_Feedback extends Component {
                 parentQuestions.push(question)
             }
             if (question.qstType === 'Secondary') {
+                if(!question.qstOptType && question.qstOptType === 'checkbox'){
+                    question.customerResponse = 'No'
+                }
                 childQuestions.push(question)
             }
         })
         const { qstCatNamePrevious, qstCatName, qstCatNameNext } = response.data.response.payload;
         const path = qstCatName;
 
-        let url = '';
-        if (path === 'HEALTH-1') {
-            url = '/customer_feedback/health';
-            this.setState({ healthForm: 'form1' })
-        } else if (path === 'PRODUCT') {
-            url = '/customer_feedback/product';
-        } else if (path === 'PSM') {
-            url = '/customer_feedback/psm';
-        } else if (path === 'RPSALES') {
-            url = '/customer_feedback/rpsales';
-        } else if (path === 'HEALTH-2') {
-            url = '/customer_feedback/health';
-            this.setState({ healthForm: 'form2' })
-        } else if (path === 'CANCER') {
-            url = '/customer_feedback/cancer'
-        }
-
-        this.props.history.push(url);
+        this.props.history.push(path.toLowerCase());
         this.setState({
             questions: parentQuestions,
             parentQuestions,
@@ -143,37 +127,17 @@ export default class Customer_Feedback extends Component {
                 setTimeout(() => {
                     this.manageChildren(question.qstId, question.customerResponse)
                 }, 100);
-                
+
             })
         })
-    }
-
-    
-    loadNextPath = () => {
-        const path = this.state.qstCatName;
-        let url = '';
-        if (path === 'HEALTH-1') {
-            url = '/customer_feedback/health';
-        } else if (path === 'PRODUCT') {
-            url = '/customer_feedback/product';
-        } else if (path === 'PSM') {
-            url = '/customer_feedback/psm';
-        } else if (path === 'RPSALES') {
-            url = '/customer_feedback/rpsales';
-        } else if (path === 'GENERATE_OTP') {
-            url = '/generate_otp';
-        } else if (path === 'CANCER') {
-            url = '/customer_feedback/cancer'
-        }
-        this.props.history.push(url);
     }
 
     submitAnswers = async () => {
         const mandatoryArray = [];
         this.state.questions.forEach(question => {
-            if(question.customerResponse) mandatoryArray.push(question.customerResponse)
-        })     
-        if(mandatoryArray.length < this.state.questions.length){
+            if (question.customerResponse) mandatoryArray.push(question.customerResponse)
+        })
+        if (mandatoryArray.length < this.state.questions.length) {
             this.setState({ allFieldsMandatoryError: true })
             return
         }
@@ -218,13 +182,17 @@ export default class Customer_Feedback extends Component {
 
         return (
             <div className="cust_feedback--page">
-                <div style={{ textAlign: 'center', textTransform: 'capitalize' }}>
+                {this.state.qstCatName ? <div style={{ textAlign: 'center', textTransform: 'capitalize' }}>
                     {this.getPageName(this.state.qstCatName)} Related Questions
-                    </div>
+                    </div> : null}
 
-                {this.state.qstCatName === 'HEALTH-1' || this.state.qstCatName === 'HEALTH-2' ? <Health
-                    healthQuestions={this.state.questions}
-                    healthForm={this.state.qstCatName}
+                {this.state.qstCatName === 'HEALTH-1' ? <Health1
+                    health1Questions={this.state.questions}
+                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                /> : null}
+
+                {this.state.qstCatName === 'HEALTH-2' ? <Health2
+                    health2Questions={this.state.questions}
                     onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
                 /> : null}
 
@@ -245,10 +213,10 @@ export default class Customer_Feedback extends Component {
                     onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
                 /> : null}
 
-                {this.state.allFieldsMandatoryError ? <div 
-                    className="required" 
-                    style={{textAlign: 'center'}}
-                    >All fields are mandatory.</div> : null}
+                {this.state.allFieldsMandatoryError ? <div
+                    className="required"
+                    style={{ textAlign: 'center' }}
+                >All fields are mandatory.</div> : null}
 
                 <div className="button_div">
                     {this.state.qstCatNamePrevious ? <Button

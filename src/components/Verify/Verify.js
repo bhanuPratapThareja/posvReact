@@ -17,7 +17,6 @@ class Verify extends Component {
     }
 
     componentWillMount() {
-        console.log('component did mount')
         this.startLoad();
     }
 
@@ -56,33 +55,17 @@ class Verify extends Component {
     }
 
     goToPage = category => {
-        console.log('category: ', category)
+        category = category.toLowerCase();
         let url = '';
-        switch (category.toLowerCase()) {
-            case 'product':
-                url = '/customer_feedback/product';
+        switch (category) {
+            case 'selfie' || 'generate_otp' || 'pdf':
+                url = `/${category}`;
                 break;
-            case 'health':
-                url = '/customer_feedback/health';
-                break;
-            case 'psm':
-                url = '/customer_feedback/psm';
-                break;
-            case 'rpsales':
-                url = '/customer_feedback/rpsales';
-                break;
-            case 'cancer':
-                 url = '/customer_feedback/cancer';
-                 break;
-            case 'selfie':
-                url = '/selfie';
-                break;
-            case 'pdf':
-                url = '/pdf';
-                break;
+            default:
+                url = `/customer_feedback/${category}`
         }
         console.log(url, category)
-        this.props.history.push(`${url}`, { category });
+        this.props.history.push(url, { category });
     }
 
     retryVerification = () => {
@@ -107,7 +90,7 @@ class Verify extends Component {
                             errorFunction={() => this.retryVerification()}
                             buttonText={"Retry"}
                         />
-                    : null}
+                        : null}
                 </div>
             </div>
         )

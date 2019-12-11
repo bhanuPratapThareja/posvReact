@@ -34,7 +34,7 @@ class Declaration extends Component {
         try {
             await axios.post(url, body, { headers });
             this.setState({ proceeding: false });
-            this.props.history.push('/thankyou');
+            this.props.history.push('/generate_otp');
         } catch (err) {
             this.setState({ proceeding: false });
             this.handleSnackbar(true, 'error', 'Something went wrong. Please try again')

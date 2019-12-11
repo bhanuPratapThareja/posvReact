@@ -80,7 +80,7 @@ class Generate_Otp extends Component {
             this.handleSnackbar(true, 'error', 'Please try again')
         } finally {
             clearInterval(interval);
-            this.setState({ generatingOtp: false, otpTime: 5 });
+            this.setState({ generatingOtp: false, otpTime: 15 });
         }
 
     }
@@ -104,7 +104,7 @@ class Generate_Otp extends Component {
                 return
             }
             document.removeEventListener('keyup', this.inputFunction)
-            this.props.history.push('/declaration')
+            this.props.history.push('/thankyou')
         } catch (err) {
             this.setState({ submitting: false })
             this.handleSnackbar(true, 'error', 'Something went wrong. Please check otp and try again')
