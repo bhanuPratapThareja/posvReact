@@ -16,7 +16,8 @@ class Verify extends Component {
         }
     }
 
-    componentDidMount() {
+    componentWillMount() {
+        console.log('component did mount')
         this.startLoad();
     }
 
@@ -26,9 +27,7 @@ class Verify extends Component {
             this.setState({ verificationError: true, errorMsg: 'No transaction ID found' })
             return
         }
-        this.setState({ txnId }, () => {
-            this.verifyUser(txnId);
-        })
+        this.verifyUser(txnId);
     }
 
     verifyUser = async txnId => {
@@ -36,14 +35,17 @@ class Verify extends Component {
         body.request.payload.posvRefNumber = txnId;
         try {
             const response = await axios.post(url, body, { headers })
+            console.log(response)
+            // return
             if (response.data.errorMessage) {
                 this.setState({ verificationError: true, errorMsg: 'Invalid Transaction ID' })
                 return
             }
-            const { posvRefNumber, authToken, businessMsg, isLinkValid, category } = response.data.response.payload;
+            const { posvRefNumber, authToken, businessMsg, isLinkValid, category, planCode } = response.data.response.payload;
             if (isLinkValid) {
                 localStorage.setItem('posvRefNumber', posvRefNumber)
                 localStorage.setItem('authToken', authToken)
+                localStorage.setItem('planCode', planCode)
                 this.goToPage(category);
             } else {
                 this.setState({ verificationError: true, errorMsg: businessMsg })
@@ -54,8 +56,9 @@ class Verify extends Component {
     }
 
     goToPage = category => {
+        console.log('category: ', category)
         let url = '';
-        switch (category) {
+        switch (category.toLowerCase()) {
             case 'product':
                 url = '/customer_feedback/product';
                 break;
@@ -72,18 +75,20 @@ class Verify extends Component {
                  url = '/customer_feedback/cancer';
                  break;
             case 'selfie':
-                url = '/customer_feedback/product';
+                url = '/selfie';
                 break;
             case 'pdf':
                 url = '/pdf';
                 break;
         }
+        console.log(url, category)
         this.props.history.push(`${url}`, { category });
     }
 
     retryVerification = () => {
+        console.log('retrying')
         this.setState({ verificationError: false })
-        this.startLoad();
+        // this.startLoad();
     }
 
     render() {
@@ -96,13 +101,13 @@ class Verify extends Component {
                             Please wait ...
                         </div>
                     </div> : null}
-                    {this.state.verificationError ? <div>
+                    {this.state.verificationError ?
                         <Error
                             errorMsg={this.state.errorMsg}
-                            errorFunction={this.retryVerification}
+                            errorFunction={() => this.retryVerification()}
                             buttonText={"Retry"}
                         />
-                    </div> : null}
+                    : null}
                 </div>
             </div>
         )

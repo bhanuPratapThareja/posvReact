@@ -29,6 +29,10 @@ class Generate_Otp extends Component {
         document.getElementsByClassName('input_otp')[0].focus();
     }
 
+    componentWillUnmount() {
+        document.removeEventListener('keyup', this.inputFunction);
+    }
+
     inputFunction = () => {
         const [i0, i1, i2, i3] = document.querySelectorAll('.input_otp');
         if (i0.value && i1.value && i2.value && i3.value) {
@@ -39,7 +43,6 @@ class Generate_Otp extends Component {
     }
 
     generateOtp = async (type) => {
-        console.log(type)
         this.setState({ generatingOtp: true, otpButtonText: 'Regenerate' }, () => {
             if (this.state.callAttemptsSuccess <= 3) {
                 this.setState({ showCallButton: true })
@@ -158,7 +161,7 @@ class Generate_Otp extends Component {
                             {this.state.generatingOtp ? <span className="otpTime">{this.state.otpTime}</span> : null}
                         </div>
 
-                        <Button variant="contained" className="default_button" onClick={this.SubmitOtp} disabled={this.state.generatingOtp || this.state.submitting || !this.state.submitButtonEnabled}>
+                        <Button variant="contained" className="default_button submit_button--generate_otp" onClick={this.SubmitOtp} disabled={this.state.generatingOtp || this.state.submitting || !this.state.submitButtonEnabled}>
                             Submit
                     </Button>
                     </Paper>

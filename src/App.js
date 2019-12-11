@@ -8,7 +8,6 @@ import Generate_Otp from './components/Generate_Otp/Generate_Otp';
 import Selfie from './components/Selfie/Selfie';
 import Declaration from './components/Declaration/Declaration';
 import Thankyou from './components/Thankyou/Thankyou';
-import Error from './components/Error/Error';
 import Snackbar from './components/Snackbar/Snackbar';
 import Customer_Feedback from './components/Customer_Feedback/Customer_Feedback';
 import Health from './components/Customer_Feedback/Health/Health';
@@ -56,12 +55,15 @@ class App extends Component {
           <Redirect exact path='/' to={redirectRoute} />
           <Route path='/verify_user' render={props => <Verify {...props} txnId={txnId} params={window.location.search} />} />
           <Route path='/pdf'render={props => <Pdf {...props} txnId={txnId} />} />
+          <Route path='/customer_feedback/product' component={Customer_Feedback} />
+          <Route path='/customer_feedback/health' component={Customer_Feedback} />
+          <Route path='/customer_feedback/psm' component={Customer_Feedback} />
+          <Route path='/customer_feedback/rpsales' component={Customer_Feedback} />
+          <Route path='/customer_feedback/cancer' component={Customer_Feedback} />
           <Route path='/generate_otp' render={props => <Generate_Otp {...props} showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />} />
           <Route path='/selfie' component={Selfie} />
           <Route path='/declaration' render={props => <Declaration {...props}  />} showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />
           <Route path='/thankyou' render={props => <Thankyou {...props } showMessageInScackbar={(options) => this.showMessageInScackbar(options)} />} />
-          <Route path='/customer_feedback' component={Customer_Feedback} />
-          <Route path='/error' component={Error} />
         </Switch>
       </BrowserRouter>
     );

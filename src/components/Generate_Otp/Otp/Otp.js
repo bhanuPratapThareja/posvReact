@@ -22,6 +22,7 @@ const Otp = props => {
             }
             if(val > 0 && keyCode === 8) {
                 inputs[val].value = '';
+                inputs[val - 1].focus();
             }
         }, 50)
     }

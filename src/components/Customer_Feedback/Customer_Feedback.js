@@ -9,7 +9,6 @@ import Cancer from './Cancer/Cancer';
 import Button from '@material-ui/core/Button';
 import './Customer_Feedback.css';
 import { headers } from './../../api/headers';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import Loader from './../Loader/Loader';
 
 export default class Customer_Feedback extends Component {
@@ -27,6 +26,7 @@ export default class Customer_Feedback extends Component {
             allFieldsMandatoryError: false
         }
     }
+
     componentDidMount() {
         let { state } = this.props.location;
         this.setState({ qstCatName: 'product'.toUpperCase() }, () => {
@@ -51,7 +51,7 @@ export default class Customer_Feedback extends Component {
     }
 
     manageChildren = (qstId, custResponse) => {
-        const questions = [...this.state.questions];
+        const questions = this.state.questions
         if (custResponse === 'Yes') {
             let childArray = []
             this.state.childQuestions.forEach(question => {
@@ -59,6 +59,7 @@ export default class Customer_Feedback extends Component {
                     childArray.push(question)
                 }
             })
+           
             questions.forEach(question => {
                 if (question.qstId === qstId) {
                     const index = questions.indexOf(question)
@@ -66,12 +67,12 @@ export default class Customer_Feedback extends Component {
                 }
             })
             const flattendArray = [].concat.apply([], questions);
-            this.setState({ questions: flattendArray })
+            this.setState({ questions: flattendArray, proceeding: false })
         } else {
             const newArray = questions.filter((currentValue, index, arr) => {
                 return arr[index].qstPrtId !== qstId
             })
-            this.setState({ questions: newArray })
+            this.setState({ questions: newArray, proceeding: false })
         }
     }
 
@@ -80,14 +81,15 @@ export default class Customer_Feedback extends Component {
         const { url, body } = getApiData('getQuestions');
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
+        body.request.payload.planCode = localStorage.getItem('planCode');
         qstCatNamePrevious ? body.request.payload.qstCatName = qstCatNamePrevious : body.request.payload.qstCatName = this.state.qstCatName;
         try {
             const response = await axios.post(url, body, { headers })
             const res = JSON.parse(JSON.stringify(response))
-            await this.setState({ proceeding: false })
+            // await this.setState({ proceeding: false })
             this.handleRsponse(res)
         } catch (err) {
-            this.setState({ proceeding: false })
+            // this.setState({ proceeding: false })
             console.log(err)
         }
     }
@@ -130,22 +132,47 @@ export default class Customer_Feedback extends Component {
 
         this.props.history.push(url);
         this.setState({
-            questions: [...parentQuestions],
+            questions: parentQuestions,
             parentQuestions,
             childQuestions,
             qstCatNamePrevious,
             qstCatName,
             qstCatNameNext,
+        }, () => {
+            this.state.questions.forEach(question => {
+                setTimeout(() => {
+                    this.manageChildren(question.qstId, question.customerResponse)
+                }, 100);
+                
+            })
         })
+    }
+
+    
+    loadNextPath = () => {
+        const path = this.state.qstCatName;
+        let url = '';
+        if (path === 'HEALTH-1') {
+            url = '/customer_feedback/health';
+        } else if (path === 'PRODUCT') {
+            url = '/customer_feedback/product';
+        } else if (path === 'PSM') {
+            url = '/customer_feedback/psm';
+        } else if (path === 'RPSALES') {
+            url = '/customer_feedback/rpsales';
+        } else if (path === 'GENERATE_OTP') {
+            url = '/generate_otp';
+        } else if (path === 'CANCER') {
+            url = '/customer_feedback/cancer'
+        }
+        this.props.history.push(url);
     }
 
     submitAnswers = async () => {
         const mandatoryArray = [];
         this.state.questions.forEach(question => {
             if(question.customerResponse) mandatoryArray.push(question.customerResponse)
-        })
-        console.log(this.state.questions)
-        console.log(mandatoryArray)       
+        })     
         if(mandatoryArray.length < this.state.questions.length){
             this.setState({ allFieldsMandatoryError: true })
             return
@@ -166,25 +193,6 @@ export default class Customer_Feedback extends Component {
             this.setState({ proceeding: false, allFieldsMandatoryError: false })
             console.log(err)
         }
-    }
-
-    loadNextPath = () => {
-        const path = this.state.qstCatName;
-        let url = '';
-        if (path === 'HEALTH-1') {
-            url = '/customer_feedback/health';
-        } else if (path === 'PRODUCT') {
-            url = '/customer_feedback/product';
-        } else if (path === 'PSM') {
-            url = '/customer_feedback/psm';
-        } else if (path === 'RPSALES') {
-            url = '/customer_feedback/rpsales';
-        } else if (path === 'GENERATE_OTP') {
-            url = '/generate_otp';
-        } else if (path === 'CANCER') {
-            url = '/customer_feedback/cancer'
-        }
-        this.props.history.push(url);
     }
 
     gotToPage = (direction) => {

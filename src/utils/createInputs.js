@@ -1,11 +1,5 @@
 import React from 'react';
 
-import { makeStyles } from '@material-ui/core/styles';
-import Radio from '@material-ui/core/Radio';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-
-
 const handleChange = (value, qstId, type) => {
     if(type === 'checkbox'){
         value === true ? value = 'Yes' : value = 'No'
@@ -16,8 +10,8 @@ const handleChange = (value, qstId, type) => {
 
 
 export default function createInput(field) {
-    console.log(field)
-    const { qstOptType, qstText, qstId, qstOpt, rows, cols } = field.question;
+    // console.log(field)
+    let { qstOptType, qstText, qstId, qstOpt, rows, cols, customerResponse } = field.question;
 
     switch (qstOptType) {
         case 'radio':
@@ -30,17 +24,17 @@ export default function createInput(field) {
             )
         case 'text':
             return (
-                <fieldset onChange={(event) => handleChange(event.target.value, qstId)}>
+                <fieldset>
                     <p>{qstText}<span className="required"> *</span></p>
-                    <input type="text" name={qstId} required />
+                    <input type="text" name={qstId} value={customerResponse} required onChange={(event) => handleChange(event.target.value, qstId)} />
                 </fieldset>
             )
         case 'dropdown':
             return (
-                <fieldset onChange={(event) => handleChange(event.target.value, qstId)}>
+                <fieldset>
                     <p>{qstText}<span className="required"> *</span></p>
-                    <select name={qstId} selected={'default'}>
-                        <option disabled>Please select one</option>
+                    <select name={qstId} value={customerResponse} onChange={(event) => handleChange(event.target.value, qstId)}>
+                        <option disabled value={null}>Please select one</option>
                         {qstOpt.map((el, i) => {
                             return <option key={i} value={qstOpt[i]}>{qstOpt[i]}</option>
                         })}
@@ -48,10 +42,17 @@ export default function createInput(field) {
                 </fieldset>
             )
         case 'checkbox':
+            customerResponse = !customerResponse ? 'No' : customerResponse
             return (
-                    <fieldset onChange={(event) => handleChange(event.target.checked, qstId, 'checkbox')}>
+                    <fieldset>
                         <p className="check-sec">{qstText}<span className="required"> *</span></p>
-                        <input type="checkbox" name={qstId} className="regular-checkbox" />
+                        <input 
+                            type="checkbox" 
+                            name={qstId} 
+                            className="regular-checkbox"
+                            value={customerResponse}
+                            checked={customerResponse === 'Yes' ? true : false }
+                            onChange={(event) => handleChange(event.target.checked, qstId, 'checkbox')} />
                     </fieldset>
                 )
         case 'textarea':

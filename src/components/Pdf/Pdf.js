@@ -27,7 +27,6 @@ export default class Pdf extends Component {
             const opened = window.open('', '_self');
             opened.document.write(transcriptFile);
         } catch (err) {
-            console.log(err)
             this.setState({ loading: false })
         }
     }
