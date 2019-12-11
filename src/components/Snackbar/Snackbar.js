@@ -3,10 +3,6 @@ import Snackbar from '@material-ui/core/Snackbar';
 
 export default function PositionedSnackbar(props) {
 
-  setTimeout(() => {
-    // handleClose()
-  }, 2000);
-  
   const [state, setState] = React.useState({
     open: true,
     vertical: 'top',
@@ -17,7 +13,7 @@ export default function PositionedSnackbar(props) {
 
 
   const handleClose = () => {
-    props.closeSnackbar();
+    // props.closeSnackbar();
   };
 
   const getTextColor = () => {

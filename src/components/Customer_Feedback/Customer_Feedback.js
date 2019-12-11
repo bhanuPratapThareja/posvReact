@@ -27,6 +27,10 @@ export default class Customer_Feedback extends Component {
         }
     }
 
+    showMessageInScackbar = ({ showSnackbar, snackbarMsgType, snackbarMsg }) => {
+        this.setState({ showSnackbar, snackbarMsgType, snackbarMsg })
+    }
+
     componentDidMount() {
         const qstCatName = this.props.location.pathname.split('/')[2].toUpperCase();
         this.setState({ qstCatName }, () => {
@@ -105,7 +109,7 @@ export default class Customer_Feedback extends Component {
                 parentQuestions.push(question)
             }
             if (question.qstType === 'Secondary') {
-                if(!question.qstOptType && question.qstOptType === 'checkbox'){
+                if (!question.qstOptType && question.qstOptType === 'checkbox') {
                     question.customerResponse = 'No'
                 }
                 childQuestions.push(question)
@@ -182,6 +186,7 @@ export default class Customer_Feedback extends Component {
 
         return (
             <div className="cust_feedback--page">
+                
                 {this.state.qstCatName ? <div style={{ textAlign: 'center', textTransform: 'capitalize' }}>
                     {this.getPageName(this.state.qstCatName)} Related Questions
                     </div> : null}
