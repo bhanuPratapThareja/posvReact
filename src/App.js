@@ -11,7 +11,7 @@ import Thankyou from './components/Thankyou/Thankyou';
 import Snackbar from './components/Snackbar/Snackbar';
 import Customer_Feedback from './components/Customer_Feedback/Customer_Feedback';
 import Pdf from './components/Pdf/Pdf';
-// import Routes from './Routes';
+import Routes from './Routes';
 // import Questionnair from './components/Questionnair/Questionnair';
 
 class App extends Component {

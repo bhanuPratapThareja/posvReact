@@ -9,8 +9,9 @@ import Thankyou from './components/Thankyou/Thankyou';
 import Customer_Feedback from './components/Customer_Feedback/Customer_Feedback';
 import Pdf from './components/Pdf/Pdf';
 
-export default function Routes(props) {
+export default function Routes(props, children) {
     console.log(props)
+    console.log(children)
     return (
             <Switch>
                 <Redirect exact path='/' to={props.redirectRoute} />
