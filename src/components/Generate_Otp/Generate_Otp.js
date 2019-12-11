@@ -7,7 +7,7 @@ import axios from 'axios';
 import { getApiData } from './../../api/api';
 import { headers } from './../../api/headers';
 import Otp from './Otp/Otp';
-
+import Snackbar from './../Snackbar/Snackbar';
 class Generate_Otp extends Component {
     constructor() {
         super();
@@ -20,7 +20,10 @@ class Generate_Otp extends Component {
             otpButtonText: 'Genrate Otp',
             showCallButton: false,
             callAttemptsSuccess: 0,
-            otpTime: 15
+            otpTime: 15,
+            showSnackbar: false,
+            snackbarMsgType: '',
+            snackbarMsg: ''
         }
     }
 
@@ -61,7 +64,7 @@ class Generate_Otp extends Component {
         body = JSON.parse(JSON.stringify(body))
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
-        if(type === 'call'){
+        if (type === 'call') {
             body.request.payload.onCallOTP = 'Yes';
         }
 
@@ -84,6 +87,7 @@ class Generate_Otp extends Component {
         }
 
     }
+
 
     SubmitOtp = async () => {
         this.setState({ submitting: true })
@@ -118,15 +122,33 @@ class Generate_Otp extends Component {
     }
 
     handleSnackbar = (showSnackbar, snackbarMsgType, snackbarMsg) => {
-        const options = { showSnackbar, snackbarMsgType, snackbarMsg }
-        this.props.showMessageInScackbar(options)
+        this.setState({ showSnackbar, snackbarMsgType, snackbarMsg })
+        // const options = { showSnackbar, snackbarMsgType, snackbarMsg }
+        // this.props.showMessageInScackbar(options)
+        setTimeout(() => {
+            this.closeSnackbar()
+        }, 2000);
     }
+
+    closeSnackbar = () => {
+        this.setState({
+          showSnackbar: false,
+          snackbarMsgType: '',
+          snackbarMsg: ''
+        })
+      }
 
     render() {
         return (
             <div>
                 <LinearProgress style={{ visibility: this.state.generatingOtp || this.state.submitting ? 'visible' : 'hidden' }} />
+                {this.state.showSnackbar ? <Snackbar
+                        closeSnackbar={this.closeSnackbar}
+                        snackbarMsgType={this.state.snackbarMsgType}
+                        snackbarMsg={this.state.snackbarMsg}
+                    /> : null}
                 <div className="generate-otp__grid">
+
                     <Paper className="paper">
                         <div >
                             <img src="" atl="image" className="phone_image" />

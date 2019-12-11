@@ -13,7 +13,7 @@ export default function PositionedSnackbar(props) {
 
 
   const handleClose = () => {
-    props.closeSnackbar();
+    // props.closeSnackbar();
   };
 
   const getTextColor = () => {
