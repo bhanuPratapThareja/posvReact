@@ -127,6 +127,7 @@ export default class Customer_Feedback extends Component {
             qstCatName,
             qstCatNameNext,
         }, () => {
+            console.log(this.state)
             this.state.questions.forEach(question => {
                 setTimeout(() => {
                     this.manageChildren(question.qstId, question.customerResponse)
@@ -145,12 +146,13 @@ export default class Customer_Feedback extends Component {
             this.setState({ allFieldsMandatoryError: true })
             return
         }
+        console.log('state check: ', this.state)
         await this.setState({ proceeding: true })
         const { url, body } = getApiData('saveCustomerResponse')
         const { qstCatName } = this.state;
         body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         body.request.payload.authToken = localStorage.getItem('authToken');
-        body.request.payload.qstCatName = qstCatName;
+        body.request.payload.qstCatName = qstCatNameNext;
         body.request.payload.customerResponse.qstCatName = qstCatName;
         body.request.payload.customerResponse.qst = [...this.state.questions]
         try {

@@ -12,12 +12,13 @@ const handleChange = (value, qstId, type) => {
 export default function createInput(field) {
     // console.log(field)
     let { qstOptType, qstText, qstId, qstOpt, rows, cols, customerResponse } = field.question;
-
+    const qst = qstText.split('?');
     switch (qstOptType) {
         case 'radio':
             return (
                 <fieldset>
-                    <p>{qstText}<span className="required"> *</span></p>
+                    <p>{`${qst[0]}?`}{!qst[1] ? <span className="required"> *</span> : null}</p>
+                    {qst[1] ? <p>{`${qst[1]}?` }<span className="required"> *</span></p>: null}
                     <input type="radio" name={qstId} value="Yes" required checked={field.question.customerResponse === 'Yes' ? true : false} onChange={(event) => handleChange(event.target.value, qstId)} /> <label>Yes</label>
                     <input type="radio" name={qstId} value="No" checked={field.question.customerResponse === 'No' ? true : false}  onChange={(event) => handleChange(event.target.value, qstId)}/> <label>No</label>
                 </fieldset>
@@ -25,14 +26,12 @@ export default function createInput(field) {
         case 'text':
             return (
                 <fieldset>
-                    <p>{qstText}<span className="required"> *</span></p>
-                    <input type="text" name={qstId} value={customerResponse} required onChange={(event) => handleChange(event.target.value, qstId)} />
+                    <input type="text" name={qstId} style={{marginTop: '16px'}} placeholder={qstText} value={customerResponse} required onChange={(event) => handleChange(event.target.value, qstId)} />
                 </fieldset>
             )
         case 'dropdown':
             return (
                 <fieldset>
-                    {/* <p>{qstText}<span className="required"> *</span></p> */}
                     <select name={qstId} style={{marginTop: '16px'}} value={customerResponse} onChange={(event) => handleChange(event.target.value, qstId)}>
                         <option value={null}>{qstText}</option>
                         {qstOpt.map((el, i) => {
