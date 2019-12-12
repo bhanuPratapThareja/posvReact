@@ -16,9 +16,6 @@ const Otp = props => {
             }, 10);
             return
         }
-        if(keyCode === 37 || keyCode === 39){
-            return
-        }
         setTimeout(() => {
             if (val < 3 && keyCode !== 8) {
                 inputs[val].value = event.target.value;
