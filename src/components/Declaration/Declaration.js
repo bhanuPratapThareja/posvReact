@@ -49,9 +49,11 @@ class Declaration extends Component {
 
     render() {
 
-        const declaration = `I have recieved, seen and understood the benefit illustration and proposal form sent on my mobile number and email.
-                            I have also filled up the verification and health and habit questions on my mobile which will also for part of the proposal form.
-                            I confirm that all the content / information therein are truea and correct to the best of my knowledge and belief.`;
+        const declaration = `I have received, seen and understood the benefit illustration and proposal form sent on my registered mobile
+        number and email. I have also filled up the verification and health & habit questions on my mobile which will
+        also form part of the proposal form. I confirm that all the content / information therein are true and correct
+        to the best of my knowledge and belief. I also hereby consent to the benefit illustration and the proposal form
+        including the verification and health & habit questions.`;
 
         return (
             <>

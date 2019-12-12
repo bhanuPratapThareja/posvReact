@@ -156,10 +156,15 @@ export default class Customer_Feedback extends Component {
 
     handleRsponse = (response) => {
         if (response && !response.data.response.payload.customerResponse) {
-            this.props.history.push('/declaration')
+            if(localStorage.getItem('channelName').toLowerCase() === 'x'){
+                this.props.history.push('/declaration')
+            } else {
+                this.props.history.push('/generate_otp')
+            }
             return;
         }
         const questions = [...response.data.response.payload.customerResponse[0].qst];
+        console.log('questions:', questions)
         let parentQuestions = [];
         let childQuestions = [];
         questions.forEach(question => {
@@ -168,7 +173,11 @@ export default class Customer_Feedback extends Component {
             }
             if (question.qstType === 'Secondary') {
                 if (question.qstOptType && question.qstOptType === 'checkbox') {
-                    question.customerResponse = 'No'
+                    if(!question.customerResponse || question.custResponse === 'No'){
+                        question.customerResponse = 'No'
+                    } else if(question.customerResponse && question.customerResponse === 'Yes'){
+                        question.customerResponse = 'Yes'
+                    }
                 }
                 childQuestions.push(question)
             }
@@ -185,7 +194,7 @@ export default class Customer_Feedback extends Component {
             qstCatName,
             qstCatNameNext,
         }, () => {
-            console.log(this.state)
+            // console.log(this.state)
             this.state.questions.forEach(question => {
                 setTimeout(() => {
                     this.manageChildren(question.qstId, question.customerResponse)
@@ -200,13 +209,22 @@ export default class Customer_Feedback extends Component {
         const customerResponseArray = [];
 
         this.state.questions.forEach(question => {
-            if(question.mandatory === true) mandatoryArray.push(question)
+            if(question.mandatory === true && !question.customerResponse) mandatoryArray.push(question)
         })
 
-        if(mandatoryArray.length){
+        if(mandatoryArray.length > 0){
+            // console.log(mandatoryArray)
             this.setState({ allFieldsMandatoryError: true })
             return
         }
+        
+        this.state.questions.forEach(question => {
+            if(question.customerResponse) customerResponseArray.push(question)
+            if(question.mandatory === false) customerResponseArray.push('')
+        })
+
+        // console.log(customerResponseArray.length)
+        // console.log(this.state.questions.length)
 
         if (customerResponseArray.length < this.state.questions.length) {
             this.setState({ allFieldsMandatoryError: true })
