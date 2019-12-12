@@ -7,15 +7,18 @@ const Otp = props => {
     const onInputChange = (event, val) => {
         const keyCode = event.keyCode;
         console.log('keyCode: ', keyCode)
+        event.persist();
+        let inputs = document.getElementsByClassName('input_otp');
+        inputs[val].value = '';
         if(!allowedOtpKeys.includes(keyCode)){
+            setTimeout(() => {
+                inputs[val].value = '';
+            }, 10);
             return
         }
-        event.persist();
         if(keyCode === 37 || keyCode === 39){
             return
         }
-        let inputs = document.getElementsByClassName('input_otp');
-        inputs[val].value = '';
         setTimeout(() => {
             if (val < 3 && keyCode !== 8) {
                 inputs[val].value = event.target.value;

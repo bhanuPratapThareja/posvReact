@@ -13,15 +13,16 @@ class Generate_Otp extends Component {
         super();
         this.state = {
             generatingOtp: false,
-            showMessage: false,
             submitting: false,
-            submitButtonEnabled: false,
+            disableSubmitButton: true,
+            disableGenerateOtpButton: false,
             otp: undefined,
-            otpButtonText: 'Genrate Otp',
+            otpButtonText: 'Generate Otp',
             showCallButton: false,
             disableCallButton: false,
             callAttemptsSuccess: 0,
-            otpTime: 15,
+            otpTime: 20,
+            showTime: false,
             showSnackbar: false,
             snackbarMsgType: '',
             snackbarMsg: '',
@@ -41,22 +42,24 @@ class Generate_Otp extends Component {
     inputFunction = () => {
         const [i0, i1, i2, i3] = document.querySelectorAll('.input_otp');
         if (i0.value && i1.value && i2.value && i3.value) {
-            this.setState({ submitButtonEnabled: true })
+            this.setState({ disableSubmitButton: false })
         } else {
-            this.setState({ submitButtonEnabled: false })
+            this.setState({ disableSubmitButton: true })
         }
     }
 
     generateOtp = async (type) => {
-        this.setState({ generatingOtp: true, otpButtonText: 'Regenerate' });
+        this.setState({ generatingOtp: true, disableGenerateOtpButton: true, otpButtonText: 'Regenerate' });
         let interval;
-        interval = setInterval(() => {
-            this.setState({ otpTime: --this.state.otpTime });
-            if (this.state.otpTime === 0) {
-                clearInterval(interval);
-                // this.setState({ generatingOtp: false, otpTime: 15 })
-            }
-        }, 1000);
+        if (type !== 'call') {
+            interval = setInterval(() => {
+                this.setState({ showTime: true, otpTime: --this.state.otpTime });
+                if (this.state.otpTime === 0) {
+                    clearInterval(interval);
+                    this.setState({ showTime: false, otpTime: 20, disableGenerateOtpButton: false })
+                }
+            }, 1000);
+        }
 
         let { url, body } = getApiData('getotp');
         body = JSON.parse(JSON.stringify(body))
@@ -64,27 +67,31 @@ class Generate_Otp extends Component {
         body.request.payload.authToken = localStorage.getItem('authToken');
         if (type === 'call') {
             body.request.payload.onCallOTP = 'Yes';
+            this.setState({ disableCallButton: true })
         }
 
         try {
             const response = await axios.post(url, body, { headers })
-            this.setState({ displayMessage: response.data.response.payload.levelMessage })
+            this.setState({ displayMessage: response.data.response.payload.levelMessage, generatingOtp: false })
             if (type === 'call') {
+                setTimeout(() => {
+                    this.setState({ disableCallButton: false })
+                }, 20000);
                 this.setState({ callAttemptsSuccess: this.state.callAttemptsSuccess + 1 }, () => {
                     if (this.state.callAttemptsSuccess >= 3) {
-                        // this.setState({ showCallButton: false })
-                        this.setState({ disableCallButton: true })
+                        this.setState({ showCallButton: false })
                     }
                 })
             }
             const msg = response.data.response.msgInfo.msgDescription
             this.handleSnackbar(true, 'success', msg)
         } catch (err) {
-            console.log('err: ', err)
+            if(interval){
+                clearInterval(interval);
+            }
             this.handleSnackbar(true, 'error', 'Please try again')
         } finally {
-            clearInterval(interval);
-            this.setState({ showCallButton: true, generatingOtp: false, otpTime: 15 });
+            this.setState({ showCallButton: true });
         }
 
     }
@@ -125,11 +132,9 @@ class Generate_Otp extends Component {
 
     handleSnackbar = (showSnackbar, snackbarMsgType, snackbarMsg) => {
         this.setState({ showSnackbar, snackbarMsgType, snackbarMsg })
-        // const options = { showSnackbar, snackbarMsgType, snackbarMsg }
-        // this.props.showMessageInScackbar(options)
         setTimeout(() => {
             this.closeSnackbar()
-        }, 2000);
+        }, 2500);
     }
 
     closeSnackbar = () => {
@@ -168,7 +173,7 @@ class Generate_Otp extends Component {
                         <div className="buttons_div__otp">
                             <Button
                                 variant="contained"
-                                disabled={this.state.generatingOtp || this.state.submitting}
+                                disabled={this.state.submitting || this.state.disableGenerateOtpButton}
                                 className="default_button"
                                 onClick={() => this.generateOtp('generate')}>
                                 {this.state.otpButtonText}
@@ -176,16 +181,16 @@ class Generate_Otp extends Component {
 
                             {this.state.showCallButton ? <Button
                                 variant="contained"
-                                disabled={this.state.generatingOtp || this.state.submitting || this.state.disableCallButton}
+                                disabled={this.state.submitting || this.state.disableCallButton}
                                 className="default_button"
                                 id="call_button"
                                 onClick={() => this.generateOtp('call')}>
                                 Call
                                 </Button> : null}
-                            {this.state.generatingOtp ? <span className="otpTime">{this.state.otpTime}</span> : null}
+                            {this.state.showTime ? <span className="otpTime">{this.state.otpTime}</span> : null}
                         </div>
 
-                        <Button variant="contained" className="default_button submit_button--generate_otp" onClick={this.SubmitOtp} disabled={this.state.generatingOtp || this.state.submitting || !this.state.submitButtonEnabled}>
+                        <Button variant="contained" className="default_button submit_button--generate_otp" onClick={this.SubmitOtp} disabled={this.state.submitting || this.state.disableSubmitButton}>
                             Submit
                     </Button>
                     </Paper>
