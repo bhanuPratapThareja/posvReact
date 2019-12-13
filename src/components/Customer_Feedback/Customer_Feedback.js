@@ -32,7 +32,6 @@ export default class Customer_Feedback extends Component {
     }
 
     componentDidMount() {
-        console.log('component mounted')
         const qstCatName = this.props.location.pathname.split('/')[2].toUpperCase();
         console.log('qstCatName: ', qstCatName)
         this.setState({ qstCatName }, () => {
@@ -51,12 +50,15 @@ export default class Customer_Feedback extends Component {
                     if (option.qstType === 'Primary') {
                         this.manageChildren(qstId, option.customerResponse)
                     }
+                    if(option.qstType === 'Secondary' && option.qstOptType === 'checkbox'){
+                        this.manageCheckboxText()
+                    }
                 })
             }
         })
-        // setTimeout(() => {
-        //     console.log(this.state)
-        // }, 1000);
+        setTimeout(() => {
+            // console.log(this.state)
+        }, 1000);
     }
 
     manageChildren = (qstId, custResponse) => {
@@ -76,13 +78,64 @@ export default class Customer_Feedback extends Component {
                 }
             })
             const flattendArray = [].concat.apply([], questions);
-            this.setState({ questions: flattendArray, proceeding: false })
+
+            this.setState({ questions: flattendArray, proceeding: false }, () => {
+                this.manageCheckboxText()
+            })
         } else {
             const newArray = questions.filter((currentValue, index, arr) => {
                 return arr[index].qstPrtId !== qstId
             })
             this.setState({ questions: newArray, proceeding: false })
         }
+
+        setTimeout(() => {
+            // console.log(this.state.questions)
+        }, 1000);
+    }
+
+    manageCheckboxText = () => {
+        let children = [];
+        let textParents = [];
+        this.state.questions.forEach(question => {
+            if (question.qstType && question.qstOptType === 'text') {
+                textParents.push(question.qstPrtId)
+            }
+        })
+
+        textParents.forEach(qId => {
+            let array = new Array();
+            this.state.questions.forEach(question => {
+                if (qId === question.qstPrtId) {
+                    array.push(question)
+                }
+            })
+            children.push(array)
+        })
+        
+       children.forEach(child => {
+           if(child.length > 1){
+            outer: for(let i = 0; i < child.length; i++){
+                if(child[i].qstOptType === 'checkbox' && child[i].customerResponse === 'Yes'){
+                    child.forEach(question => {
+                        if(question.qstOptType === 'text'){
+                            question.mandatory = false
+                        }
+                    })
+                    break outer;
+                } else {
+                    child.forEach(question => {
+                        if(question.qstOptType === 'text'){
+                            question.mandatory = true
+                        }
+                    })
+                }
+            }
+           }
+       })
+       setTimeout(() => {
+        console.log('state: ', this.state.questions)
+       }, 1000);
     }
 
     getQuestions = async (qstCatNamePrevious) => {
@@ -103,10 +156,15 @@ export default class Customer_Feedback extends Component {
 
     handleRsponse = (response) => {
         if (response && !response.data.response.payload.customerResponse) {
-            this.props.history.push('/declaration')
+            if(localStorage.getItem('channelName').toLowerCase() === 'x'){
+                this.props.history.push('/declaration')
+            } else {
+                this.props.history.push('/generate_otp')
+            }
             return;
         }
         const questions = [...response.data.response.payload.customerResponse[0].qst];
+        console.log('questions:', questions)
         let parentQuestions = [];
         let childQuestions = [];
         questions.forEach(question => {
@@ -115,7 +173,11 @@ export default class Customer_Feedback extends Component {
             }
             if (question.qstType === 'Secondary') {
                 if (question.qstOptType && question.qstOptType === 'checkbox') {
-                    question.customerResponse = 'No'
+                    if(!question.customerResponse || question.custResponse === 'No'){
+                        question.customerResponse = 'No'
+                    } else if(question.customerResponse && question.customerResponse === 'Yes'){
+                        question.customerResponse = 'Yes'
+                    }
                 }
                 childQuestions.push(question)
             }
@@ -132,7 +194,7 @@ export default class Customer_Feedback extends Component {
             qstCatName,
             qstCatNameNext,
         }, () => {
-            console.log(this.state)
+            // console.log(this.state)
             this.state.questions.forEach(question => {
                 setTimeout(() => {
                     this.manageChildren(question.qstId, question.customerResponse)
@@ -144,10 +206,27 @@ export default class Customer_Feedback extends Component {
 
     submitAnswers = async () => {
         const mandatoryArray = [];
+        const customerResponseArray = [];
+
         this.state.questions.forEach(question => {
-            if (question.customerResponse) mandatoryArray.push(question.customerResponse)
+            if(question.mandatory === true && !question.customerResponse) mandatoryArray.push(question)
         })
-        if (mandatoryArray.length < this.state.questions.length) {
+
+        if(mandatoryArray.length > 0){
+            // console.log(mandatoryArray)
+            this.setState({ allFieldsMandatoryError: true })
+            return
+        }
+        
+        this.state.questions.forEach(question => {
+            if(question.customerResponse) customerResponseArray.push(question)
+            if(question.mandatory === false) customerResponseArray.push('')
+        })
+
+        // console.log(customerResponseArray.length)
+        // console.log(this.state.questions.length)
+
+        if (customerResponseArray.length < this.state.questions.length) {
             this.setState({ allFieldsMandatoryError: true })
             return
         }
@@ -193,7 +272,7 @@ export default class Customer_Feedback extends Component {
 
         return (
             <div className="cust_feedback--page">
-                
+
                 {this.state.qstCatName ? <div style={{ textAlign: 'center', textTransform: 'capitalize' }}>
                     {this.getPageName(this.state.qstCatName)} Related Questions
                     </div> : null}

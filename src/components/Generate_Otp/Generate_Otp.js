@@ -86,7 +86,7 @@ class Generate_Otp extends Component {
             const msg = response.data.response.msgInfo.msgDescription
             this.handleSnackbar(true, 'success', msg)
         } catch (err) {
-            if(interval){
+            if (interval) {
                 clearInterval(interval);
             }
             this.handleSnackbar(true, 'error', 'Please try again')
@@ -146,6 +146,8 @@ class Generate_Otp extends Component {
     }
 
     render() {
+        const channelName = localStorage.getItem('channelName');
+ 
         return (
             <div>
                 <LinearProgress style={{ visibility: this.state.generatingOtp || this.state.submitting ? 'visible' : 'hidden' }} />
@@ -195,6 +197,12 @@ class Generate_Otp extends Component {
                     </Button>
                     </Paper>
                 </div>
+                {channelName !== 'x' ? 
+                <div>
+                    <p>
+                        I have received, seen and understood the benefit illustration and proposal form sent on my registered mobile number and email. I have also filled up the verification and health & habit questions on my mobile which will also form part of the proposal form. I confirm that all the content / information therein are true and correct to the best of my knowledge and belief. I also hereby consent to the benefit illustration and the proposal form including the verification and health & habit questions.
+                    </p>
+                </div> : null}
             </div>
         )
     }

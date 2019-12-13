@@ -40,11 +40,13 @@ class Verify extends Component {
                 this.setState({ verificationError: true, errorMsg: 'Invalid Transaction ID' })
                 return
             }
-            const { posvRefNumber, authToken, businessMsg, isLinkValid, category, planCode } = response.data.response.payload;
+            const { posvRefNumber, authToken, businessMsg, isLinkValid, category, planCode, chanelName } = response.data.response.payload;
             if (isLinkValid) {
+                localStorage.clear();
                 localStorage.setItem('posvRefNumber', posvRefNumber)
                 localStorage.setItem('authToken', authToken)
                 localStorage.setItem('planCode', planCode)
+                localStorage.setItem('channelName', chanelName.toLowerCase())
                 this.goToPage(category);
             } else {
                 this.setState({ verificationError: true, errorMsg: businessMsg })
