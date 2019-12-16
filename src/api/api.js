@@ -1,4 +1,4 @@
-export const mode = 'qualTechDev'; // qualTechDev // mliDev
+export const mode = 'mliDev'; // qualTechDev // mliDev
 
 const api = {
     qualTechDevbaseUrl: 'https://n913i5xkoi.execute-api.ap-south-1.amazonaws.com/',
