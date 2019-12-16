@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
+// import Button from '@material-ui/core/Button';
 // import RefreshIcon from '@material-ui/icons/Refresh';
 
 export default function Error(props) {
@@ -13,12 +13,12 @@ export default function Error(props) {
     return (
         <div className="cstm-wrap">
             <div style={textStyles}>{props.errorMsg}</div>
-            <Button
+            {/* <Button
                 variant="contained"
                 onClick={props.errorFunction}
                 className="default_button">
                 {props.buttonText}
-            </Button>
+            </Button> */}
         </div>
     )
 }

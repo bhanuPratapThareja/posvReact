@@ -1,4 +1,4 @@
-export const mode = 'mliDev'; // qualTechDev // mliDev
+export const mode = 'qualTechDev'; // qualTechDev // mliDev
 
 const api = {
     qualTechDevbaseUrl: 'https://n913i5xkoi.execute-api.ap-south-1.amazonaws.com/',
@@ -17,7 +17,7 @@ const api = {
         getotp: {
             qualTechDevUrl: 'Stage/getotp',
             mliDevUrl: 'get-otp-dev',
-            body: { "request": { "header": { "correlationId": "25478965874", "appId": "ABC" }, "payload": { "posvRefNumber": "", "authToken": "", "onCallOTP":"No" } } },
+            body: { "request": { "header": { "correlationId": "25478965874", "appId": "ABC" }, "payload": { "posvRefNumber": "", "authToken": "", "onCallOTP": "No" } } },
         },
         validateOtp: {
             qualTechDevUrl: 'Stage/validateotp',
@@ -50,13 +50,15 @@ const api = {
 const getUrl = route => {
     let baseUrl;
     let url;
-    if(mode === 'qualTechDev'){
-        baseUrl = `${api.qualTechDevbaseUrl}`;
-        url =  `${baseUrl}${api['routes'][route]['qualTechDevUrl']}`;
-    }
-    if(mode === 'mliDev'){
-        baseUrl = `${api.mliDevBaseUrl}`;
-        url =  `${baseUrl}${api['routes'][route]['mliDevUrl']}`;
+    switch (mode) {
+        case 'qualTechDev':
+            baseUrl = `${api.qualTechDevbaseUrl}`;
+            url = `${baseUrl}${api['routes'][route]['qualTechDevUrl']}`;
+            break;
+        case 'mliDev':
+            baseUrl = `${api.mliDevBaseUrl}`;
+            url = `${baseUrl}${api['routes'][route]['mliDevUrl']}`;
+            break;
     }
     console.log('url: ', url)
     return url;

@@ -3,65 +3,106 @@
     width: 100vw;
 } */
 
-.generate-otp__grid {
-  width: 400px;
-  height: 300px;
-  position: absolute;
+.dsclmr-wrap {
+  /* position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);   */
+  position: relative;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, 20%);
+    -webkit-transform: translate(-50%, 20%);
+    -moz-transform: translate(-50%, 20%);
+    -ms-transform: translate(-50%, 20%);
+    max-width: 70%;
+}
+
+.generate-otp__grid {
+  width: 90%;
+  height: 300px;
+  margin: 0 auto;
 }
 
 .paper {
-    text-align: center;
-    padding-bottom: 16px;
+  text-align: center;
+  padding-bottom: 1rem;
 }
 
 .otp_div {
-    display: flex;
-    justify-content: space-around;
+  display: flex;
+  justify-content: space-around;
 }
 
 .otp_div input {
-    border: none;
-    border-bottom: 1px solid grey;
+  border: none;
+  border-bottom: 1px solid grey;
 }
 
 .buttons_div__otp {
-  margin-top: 24px;
+margin-top: 24px;
 }
 
 .buttons_div__otp button {
-  margin: 0 10px;
+margin: 0 10px;
 }
 
 
 .call_button {
-  display: none !important;
+display: none !important;
 }
 
 .submit_button--generate_otp {
-  margin-top: 16px !important;
+margin-top: 16px !important;
 }
 
 .otpTime {
-  font-weight: 700;
-  color: #00236e;
+font-weight: 700;
+color: #00236e;
+}
+
+.tnc-txt input[type="checkbox"] {
+  position:  relative;
+  top: 3px;
+  float: none;
+  margin:  0 13px 5px 0;
+}
+
+.tnc-txt p {
+  text-align:  justify;
+  font-size:  13px;
+  line-height: 19px;
+  margin: 0;
+}
+
+.tnc-txt form {
+  text-align: center;
+  margin: 0 0 20px;
 }
 
 @media(max-width: 640px){
-    .generate-otp__grid {
-        width: 90%;
-    }
+  .generate-otp__grid {
+      width: 90%;
+  }
 
-    p.default_text {
-        font-size: 14px;
-        line-height: 20px;
-        margin: 0;
-        padding: 0 20px;
-    }
-    
-    .MuiButton-label {
-        font-size: 11px;
-    }
+  p.default_text {
+      font-size: 14px;
+      line-height: 20px;
+      margin: 0;
+      padding: 0 20px;
+  }
+  
+  .MuiButton-label {
+      font-size: 11px;
+  }
+
+  .dsclmr-wrap {
+    max-width: 90%;
+  }
+
+
+  
 }
