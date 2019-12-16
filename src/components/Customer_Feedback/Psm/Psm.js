@@ -18,11 +18,11 @@ class Psm extends Component {
     }
 
     render() {
-        if (!this.props.psmQuestions || this.props.psmQuestions.length == '0') {
-            return (
-                <div>Please wait</div>
-            )
-        }
+        // if (!this.props.psmQuestions || this.props.psmQuestions.length == '0') {
+        //     return (
+        //         <div>Please wait</div>
+        //     )
+        // }
         return (
             <form>
                 {this.props.psmQuestions.map(question => {

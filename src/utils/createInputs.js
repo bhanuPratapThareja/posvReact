@@ -27,9 +27,11 @@ export default function createInput(field) {
                 </fieldset>
             )
         case 'text':
+        case 'tel':
+        case 'number':
             return (
                 <fieldset>
-                    <input type="text" name={qstId} style={{ marginTop: '16px' }} placeholder={qstText} value={customerResponse} required onChange={(event) => handleChange(event.target.value, qstId)} />
+                    <input type={qstOptType} name={qstId} style={{ marginTop: '16px' }} placeholder={qstText} value={customerResponse} required onChange={(event) => handleChange(event.target.value, qstId)} />
                 </fieldset>
             )
         case 'dropdown':

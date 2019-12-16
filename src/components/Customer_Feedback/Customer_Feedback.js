@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import './Customer_Feedback.css';
 import { headers } from './../../api/headers';
 import Loader from './../Loader/Loader';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 export default class Customer_Feedback extends Component {
     constructor() {
@@ -50,7 +51,7 @@ export default class Customer_Feedback extends Component {
                     if (option.qstType === 'Primary') {
                         this.manageChildren(qstId, option.customerResponse)
                     }
-                    if(option.qstType === 'Secondary' && option.qstOptType === 'checkbox'){
+                    if (option.qstType === 'Secondary' && option.qstOptType === 'checkbox') {
                         this.manageCheckboxText()
                     }
                 })
@@ -112,30 +113,30 @@ export default class Customer_Feedback extends Component {
             })
             children.push(array)
         })
-        
-       children.forEach(child => {
-           if(child.length > 1){
-            outer: for(let i = 0; i < child.length; i++){
-                if(child[i].qstOptType === 'checkbox' && child[i].customerResponse === 'Yes'){
-                    child.forEach(question => {
-                        if(question.qstOptType === 'text'){
-                            question.mandatory = false
-                        }
-                    })
-                    break outer;
-                } else {
-                    child.forEach(question => {
-                        if(question.qstOptType === 'text'){
-                            question.mandatory = true
-                        }
-                    })
+
+        children.forEach(child => {
+            if (child.length > 1) {
+                outer: for (let i = 0; i < child.length; i++) {
+                    if (child[i].qstOptType === 'checkbox' && child[i].customerResponse === 'Yes') {
+                        child.forEach(question => {
+                            if (question.qstOptType === 'text') {
+                                question.mandatory = false
+                            }
+                        })
+                        break outer;
+                    } else {
+                        child.forEach(question => {
+                            if (question.qstOptType === 'text') {
+                                question.mandatory = true
+                            }
+                        })
+                    }
                 }
             }
-           }
-       })
-       setTimeout(() => {
-        console.log('state: ', this.state.questions)
-       }, 1000);
+        })
+        setTimeout(() => {
+            console.log('state: ', this.state.questions)
+        }, 1000);
     }
 
     getQuestions = async (qstCatNamePrevious) => {
@@ -156,7 +157,7 @@ export default class Customer_Feedback extends Component {
 
     handleRsponse = (response) => {
         if (response && !response.data.response.payload.customerResponse) {
-            if(localStorage.getItem('channelName').toLowerCase() === 'x'){
+            if (localStorage.getItem('channelName').toLowerCase() === 'x') {
                 this.props.history.push('/declaration')
             } else {
                 this.props.history.push('/generate_otp')
@@ -164,7 +165,7 @@ export default class Customer_Feedback extends Component {
             return;
         }
         const questions = [...response.data.response.payload.customerResponse[0].qst];
-        console.log('questions:', questions)
+        // console.log('questions:', questions)
         let parentQuestions = [];
         let childQuestions = [];
         questions.forEach(question => {
@@ -173,9 +174,9 @@ export default class Customer_Feedback extends Component {
             }
             if (question.qstType === 'Secondary') {
                 if (question.qstOptType && question.qstOptType === 'checkbox') {
-                    if(!question.customerResponse || question.custResponse === 'No'){
+                    if (!question.customerResponse || question.custResponse === 'No') {
                         question.customerResponse = 'No'
-                    } else if(question.customerResponse && question.customerResponse === 'Yes'){
+                    } else if (question.customerResponse && question.customerResponse === 'Yes') {
                         question.customerResponse = 'Yes'
                     }
                 }
@@ -209,18 +210,18 @@ export default class Customer_Feedback extends Component {
         const customerResponseArray = [];
 
         this.state.questions.forEach(question => {
-            if(question.mandatory === true && !question.customerResponse) mandatoryArray.push(question)
+            if (question.mandatory === true && !question.customerResponse) mandatoryArray.push(question)
         })
 
-        if(mandatoryArray.length > 0){
+        if (mandatoryArray.length > 0) {
             // console.log(mandatoryArray)
             this.setState({ allFieldsMandatoryError: true })
             return
         }
-        
+
         this.state.questions.forEach(question => {
-            if(question.customerResponse) customerResponseArray.push(question)
-            if(question.mandatory === false) customerResponseArray.push('')
+            if (question.customerResponse) customerResponseArray.push(question)
+            if (question.mandatory === false) customerResponseArray.push('')
         })
 
         // console.log(customerResponseArray.length)
@@ -265,66 +266,75 @@ export default class Customer_Feedback extends Component {
     }
 
     render() {
-        if (this.state.proceeding) {
-            return <Loader />
+        // if (this.state.proceeding) {
+        //     return <Loader />
+        // }
+
+        const progressStyle = {
+            visibility: this.state.proceeding ? 'visible' : 'hidden'
         }
 
-
         return (
-            <div className="cust_feedback--page">
+            <>
+                <LinearProgress style={progressStyle} />
+                <div className="cust_feedback--page">
 
-                {this.state.qstCatName ? <div style={{ textAlign: 'center', textTransform: 'capitalize' }}>
-                    {this.getPageName(this.state.qstCatName)} Related Questions
+                    {this.state.qstCatName ? <div style={{ textAlign: 'center', textTransform: 'capitalize' }}>
+                        {this.getPageName(this.state.qstCatName)} Related Questions
                     </div> : null}
 
-                {this.state.qstCatName === 'HEALTH-1' ? <Health1
-                    health1Questions={this.state.questions}
-                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                /> : null}
+                    {this.state.qstCatName === 'HEALTH-1' ? <Health1
+                        health1Questions={this.state.questions}
+                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                    /> : null}
 
-                {this.state.qstCatName === 'HEALTH-2' ? <Health2
-                    health2Questions={this.state.questions}
-                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                /> : null}
+                    {this.state.qstCatName === 'HEALTH-2' ? <Health2
+                        health2Questions={this.state.questions}
+                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                    /> : null}
 
-                {this.state.qstCatName === 'PRODUCT' ? <Product
-                    productQuestions={this.state.questions}
-                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                /> : null}
-                {this.state.qstCatName === 'PSM' ? <Psm
-                    psmQuestions={this.state.questions}
-                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                /> : null}
-                {this.state.qstCatName === 'RPSALES' ? <RpSales
-                    rpSalesQuestions={this.state.questions}
-                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                /> : null}
-                {this.state.qstCatName === 'CANCER' ? <Cancer
-                    cancerQuestions={this.state.questions}
-                    onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
-                /> : null}
+                    {this.state.qstCatName === 'PRODUCT' ? <Product
+                        productQuestions={this.state.questions}
+                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                    /> : null}
+                    {this.state.qstCatName === 'PSM' ? <Psm
+                        psmQuestions={this.state.questions}
+                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                    /> : null}
+                    {this.state.qstCatName === 'RPSALES' ? <RpSales
+                        rpSalesQuestions={this.state.questions}
+                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                    /> : null}
+                    {this.state.qstCatName === 'CANCER' ? <Cancer
+                        cancerQuestions={this.state.questions}
+                        onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
+                    /> : null}
 
-                {this.state.allFieldsMandatoryError ? <div
-                    className="required"
-                    style={{ textAlign: 'center' }}
-                >All fields are mandatory.</div> : null}
+                    {this.state.allFieldsMandatoryError ? <div
+                        className="required"
+                        style={{ textAlign: 'center' }}
+                    >All fields are mandatory.</div> : null}
 
-                <div className="button_div">
-                    {this.state.qstCatNamePrevious ? <Button
-                        variant="contained"
-                        onClick={() => this.gotToPage('previous')}
-                        className="default_button">
-                        Previous
-                    </Button> : null}
+                    {this.state.questions.length ? <div className="button_div">
+                        {this.state.qstCatNamePrevious ?
+                            <Button
+                                variant="contained"
+                                onClick={() => this.gotToPage('previous')}
+                                className="default_button"
+                                disabled={this.state.proceeding}>
+                                Previous
+                            </Button> : null}
 
-                    <Button
-                        variant="contained"
-                        onClick={() => this.gotToPage('next')}
-                        className="default_button">
-                        Next
-                        </Button>
+                            <Button
+                                variant="contained"
+                                onClick={() => this.gotToPage('next')}
+                                className="default_button"
+                                disabled={this.state.proceeding}>
+                                Next
+                            </Button>
+                    </div>: null}
                 </div>
-            </div>
+            </>
         )
     }
 }

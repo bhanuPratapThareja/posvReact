@@ -33,6 +33,7 @@ class Verify extends Component {
         const { url, body } = getApiData('verifyUser');
         body.request.payload.posvRefNumber = txnId;
         try {
+            console.log('header: ', headers)
             const response = await axios.post(url, body, { headers })
             console.log(response)
             // return

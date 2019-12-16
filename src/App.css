@@ -1,7 +1,7 @@
 body {
     margin: 0;
     padding: 0;
-    width: 100vw;
+    /* width: 100vw; */
     height: 100vh;
 }
 
@@ -27,3 +27,46 @@ body {
 button:disabled {
     opacity: 0.5;
 }
+
+/*-- Checkboxes Styling --*/
+input[type="checkbox"]:checked, 
+input[type="checkbox"]:not(:checked) {
+    position: relative;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:checked:after, 
+input[type="checkbox"]:not(:checked):after {
+    position: relative;
+    background: #fff;
+    border: 1px solid #f37920;
+    content: "";
+    display: block;
+    z-index: 0;
+    width: 15px;
+    height: 15px;
+    transition: all ease 0.5s;
+    -webkit-transition: all ease 0.5s;
+    -moz-transition: all ease 0.5s;
+    -ms-transition: all ease 0.5s;
+    -o-transition: all ease 0.5s;
+}
+
+input[type="checkbox"]:checked:after {
+    background: #f37920;
+}
+
+input[type="checkbox"] {
+    float: left;
+    margin: 0 15px 0 5px;
+    position: relative;
+    z-index: 100;
+    top: 7px;
+    width: 17px;
+    height: 17px;
+}
+
+p.check-sec {
+    display: inline-block;
+    margin: 7px 0 7px 15px;
+} 
