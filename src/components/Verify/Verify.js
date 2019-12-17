@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import './Verify.css';
-import Loader from './../Loader/Loader';
 import { getApiData } from './../../api/api';
 import Error from './../Error/Error';
 
@@ -29,6 +28,7 @@ class Verify extends Component {
     }
 
     verifyUser = async txnId => {
+        this.props.manageLoader(true)
         const { url, body } = getApiData('verifyUser');
         body.request.payload.posvRefNumber = txnId;
         try {
@@ -49,6 +49,8 @@ class Verify extends Component {
             }
         } catch (err) {
             this.setState({ verificationError: true })
+        } finally {
+            this.props.manageLoader(false)
         }
     }
 
@@ -77,10 +79,9 @@ class Verify extends Component {
             <div className="cstm-wrap">
                 <div className="verify_user">
                     {!this.state.verificationError ? <div>
-                        <Loader />
-                        <div className="loading_text">
+                        {this.props.loading ? <div className="display_text">
                             Please wait ...
-                        </div>
+                            </div> : null}
                     </div> : null}
                     {this.state.verificationError ?
                         <Error

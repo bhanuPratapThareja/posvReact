@@ -9,9 +9,6 @@ import RpSales from './Rp_Sales/Rp_Sales';
 import Cancer from './Cancer/Cancer';
 import Button from '@material-ui/core/Button';
 import './Customer_Feedback.css';
-import { headers } from './../../api/headers';
-import Loader from './../Loader/Loader';
-import LinearProgress from '@material-ui/core/LinearProgress';
 
 export default class Customer_Feedback extends Component {
     constructor() {
@@ -23,7 +20,6 @@ export default class Customer_Feedback extends Component {
             qstCatName: '',
             qstCatNameNext: '',
             qstCatNamePrevious: '',
-            proceeding: false,
             allFieldsMandatoryError: false
         }
     }
@@ -33,6 +29,7 @@ export default class Customer_Feedback extends Component {
     }
 
     componentDidMount() {
+        console.log(this.props)
         const qstCatName = this.props.location.pathname.split('/')[2].toUpperCase();
         console.log('qstCatName: ', qstCatName)
         this.setState({ qstCatName }, () => {
@@ -80,14 +77,14 @@ export default class Customer_Feedback extends Component {
             })
             const flattendArray = [].concat.apply([], questions);
 
-            this.setState({ questions: flattendArray, proceeding: false }, () => {
+            this.setState({ questions: flattendArray }, () => {
                 this.manageCheckboxText()
             })
         } else {
             const newArray = questions.filter((currentValue, index, arr) => {
                 return arr[index].qstPrtId !== qstId
             })
-            this.setState({ questions: newArray, proceeding: false })
+            this.setState({ questions: newArray })
         }
 
         setTimeout(() => {
@@ -140,7 +137,7 @@ export default class Customer_Feedback extends Component {
     }
 
     getQuestions = async (qstCatNamePrevious) => {
-        await this.setState({ proceeding: true })
+        this.props.manageLoader(true)
         const { url, body } = getApiData('getQuestions');
         qstCatNamePrevious ? body.request.payload.qstCatName = qstCatNamePrevious : body.request.payload.qstCatName = this.state.qstCatName;
         try {
@@ -149,6 +146,8 @@ export default class Customer_Feedback extends Component {
             this.handleRsponse(res)
         } catch (err) {
             console.log(err)
+        } finally {
+            this.props.manageLoader(false)
         }
     }
 
@@ -228,19 +227,21 @@ export default class Customer_Feedback extends Component {
             this.setState({ allFieldsMandatoryError: true })
             return
         }
-        await this.setState({ proceeding: true })
+   
         const { url, body } = getApiData('saveCustomerResponse')
         const { qstCatName } = this.state;
         body.request.payload.qstCatName = qstCatName;
         body.request.payload.customerResponse.qstCatName = qstCatName;
         body.request.payload.customerResponse.qst = [...this.state.questions]
         try {
+            this.props.manageLoader(true)
             const response = await axios.post(url, body)
-            await this.setState({ proceeding: false, allFieldsMandatoryError: false })
             this.handleRsponse(response)
         } catch (err) {
-            this.setState({ proceeding: false, allFieldsMandatoryError: false })
             console.log(err)
+        } finally {
+            this.props.manageLoader(false)
+            this.setState({ allFieldsMandatoryError: false })
         }
     }
 
@@ -260,17 +261,10 @@ export default class Customer_Feedback extends Component {
     }
 
     render() {
-        // if (this.state.proceeding) {
-        //     return <Loader />
-        // }
 
-        const progressStyle = {
-            visibility: this.state.proceeding ? 'visible' : 'hidden'
-        }
 
         return (
             <>
-                <LinearProgress style={progressStyle} />
                 <div className="cust_feedback--page">
 
                     {this.state.qstCatName ? <div style={{ textAlign: 'center', textTransform: 'capitalize' }}>
@@ -315,7 +309,7 @@ export default class Customer_Feedback extends Component {
                                 variant="contained"
                                 onClick={() => this.gotToPage('previous')}
                                 className="default_button"
-                                disabled={this.state.proceeding}>
+                                disabled={this.props.loading}>
                                 Previous
                             </Button> : null}
 
@@ -323,7 +317,7 @@ export default class Customer_Feedback extends Component {
                                 variant="contained"
                                 onClick={() => this.gotToPage('next')}
                                 className="default_button"
-                                disabled={this.state.proceeding}>
+                                disabled={this.props.loading}>
                                 Next
                             </Button>
                     </div>: null}

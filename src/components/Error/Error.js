@@ -11,7 +11,7 @@ export default function Error(props) {
     }
 
     return (
-        <div className="cstm-wrap">
+        <div className="display_text">
             <div style={textStyles}>{props.errorMsg}</div>
             {/* <Button
                 variant="contained"
