@@ -6,10 +6,10 @@ import Icon from '@material-ui/core/Icon';
 const Thankyou = (props) => {
 
     props.history.listen((location, action) => {
-        alert(action)
-        // if(action === 'POP'){
-        //     props.history.push('/thankyou')
-        // }
+        // alert(action)
+        if(action === 'POP'){
+            props.history.push('/thankyou')
+        }
     });
     
     return (

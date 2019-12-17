@@ -9,7 +9,6 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
 import './Declaration.css';
-import { headers } from './../../api/headers';
 
 class Declaration extends Component {
 
@@ -28,12 +27,10 @@ class Declaration extends Component {
     proceed = async () => {
         await this.setState({ proceeding: true });
         const { url, body } = getApiData('declaration');
-        body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
-        body.request.payload.authToken = localStorage.getItem('authToken');
-        body.request.payload.planCode = localStorage.getItem('planCode');
         body.request.payload.customerDisclaimer = 'Agreed';
+
         try {
-            await axios.post(url, body, { headers });
+            await axios.post(url, body);
             this.setState({ proceeding: false });
             this.props.history.push('/generate_otp');
         } catch (err) {

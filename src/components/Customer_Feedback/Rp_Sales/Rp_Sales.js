@@ -18,11 +18,6 @@ class RpSales extends Component {
     }
 
     render() {
-        if (!this.props.rpSalesQuestions || this.props.rpSalesQuestions.length == '0') {
-            return (
-                <div>Please wait</div>
-            )
-        }
         return (
             <form>
                 {this.props.rpSalesQuestions.map(question => {

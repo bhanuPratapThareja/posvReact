@@ -4,7 +4,6 @@ import Button from '@material-ui/core/Button';
 import * as faceapi from 'face-api.js';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
-import { headers } from './../../api/headers';
 import LinearProgress from '@material-ui/core/LinearProgress';
 
 export default class Selfie extends Component {
@@ -80,13 +79,11 @@ export default class Selfie extends Component {
         const type = base64.substring(base64.indexOf('/') + 1, base64.indexOf(';base64'));
         const imgString = base64.split(",")[1]
 
-        body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber')
-        body.request.payload.authToken = localStorage.getItem('authToken')
         body.request.payload.imageFile = imgString;
         body.request.payload.fileExtension = type;
 
         try {
-            const response = await axios.post(url, body, { headers })
+            const response = await axios.post(url, body)
             this.setState({ submitting: false })
             if (this.localStream != null) {
                 this.localStream.getTracks().map(function (val) {

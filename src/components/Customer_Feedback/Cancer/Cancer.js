@@ -18,11 +18,6 @@ class Cancer extends Component {
     }
 
     render() {
-        if (!this.props.cancerQuestions || this.props.cancerQuestions.length == '0') {
-            return (
-                <div>Please wait</div>
-            )
-        }
         return (
             <>
                 <div className="heading one">

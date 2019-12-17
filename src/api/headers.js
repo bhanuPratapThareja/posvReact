@@ -1,7 +1,6 @@
 import { mode } from './api';
 
-const getHeader = () => {
-    console.log('mode:: ', mode)
+export const getHeader = () => {
     let header;
     switch(mode){
         case 'qualTechDev':
