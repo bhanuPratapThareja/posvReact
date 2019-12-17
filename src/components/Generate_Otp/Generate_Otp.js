@@ -5,7 +5,6 @@ import './Generate_Otp.css';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
-import { headers } from './../../api/headers';
 import Otp from './Otp/Otp';
 import Snackbar from './../Snackbar/Snackbar';
 
@@ -51,61 +50,62 @@ class Generate_Otp extends Component {
         }
     }
 
-    generateOtp = async (type) => {
-        this.setState({ generatingOtp: true });
-        let generateOtpinterval;
-        if (type !== 'call') {
-            generateOtpinterval = setInterval(() => {
-                this.setState({ showGenerateOtpTime: true, generateOtpTime: --this.state.generateOtpTime, disableGenerateOtpButton: true });
-                if (this.state.generateOtpTime === 0) {
-                    clearInterval(generateOtpinterval);
-                    this.setState({ showGenerateOtpTime: false, generateOtpTime: 20, disableGenerateOtpButton: false })
-                }
-            }, 1000);
-        }
-
-        let { url, body } = getApiData('getotp');
-        body = JSON.parse(JSON.stringify(body))
-        body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
-        body.request.payload.authToken = localStorage.getItem('authToken');
-
-        let callInterval;
-        if (type === 'call') {
-            body.request.payload.onCallOTP = 'Yes';
-            callInterval = setInterval(() => {
-                this.setState({ showCallTime: true, callOtpTime: --this.state.callOtpTime, disableCallButton: true });
-                if (this.state.callOtpTime === 0) {
-                    clearInterval(callInterval);
-                    this.setState({ showCallTime: false, callOtpTime: 20, disableCallButton: false })
-                }
-            }, 1000);
-        }
-
-        try {
-            const response = await axios.post(url, body, { headers })
-            this.setState({ displayMessage: response.data.response.payload.levelMessage, generatingOtp: false })
-            if (type === 'call') {
-
-                this.setState({ callAttemptsSuccess: this.state.callAttemptsSuccess + 1 }, () => {
-                    if (this.state.callAttemptsSuccess >= 3) {
-                        this.setState({ showCallButton: false })
+    generateOtp = (type) => {
+        this.setState({  generatingOtp: true }, async () => {
+            let { url, body } = getApiData('getotp');
+            body = JSON.parse(JSON.stringify(body));
+    
+            let generateOtpinterval;
+            if (type !== 'call') {
+                generateOtpinterval = setInterval(() => {
+                    this.setState({ showGenerateOtpTime: true, generateOtpTime: --this.state.generateOtpTime, disableGenerateOtpButton: true });
+                    if (this.state.generateOtpTime === 0) {
+                        clearInterval(generateOtpinterval);
+                        this.setState({ showGenerateOtpTime: false, generateOtpTime: 20, disableGenerateOtpButton: false })
                     }
-                })
+                }, 1000);
             }
-            const msg = response.data.response.msgInfo.msgDescription
-            this.handleSnackbar(true, 'success', msg)
-        } catch (err) {
-            if (generateOtpinterval) {
-                clearInterval(generateOtpinterval);
+    
+            let callInterval;
+            if (type === 'call') {
+                body.request.payload.onCallOTP = 'Yes';
+                callInterval = setInterval(() => {
+                    this.setState({ showCallTime: true, callOtpTime: --this.state.callOtpTime, disableCallButton: true });
+                    if (this.state.callOtpTime === 0) {
+                        clearInterval(callInterval);
+                        this.setState({ showCallTime: false, callOtpTime: 20, disableCallButton: false })
+                    }
+                }, 1000);
             }
-            if(callInterval){
-                clearInterval(callInterval)
+    
+            try {
+                const response = await axios.post(url, body)
+                this.setState({ displayMessage: response.data.response.payload.levelMessage })
+                if (type === 'call') {
+    
+                    this.setState({ callAttemptsSuccess: this.state.callAttemptsSuccess + 1 }, () => {
+                        if (this.state.callAttemptsSuccess >= 3) {
+                            this.setState({ showCallButton: false })
+                        }
+                    })
+                }
+                const msg = response.data.response.msgInfo.msgDescription;
+                this.handleSnackbar(true, 'success', msg)
+            } catch (err) {
+    
+                if (generateOtpinterval) {
+                    clearInterval(generateOtpinterval);
+                }
+                if(callInterval){
+                    clearInterval(callInterval)
+                }
+    
+                this.handleSnackbar(true, 'error', 'Please try again')
+            } finally {
+                console.log('finalling')
+                this.setState({ generatingOtp: false, showCallButton: true, otpButtonText: 'Regenerate OTP' });
             }
-            this.handleSnackbar(true, 'error', 'Please try again')
-        } finally {
-            this.setState({ showCallButton: true, otpButtonText: 'Regenerate OTP' });
-        }
-
+        })
     }
 
     handleCheckbox = value => {
@@ -122,12 +122,9 @@ class Generate_Otp extends Component {
         }
         const { url, body } = getApiData('validateOtp');
         body.request.payload.otp = otp;
-        body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
-        body.request.payload.authToken = localStorage.getItem('authToken');
-        body.request.payload.planCode = localStorage.getItem('planCode');
 
         try {
-            const response = await axios.post(url, body, { headers })
+            const response = await axios.post(url, body)
             if (response.data.response.messageInfo.msgCode == 700) {
                 this.handleSnackbar(true, 'error', response.data.response.messageInfo.msgDescription)
                 return

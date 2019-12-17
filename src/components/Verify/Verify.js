@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { headers } from './../../api/headers';
 import './Verify.css';
 import Loader from './../Loader/Loader';
 import { getApiData } from './../../api/api';
@@ -33,19 +32,15 @@ class Verify extends Component {
         const { url, body } = getApiData('verifyUser');
         body.request.payload.posvRefNumber = txnId;
         try {
-            console.log('header: ', headers)
-            const response = await axios.post(url, body, { headers })
-            console.log(response)
-            // return
+            const response = await axios.post(url, body);
             if (response.data.errorMessage) {
                 this.setState({ verificationError: true, errorMsg: 'Invalid Transaction ID' })
                 return
             }
-            const { posvRefNumber, authToken, businessMsg, isLinkValid, category, planCode, chanelName } = response.data.response.payload;
+            const { posvRefNumber, businessMsg, isLinkValid, category, planCode, chanelName } = response.data.response.payload;
             if (isLinkValid) {
                 localStorage.clear();
                 localStorage.setItem('posvRefNumber', posvRefNumber)
-                localStorage.setItem('authToken', authToken)
                 localStorage.setItem('planCode', planCode)
                 localStorage.setItem('channelName', chanelName.toLowerCase())
                 this.goToPage(category);

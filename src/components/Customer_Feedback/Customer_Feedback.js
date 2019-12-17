@@ -142,12 +142,9 @@ export default class Customer_Feedback extends Component {
     getQuestions = async (qstCatNamePrevious) => {
         await this.setState({ proceeding: true })
         const { url, body } = getApiData('getQuestions');
-        body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
-        body.request.payload.authToken = localStorage.getItem('authToken');
-        body.request.payload.planCode = localStorage.getItem('planCode');
         qstCatNamePrevious ? body.request.payload.qstCatName = qstCatNamePrevious : body.request.payload.qstCatName = this.state.qstCatName;
         try {
-            const response = await axios.post(url, body, { headers })
+            const response = await axios.post(url, body)
             const res = JSON.parse(JSON.stringify(response))
             this.handleRsponse(res)
         } catch (err) {
@@ -234,14 +231,11 @@ export default class Customer_Feedback extends Component {
         await this.setState({ proceeding: true })
         const { url, body } = getApiData('saveCustomerResponse')
         const { qstCatName } = this.state;
-        body.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
-        body.request.payload.authToken = localStorage.getItem('authToken');
-        body.request.payload.planCode = localStorage.getItem('planCode');
         body.request.payload.qstCatName = qstCatName;
         body.request.payload.customerResponse.qstCatName = qstCatName;
         body.request.payload.customerResponse.qst = [...this.state.questions]
         try {
-            const response = await axios.post(url, body, { headers })
+            const response = await axios.post(url, body)
             await this.setState({ proceeding: false, allFieldsMandatoryError: false })
             this.handleRsponse(response)
         } catch (err) {
