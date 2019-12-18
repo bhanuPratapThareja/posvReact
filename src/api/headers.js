@@ -1,8 +1,8 @@
-import { mode } from './api';
+import { env } from './../env/env';
 
 export const getHeader = () => {
     let header;
-    switch(mode){
+    switch(env){
         case 'qualTechDev':
             header = 'U8eL0A3syl3wPN0U1tMuN7OJH66cXw0llUlC4deg';
             break;

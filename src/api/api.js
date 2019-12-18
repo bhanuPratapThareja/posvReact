@@ -1,4 +1,4 @@
-export const mode = 'mliDev'; // qualTechDev // mliDev
+import { env } from './../env/env';
 
 const api = {
     qualTechDevbaseUrl: 'https://n913i5xkoi.execute-api.ap-south-1.amazonaws.com/',
@@ -50,7 +50,7 @@ const api = {
 const getUrl = route => {
     let baseUrl;
     let url;
-    switch (mode) {
+    switch (env) {
         case 'qualTechDev':
             baseUrl = `${api.qualTechDevbaseUrl}`;
             url = `${baseUrl}${api['routes'][route]['qualTechDevUrl']}`;
