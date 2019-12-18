@@ -29,9 +29,7 @@ export default class Customer_Feedback extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props)
         const qstCatName = this.props.location.pathname.split('/')[2].toUpperCase();
-        console.log('qstCatName: ', qstCatName)
         this.setState({ qstCatName }, () => {
             this.getQuestions();
         })
@@ -133,6 +131,9 @@ export default class Customer_Feedback extends Component {
                 }
             }
         })
+        setTimeout(() => {
+            console.log(this.state.questions)
+        }, 1000);
     }
 
     getQuestions = async (qstCatNamePrevious) => {

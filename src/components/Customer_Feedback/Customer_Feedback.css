@@ -14,11 +14,6 @@
     margin: 20px;
 }
 
-.chevron {
-    font-size: 40px !important;
-    font-weight: 900 !important;
-}
-
 /*-- Radio btn styling --*/
 
 [type="radio"]:checked, [type="radio"]:not(:checked) {
