@@ -9,7 +9,7 @@ export default class Header extends Component {
     render() {
         return (
             <>
-            <AppBar position="static" className="appbar">
+            <AppBar className="appbar">
                 <Toolbar className="header">
                     <img src={mli_logo}  alt="Logo"/>
                 </Toolbar>

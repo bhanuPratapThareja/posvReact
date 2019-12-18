@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    padding: 0;
+    padding: 70px 0 0;
     /* width: 100vw; */
     height: 100vh;
 }
@@ -80,3 +80,9 @@ p.check-sec {
     display: inline-block;
     margin: 7px 0 7px 15px;
 } 
+
+.MuiLinearProgress-root {
+    position: fixed !important;
+    top: 70px !important;
+    width: 100%;
+}
