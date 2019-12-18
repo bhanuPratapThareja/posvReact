@@ -21,7 +21,6 @@ axios.interceptors.request.use(config => {
         newConfig.data.request.payload.posvRefNumber = localStorage.getItem('posvRefNumber');
         newConfig.data.request.payload.planCode = localStorage.getItem('planCode');
     }
-    console.log('newConfig: ', newConfig.data)
     return newConfig
 })
 

@@ -1,7 +1,7 @@
-export const mode = 'mliDev'; // qualTechDev // mliDev
+import { env } from './../env/env';
 
 const api = {
-    qualTechDevbaseUrl: 'https://n913i5xkoi.execute-api.ap-south-1.amazonaws.com/',
+    qualTechDevBaseUrl: 'https://n913i5xkoi.execute-api.ap-south-1.amazonaws.com/',
     mliDevBaseUrl: 'https://djedtvaxn2.execute-api.ap-south-1.amazonaws.com/posvdev/',
     routes: {
         verifyUser: {
@@ -42,30 +42,20 @@ const api = {
         saveCustomerResponse: {
             qualTechDevUrl: 'Stage/save-customer-response',
             mliDevUrl: 'save-customer-response-dev',
-            body: { "request": { "header": { "appId": "mpro", "correlationId": "" }, "payload": { "customerResponse": { "qst": [] }, "qstCatName": "", "qstSubCatName": null, "posvRefNumber": "", "lang": "EN", "planCode": "EFGEP8", "qstCatNameNext": null, "qstSubCatNameNext": null, "qstCatNamePrevious": null, "qstSubCatNamePrevious": null, "authToken": "wtewe834jwe" } } }
+            body: { "request": { "header": { "appId": "mpro", "correlationId": "" }, "payload": { "customerResponse": { "qst": [] }, "qstCatName": "", "qstSubCatName": null, "posvRefNumber": "", "lang": "EN", "planCode": "", "qstCatNameNext": null, "qstSubCatNameNext": null, "qstCatNamePrevious": null, "qstSubCatNamePrevious": null, "authToken": "" } } }
         }
     }
 }
 
 const getUrl = route => {
-    let baseUrl;
-    let url;
-    switch (mode) {
-        case 'qualTechDev':
-            baseUrl = `${api.qualTechDevbaseUrl}`;
-            url = `${baseUrl}${api['routes'][route]['qualTechDevUrl']}`;
-            break;
-        case 'mliDev':
-            baseUrl = `${api.mliDevBaseUrl}`;
-            url = `${baseUrl}${api['routes'][route]['mliDevUrl']}`;
-            break;
-    }
-    console.log('url: ', url)
+    const baseUrl = api[`${env}BaseUrl`];
+    const pathUrl = `${env}Url`;
+    let url = `${baseUrl}${api['routes'][route][pathUrl]}`;
     return url;
 }
 
 const getBody = route => {
-    return api['routes'][route]['body']
+    return api['routes'][route]['body'];
 }
 
 export const getApiData = route => {

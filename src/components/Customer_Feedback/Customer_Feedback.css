@@ -11,12 +11,7 @@
     width: auto;
     padding: 5px 20px;
     border-radius: 0;
-    margin: 0 10px;
-}
-
-.chevron {
-    font-size: 40px !important;
-    font-weight: 900 !important;
+    margin: 20px;
 }
 
 /*-- Radio btn styling --*/
@@ -57,10 +52,10 @@
     color: #fff;
 }
 
-[type="radio"]:checked + label::before, [type="radio"]:not(:checked) + label::before {}
+/* [type="radio"]:checked + label::before, [type="radio"]:not(:checked) + label::before {}
 [type="radio"]:checked + label::after, [type="radio"]:not(:checked) + label::after {}
 [type="radio"]:not(:checked) + label::after {}
-[type="radio"]:checked + label::after {}
+[type="radio"]:checked + label::after {} */
 
 
 /*-- Radio Styling Ends Here --*/
@@ -153,6 +148,20 @@ select{
     background: url("../../images/down-arrow.png") no-repeat 95% center / 10px;
 }
 
+
+.heading.one {
+    padding: 16px 0 0;
+}
+
+input[type="radio"]:focus, 
+input[type="checkbox"]:focus {
+    background: transparent;
+    box-shadow: none;
+    outline: 0!important;
+    outline: none!important;
+    -webkit-tap-highlight-color: transparent!important;
+}
+
 .snackbar .MuiSnackbarContent-root {
     text-align: center;
     position: relative;
@@ -169,7 +178,7 @@ select{
 }
 /*-- Checkbox Styling ends Here --*/ 
 
-@media(max-width: 480px) {
+@media(max-width: 479px) {
     form fieldset p.check-sec {
         display: inline-block;
         margin: 5px 0;

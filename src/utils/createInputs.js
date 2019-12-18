@@ -1,6 +1,17 @@
 import React from 'react';
+import MaskedInput from 'react-maskedinput'
+import { allowedOtpKeys } from './allowedOtpKeys';
 
-const handleChange = (value, qstId, type) => {
+const handleChange = (e, qstId, type) => {
+    // console.log('key: ', typeof num)
+    let value = type === 'checkbox' ? e.target.checked : e.target.value;
+    // if (type === 'dateYearMask') {
+    //     console.log(value)
+    // } else {
+    //     e.preventDefault();
+    // }
+
+    console.log(value)
     if (type === 'checkbox') {
         value === true ? value = 'Yes' : value = 'No'
     }
@@ -10,7 +21,7 @@ const handleChange = (value, qstId, type) => {
 
 
 export default function createInput(field) {
-    let { qstOptType, qstText, qstId, qstOpt, rows, cols, customerResponse } = field.question;
+    let { qstOptType, qstText, qstId, qstOpt, customerResponse } = field.question;
     const qst = qstText.split('^^^');
 
     const getRadioQuestions = qst.map((q, i) => {
@@ -22,8 +33,8 @@ export default function createInput(field) {
             return (
                 <fieldset>
                     {getRadioQuestions}
-                    <input type="radio" name={qstId} value="Yes" required checked={field.question.customerResponse === 'Yes' ? true : false} onChange={(event) => handleChange(event.target.value, qstId)} /> <label>Yes</label>
-                    <input type="radio" name={qstId} value="No" checked={field.question.customerResponse === 'No' ? true : false} onChange={(event) => handleChange(event.target.value, qstId)} /> <label>No</label>
+                    <input type="radio" name={qstId} value="Yes" required checked={field.question.customerResponse === 'Yes' ? true : false} onChange={(event) => handleChange(event, qstId)} /> <label>Yes</label>
+                    <input type="radio" name={qstId} value="No" checked={field.question.customerResponse === 'No' ? true : false} onChange={(event) => handleChange(event, qstId)} /> <label>No</label>
                 </fieldset>
             )
         case 'text':
@@ -31,7 +42,7 @@ export default function createInput(field) {
         case 'number':
             return (
                 <fieldset>
-                    <input type={qstOptType} name={qstId} style={{ marginTop: '16px' }} placeholder={qstText} value={customerResponse} required onChange={(event) => handleChange(event.target.value, qstId)} />
+                    <input type={qstOptType} name={qstId} style={{ marginTop: '16px' }} placeholder={qstText} value={customerResponse} required onChange={(event) => handleChange(event, qstId)} />
                 </fieldset>
             )
         case 'dropdown':
@@ -39,7 +50,7 @@ export default function createInput(field) {
             const selectedValue = customerResponse ? customerResponse : 'default';
             return (
                 <fieldset>
-                    <select name={qstId} style={{ marginTop: '16px' }} value={selectedValue} onChange={(event) => handleChange(event.target.value, qstId)}>
+                    <select name={qstId} style={{ marginTop: '16px' }} value={selectedValue} onChange={(event) => handleChange(event, qstId)}>
                         <option value="default" disabled hidden>{qstText}</option>
                         {qstOpt.map((el, i) => {
                             return <option key={i} value={qstOpt[i]}>{qstOpt[i]}</option>
@@ -58,14 +69,21 @@ export default function createInput(field) {
                         className="regular-checkbox"
                         value={customerResponse}
                         checked={customerResponse === 'Yes' ? true : false}
-                        onChange={(event) => handleChange(event.target.checked, qstId, 'checkbox')} />
+                        onChange={(event) => handleChange(event, qstId, 'checkbox')} />
                 </fieldset>
             )
         case 'textarea':
             return (
-                <fieldset onChange={(event) => handleChange(event.target.value, qstId)}>
+                <fieldset onChange={(event) => handleChange(event, qstId)}>
                     <p>{qstText}<span className="required"> *</span></p>
                     <textarea rows={5} cols={30}></textarea>
+                </fieldset>
+            )
+        case 'dateYearMask':
+            return (
+                <fieldset>
+                    <p>{qstText}<span className="required"> *</span></p>
+                    <MaskedInput mask="11/1111" name={qstId} value={customerResponse} placeholder="MM/YYYY" onChange={(event) => handleChange(event, qstId)} />
                 </fieldset>
             )
         default:

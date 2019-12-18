@@ -16,6 +16,7 @@ form fieldset label{
     cursor: pointer;
 }
 
+
 .cust_feedback--page > div:first-child {
     font-size: 16px;
     font-weight: 500;
@@ -28,7 +29,7 @@ form fieldset label{
     }
     
     .cust_feedback--page .button_div {
-        margin: 15px 0;
+        margin: 1rem 0;
     }
 
 }

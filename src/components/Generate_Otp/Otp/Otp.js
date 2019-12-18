@@ -7,7 +7,6 @@ const Otp = props => {
 
     const onInputChange = (event, val) => {
         const keyCode = event.keyCode;
-        console.log('keyCode: ', keyCode);
         event.persist();
         let inputs = document.getElementsByClassName('input_otp');
         inputs[val].value = '';

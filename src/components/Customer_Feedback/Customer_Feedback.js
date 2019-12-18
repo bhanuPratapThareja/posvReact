@@ -29,9 +29,7 @@ export default class Customer_Feedback extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props)
         const qstCatName = this.props.location.pathname.split('/')[2].toUpperCase();
-        console.log('qstCatName: ', qstCatName)
         this.setState({ qstCatName }, () => {
             this.getQuestions();
         })
@@ -48,15 +46,15 @@ export default class Customer_Feedback extends Component {
                     if (option.qstType === 'Primary') {
                         this.manageChildren(qstId, option.customerResponse)
                     }
-                    if (option.qstType === 'Secondary' && option.qstOptType === 'checkbox') {
+                    if (option.qstType === 'Secondary' && (option.qstOptType === 'checkbox' || option.qstOptType === 'radio')) {
                         this.manageCheckboxText()
                     }
                 })
             }
         })
-        setTimeout(() => {
-            // console.log(this.state)
-        }, 1000);
+        // setTimeout(() => {
+        //     console.log(this.state)
+        // }, 1000);
     }
 
     manageChildren = (qstId, custResponse) => {
@@ -102,7 +100,7 @@ export default class Customer_Feedback extends Component {
         })
 
         textParents.forEach(qId => {
-            let array = new Array();
+            let array = [];
             this.state.questions.forEach(question => {
                 if (qId === question.qstPrtId) {
                     array.push(question)
@@ -113,14 +111,16 @@ export default class Customer_Feedback extends Component {
 
         children.forEach(child => {
             if (child.length > 1) {
-                outer: for (let i = 0; i < child.length; i++) {
-                    if (child[i].qstOptType === 'checkbox' && child[i].customerResponse === 'Yes') {
+                for (let i = 0; i < child.length; i++) {
+                    if ((child[i].qstOptType === 'checkbox' && child[i].customerResponse && child[i].customerResponse === 'Yes') || 
+                        (child[i].qstOptType === 'radio' && child[i].customerResponse && child[i].customerResponse === 'No')) {
+                            
                         child.forEach(question => {
                             if (question.qstOptType === 'text') {
                                 question.mandatory = false
                             }
                         })
-                        break outer;
+                        break;
                     } else {
                         child.forEach(question => {
                             if (question.qstOptType === 'text') {
@@ -132,7 +132,7 @@ export default class Customer_Feedback extends Component {
             }
         })
         setTimeout(() => {
-            console.log('state: ', this.state.questions)
+            console.log(this.state.questions)
         }, 1000);
     }
 
@@ -202,17 +202,16 @@ export default class Customer_Feedback extends Component {
     }
 
     submitAnswers = async () => {
+        this.setState({ allFieldsMandatoryError: false })
         const mandatoryArray = [];
         const customerResponseArray = [];
 
         this.state.questions.forEach(question => {
             if (question.mandatory === true && !question.customerResponse) mandatoryArray.push(question)
         })
-
+        console.log(mandatoryArray)
         if (mandatoryArray.length > 0) {
-            // console.log(mandatoryArray)
             this.setState({ allFieldsMandatoryError: true })
-            return
         }
 
         this.state.questions.forEach(question => {
@@ -220,8 +219,8 @@ export default class Customer_Feedback extends Component {
             if (question.mandatory === false) customerResponseArray.push('')
         })
 
-        // console.log(customerResponseArray.length)
-        // console.log(this.state.questions.length)
+        console.log(customerResponseArray.length)
+        console.log(this.state.questions.length)
 
         if (customerResponseArray.length < this.state.questions.length) {
             this.setState({ allFieldsMandatoryError: true })
@@ -300,7 +299,7 @@ export default class Customer_Feedback extends Component {
 
                     {this.state.allFieldsMandatoryError ? <div
                         className="required"
-                        style={{ textAlign: 'center' }}
+                        style={{ textAlign: 'center', marginTop: '1rem' }}
                     >All fields are mandatory.</div> : null}
 
                     {this.state.questions.length ? <div className="button_div">

@@ -23,7 +23,7 @@ export default class Pdf extends Component {
             const res = await axios.post(url, body)
             const { response } = res.data;
 
-            if (response && response.msgInfo && response.msgInfo.msgCode == 500) {
+            if (response && response.msgInfo && response.msgInfo.msgCode === '500') {
                 this.setState({ errorMsg: response.msgInfo.msgDescription })
                 return
             }

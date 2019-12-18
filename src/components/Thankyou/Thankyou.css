@@ -1,3 +1,11 @@
+.cstm-wrap.MuiGrid-container {
+    transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 90%;
+}
+
 .cstm-wrap .MuiCardContent-root h4 {
     margin: 0 0 20px;
 }

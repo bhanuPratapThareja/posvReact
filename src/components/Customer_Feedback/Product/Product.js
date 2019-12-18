@@ -19,11 +19,6 @@ class Product extends Component {
     }
 
     render() {
-        if (!this.props.productQuestions || this.props.productQuestions.length == '0') {
-            return (
-                <div></div>
-            )
-        }
         return (
             <form>
                 {this.props.productQuestions.map(question => {
