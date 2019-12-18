@@ -10,7 +10,7 @@ const handleChange = (value, qstId, type) => {
 
 
 export default function createInput(field) {
-    let { qstOptType, qstText, qstId, qstOpt, rows, cols, customerResponse } = field.question;
+    let { qstOptType, qstText, qstId, qstOpt, customerResponse } = field.question;
     const qst = qstText.split('^^^');
 
     const getRadioQuestions = qst.map((q, i) => {

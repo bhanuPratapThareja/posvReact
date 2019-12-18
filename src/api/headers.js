@@ -6,7 +6,7 @@ export const getHeader = () => {
         case 'qualTechDev':
             header = 'U8eL0A3syl3wPN0U1tMuN7OJH66cXw0llUlC4deg';
             break;
-        case 'mliDev':
+        default:
             header = 'niu7mbEQoX1rGcOOEEOVV4x289vK8MT89D5Dd0nR';
             break;
     }

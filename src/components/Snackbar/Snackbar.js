@@ -3,7 +3,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 
 export default function PositionedSnackbar(props) {
 
-  const [state, setState] = React.useState({
+  const [state] = React.useState({
     open: true,
     vertical: 'top',
     horizontal: 'center',

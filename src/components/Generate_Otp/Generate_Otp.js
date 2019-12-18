@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import './Generate_Otp.css';
 import LinearProgress from '@material-ui/core/LinearProgress';
@@ -51,38 +50,40 @@ class Generate_Otp extends Component {
     }
 
     generateOtp = (type) => {
-        this.setState({  generatingOtp: true }, async () => {
+        this.setState({ generatingOtp: true }, async () => {
             let { url, body } = getApiData('getotp');
             body = JSON.parse(JSON.stringify(body));
-    
+
             let generateOtpinterval;
             if (type !== 'call') {
+                this.setState({ showGenerateOtpTime: true })
                 generateOtpinterval = setInterval(() => {
-                    this.setState({ showGenerateOtpTime: true, generateOtpTime: --this.state.generateOtpTime, disableGenerateOtpButton: true });
+                    this.setState({ generateOtpTime: --this.state.generateOtpTime, disableGenerateOtpButton: true });
                     if (this.state.generateOtpTime === 0) {
                         clearInterval(generateOtpinterval);
                         this.setState({ showGenerateOtpTime: false, generateOtpTime: 20, disableGenerateOtpButton: false })
                     }
                 }, 1000);
             }
-    
+
             let callInterval;
             if (type === 'call') {
+                this.setState({ showCallTime: true })
                 body.request.payload.onCallOTP = 'Yes';
                 callInterval = setInterval(() => {
-                    this.setState({ showCallTime: true, callOtpTime: --this.state.callOtpTime, disableCallButton: true });
+                    this.setState({ callOtpTime: --this.state.callOtpTime, disableCallButton: true });
                     if (this.state.callOtpTime === 0) {
                         clearInterval(callInterval);
                         this.setState({ showCallTime: false, callOtpTime: 20, disableCallButton: false })
                     }
                 }, 1000);
             }
-    
+
             try {
                 const response = await axios.post(url, body)
                 this.setState({ displayMessage: response.data.response.payload.levelMessage })
                 if (type === 'call') {
-    
+
                     this.setState({ callAttemptsSuccess: this.state.callAttemptsSuccess + 1 }, () => {
                         if (this.state.callAttemptsSuccess >= 3) {
                             this.setState({ showCallButton: false })
@@ -92,17 +93,16 @@ class Generate_Otp extends Component {
                 const msg = response.data.response.msgInfo.msgDescription;
                 this.handleSnackbar(true, 'success', msg)
             } catch (err) {
-    
+
                 if (generateOtpinterval) {
                     clearInterval(generateOtpinterval);
                 }
-                if(callInterval){
+                if (callInterval) {
                     clearInterval(callInterval)
                 }
-    
+
                 this.handleSnackbar(true, 'error', 'Please try again')
             } finally {
-                console.log('finalling')
                 this.setState({ generatingOtp: false, showCallButton: true, otpButtonText: 'Regenerate OTP' });
             }
         })
@@ -125,7 +125,7 @@ class Generate_Otp extends Component {
 
         try {
             const response = await axios.post(url, body)
-            if (response.data.response.messageInfo.msgCode == 700) {
+            if (response.data.response.messageInfo.msgCode === '700') {
                 this.handleSnackbar(true, 'error', response.data.response.messageInfo.msgDescription)
                 return
             }
@@ -137,10 +137,6 @@ class Generate_Otp extends Component {
         } finally {
             this.setState({ submitting: false })
         }
-    }
-
-    onDidntGetOtp = () => {
-        console.log('didint get otp')
     }
 
     handleSnackbar = (showSnackbar, snackbarMsgType, snackbarMsg) => {
@@ -172,23 +168,18 @@ class Generate_Otp extends Component {
                 <div className="dsclmr-wrap">
 
                     <div className="generate-otp__grid">
+                        <div>
+                            <p className="default_text">{this.state.displayMessage}</p>
+                            <h4 className="default_text">Enter 4 - Digit code</h4>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
 
-                        <Paper className="paper">
-                            <div >
-                                <img src="" atl="image" className="phone_image" />
-                            </div>
-                            <div>
-                                <p className="default_text">{this.state.displayMessage}</p>
-                                <h4 className="default_text">Enter 4 - Digit code</h4>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <Otp submitting={this.state.submitting} />
 
-                                <Otp submitting={this.state.submitting} />
+                        </div>
 
-                            </div>
-
-                            <div className="buttons_div__otp">
-                                {this.state.showGenerateOtpTime ? <span className="otpTime">{this.state.generateOtpTime}</span> : null}
+                        <div className="buttons_div__otp">
+                            <div className="btn-time">
                                 <Button
                                     variant="contained"
                                     disabled={this.state.submitting || this.state.disableGenerateOtpButton}
@@ -196,30 +187,35 @@ class Generate_Otp extends Component {
                                     onClick={() => this.generateOtp('generate')}>
                                     {this.state.otpButtonText}
                                 </Button>
+                                {this.state.showGenerateOtpTime ? <span className="otpTime">{this.state.generateOtpTime}</span> : null}
+                            </div>
 
-                                {this.state.showCallButton ? <Button
+                            <div className="btn-time">
+                                <Button
                                     variant="contained"
                                     disabled={this.state.submitting || this.state.disableCallButton}
                                     className="default_button"
                                     id="call_button"
                                     onClick={() => this.generateOtp('call')}>
                                     Get OTP on Call
-                                    </Button> : null}
+                                    </Button>
                                 {this.state.showCallTime ? <span className="otpTime">{this.state.callOtpTime}</span> : null}
                             </div>
-                            {channelName === 'x' ?
-                                <Button variant="contained" className="default_button submit_button--generate_otp" onClick={this.SubmitOtp} disabled={this.state.submitting || this.state.disableSubmitButton}>
-                                    Submit
+                        </div>
+                        {channelName === 'x' ?
+                            <Button variant="contained" className="default_button submit_button--generate_otp" onClick={this.SubmitOtp} disabled={this.state.submitting || this.state.disableSubmitButton}>
+                                Submit
                             </Button> : null}
-                        </Paper>
                     </div>
                     {channelName !== 'x' ?
                         <div className="tnc-txt">
                             <form>
-                                <p>
+                                <fieldset>
                                     <input disabled={this.state.submitting} type="checkbox" value={this.state.checkboxValue} onChange={event => this.handleCheckbox(event.target.checked)} />
-                                    I have received, seen and understood the benefit illustration and proposal form sent on my registered mobile number and email. I have also filled up the verification and health & habit questions on my mobile which will also form part of the proposal form. I confirm that all the content / information therein are true and correct to the best of my knowledge and belief. I also hereby consent to the benefit illustration and the proposal form including the verification and health & habit questions.
-                            </p>
+                                    <p className="check-sec">
+                                        I have received, seen and understood the benefit illustration and proposal form sent on my registered mobile number and email. I have also filled up the verification and health & habit questions on my mobile which will also form part of the proposal form. I confirm that all the content / information therein are true and correct to the best of my knowledge and belief. I also hereby consent to the benefit illustration and the proposal form including the verification and health & habit questions.
+                                    </p>
+                                </fieldset>
                                 <Button
                                     variant="contained"
                                     className="default_button submit_button--generate_otp"

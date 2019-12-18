@@ -102,7 +102,7 @@ export default class Customer_Feedback extends Component {
         })
 
         textParents.forEach(qId => {
-            let array = new Array();
+            let array = [];
             this.state.questions.forEach(question => {
                 if (qId === question.qstPrtId) {
                     array.push(question)
@@ -113,14 +113,14 @@ export default class Customer_Feedback extends Component {
 
         children.forEach(child => {
             if (child.length > 1) {
-                outer: for (let i = 0; i < child.length; i++) {
+                for (let i = 0; i < child.length; i++) {
                     if (child[i].qstOptType === 'checkbox' && child[i].customerResponse === 'Yes') {
                         child.forEach(question => {
                             if (question.qstOptType === 'text') {
                                 question.mandatory = false
                             }
                         })
-                        break outer;
+                        break;
                     } else {
                         child.forEach(question => {
                             if (question.qstOptType === 'text') {

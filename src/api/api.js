@@ -55,12 +55,11 @@ const getUrl = route => {
             baseUrl = `${api.qualTechDevbaseUrl}`;
             url = `${baseUrl}${api['routes'][route]['qualTechDevUrl']}`;
             break;
-        case 'mliDev':
+        default:
             baseUrl = `${api.mliDevBaseUrl}`;
             url = `${baseUrl}${api['routes'][route]['mliDevUrl']}`;
             break;
     }
-    console.log('url: ', url)
     return url;
 }
 
