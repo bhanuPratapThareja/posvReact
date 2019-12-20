@@ -16,7 +16,7 @@ class Generate_Otp extends Component {
             disableSubmitButton: true,
             disableGenerateOtpButton: false,
             otp: undefined,
-            otpButtonText: 'Generate Otp',
+            otpButtonText: 'Generate OTP',
             showCallButton: false,
             disableCallButton: false,
             callAttemptsSuccess: 0,

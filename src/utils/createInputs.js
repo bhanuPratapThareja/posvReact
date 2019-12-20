@@ -1,22 +1,31 @@
 import React from 'react';
 import MaskedInput from 'react-maskedinput'
-import { allowedOtpKeys } from './allowedOtpKeys';
+import { dateYearPos0, dateYearPos1 } from './allowedCharCodesDateYearMask';
+
+const handledateYearMask = (event, qstId, el) => {
+    // console.log('here: ', event.keyCode)
+    let len = el.value.length;
+    if (len === 0 && !dateYearPos0.includes(event.keyCode)) {
+        event.preventDefault();
+    }
+    if (len === 1) {
+        console.log(event.keyCode)
+        let posVal0 = el.value.charAt(0);
+        if (posVal0 == '0' && !dateYearPos1.includes(event.keyCode)) {
+            event.preventDefault();
+        }
+    }
+
+}
 
 const handleChange = (e, qstId, type) => {
-    // console.log('key: ', typeof num)
     let value = type === 'checkbox' ? e.target.checked : e.target.value;
-    // if (type === 'dateYearMask') {
-    //     console.log(value)
-    // } else {
-    //     e.preventDefault();
-    // }
-
-    console.log(value)
     if (type === 'checkbox') {
         value === true ? value = 'Yes' : value = 'No'
     }
     var event = new CustomEvent("emitted", { "detail": { qstId, value } });
     document.dispatchEvent(event);
+
 }
 
 
@@ -82,8 +91,7 @@ export default function createInput(field) {
         case 'dateYearMask':
             return (
                 <fieldset>
-                    <p>{qstText}<span className="required"> *</span></p>
-                    <MaskedInput mask="11/1111" name={qstId} value={customerResponse} placeholder="MM/YYYY" onChange={(event) => handleChange(event, qstId)} />
+                    <MaskedInput style={{ marginTop: '16px' }} mask="11/1111" name={qstId} id={qstId} value={customerResponse} placeholder={qstText} onChange={(event) => handleChange(event, qstId, 'dateYearMask')} />
                 </fieldset>
             )
         default:
