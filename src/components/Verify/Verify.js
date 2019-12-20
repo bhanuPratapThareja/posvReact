@@ -33,25 +33,25 @@ class Verify extends Component {
         body.request.payload.posvRefNumber = txnId;
         try {
             const response = await axios.post(url, body);
-            if (response.data.errorMessage) {
-                this.props.manageLoader(false)
-                this.setState({ verificationError: true, errorMsg: 'Invalid Transaction ID' })
-                return
+            if (response.data && response.data.errorMessage) {
+                throw(response.data.errorMessage)
             }
-            const { posvRefNumber, businessMsg, isLinkValid, category, planCode, chanelName } = response.data.response.payload;
+            const { posvRefNumber, businessMsg, isLinkValid, category, planCode, chanelName: channelName } = response.data.response.payload;
+            if(!planCode || !channelName){
+               throw ('Invalid Transaction ID')
+            }
             if (isLinkValid) {
                 localStorage.clear();
                 localStorage.setItem('posvRefNumber', posvRefNumber)
                 localStorage.setItem('planCode', planCode)
-                localStorage.setItem('channelName', chanelName.toLowerCase())
+                localStorage.setItem('channelName', channelName.toLowerCase())
                 this.goToPage(category);
             } else {
-                this.props.manageLoader(false)
-                this.setState({ verificationError: true, errorMsg: businessMsg })
+                throw(businessMsg)
             }
-        } catch (err) {
+        } catch (errorMsg) {
             this.props.manageLoader(false)
-            this.setState({ verificationError: true })
+            this.setState({ verificationError: true, errorMsg })
         }
     }
 
@@ -70,12 +70,6 @@ class Verify extends Component {
         this.props.history.push(url, { category });
     }
 
-    retryVerification = () => {
-        console.log('retrying')
-        this.setState({ verificationError: false })
-        // this.startLoad();
-    }
-
     render() {
         return (
             <div className="cstm-wrap">
@@ -88,7 +82,6 @@ class Verify extends Component {
                     {this.state.verificationError ?
                         <Error
                             errorMsg={this.state.errorMsg}
-                            errorFunction={() => this.retryVerification()}
                             buttonText={"Retry"}
                         />
                         : null}
