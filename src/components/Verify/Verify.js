@@ -46,6 +46,7 @@ class Verify extends Component {
                 localStorage.setItem('channelName', chanelName.toLowerCase())
                 this.goToPage(category);
             } else {
+                this.props.manageLoader(false)
                 this.setState({ verificationError: true, errorMsg: businessMsg })
             }
         } catch (err) {
