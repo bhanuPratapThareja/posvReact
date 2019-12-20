@@ -42,7 +42,7 @@ export default function createInput(field) {
             const selectedValue = customerResponse ? customerResponse : 'default';
             return (
                 <fieldset>
-                    <select name={qstId} style={{ marginTop: '16px' }} value={selectedValue} onChange={(event) => handleChange(event, qstId)}>
+                    <select name={qstId} style={{ marginTop: '16px', minWidth: 'auto' }} value={selectedValue} onChange={(event) => handleChange(event, qstId)}>
                         <option value="default" disabled hidden>{qstText}</option>
                         {qstOpt.map((el, i) => {
                             return <option key={i} value={qstOpt[i]}>{qstOpt[i]}</option>

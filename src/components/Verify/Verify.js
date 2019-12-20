@@ -34,6 +34,7 @@ class Verify extends Component {
         try {
             const response = await axios.post(url, body);
             if (response.data.errorMessage) {
+                this.props.manageLoader(false)
                 this.setState({ verificationError: true, errorMsg: 'Invalid Transaction ID' })
                 return
             }
@@ -48,9 +49,8 @@ class Verify extends Component {
                 this.setState({ verificationError: true, errorMsg: businessMsg })
             }
         } catch (err) {
-            this.setState({ verificationError: true })
-        } finally {
             this.props.manageLoader(false)
+            this.setState({ verificationError: true })
         }
     }
 
@@ -59,6 +59,7 @@ class Verify extends Component {
         let url = '';
         switch (category) {
             case 'selfie' || 'generate_otp' || 'pdf':
+                this.props.manageLoader(false)
                 url = `/${category}`;
                 break;
             default:
@@ -80,7 +81,7 @@ class Verify extends Component {
                 <div className="verify_user">
                     {!this.state.verificationError ? <div>
                         {this.props.loading ? <div className="display_text">
-                            Please wait ...
+                            Please wait...
                             </div> : null}
                     </div> : null}
                     {this.state.verificationError ?

@@ -24,7 +24,8 @@ export default class Customer_Feedback extends Component {
             qstCatNameNext: '',
             qstCatNamePrevious: '',
             errorMsg: '',
-            mandatoryError: 'All fields are mandatory'
+            mandatoryError: 'All fields are mandatory',
+            loading: false
         }
     }
 
@@ -34,44 +35,25 @@ export default class Customer_Feedback extends Component {
 
     componentDidMount() {
         const qstCatName = this.props.location.pathname.split('/')[2].toUpperCase();
-        this.setState({ qstCatName }, () => {
-            this.getQuestions();
-        })
+        this.getQuestions(null, qstCatName);
     }
 
-    onUserAnswer = (qstId, value) => {
-        const questions = [...this.state.questions]
-        questions.forEach(option => {
-            if (option.qstId === qstId) {
-                option.customerResponse = value;
-                this.setState({
-                    questions
-                }, () => {
-                    if (option.qstType === 'Primary') {
-                        this.manageChildren(qstId, option.customerResponse)
-                    }
-                    if (option.qstType === 'Secondary' && (option.qstOptType === 'checkbox' || option.qstOptType === 'radio')) {
-                        this.manageCheckboxText()
-                    }
-                })
-            }
-        })
-        // setTimeout(() => {
-        //     console.log(this.state)
-        // }, 1000);
-    }
-
-    getQuestions = async (qstCatNamePrevious) => {
+    
+    getQuestions = async (qstCatNamePrevious, qstCatName, direction) => {
         this.props.manageLoader(true)
+        if(direction !== 'previous'){
+            await this.setState({ loading: true })
+        }
         const { url, body } = getApiData('getQuestions');
-        qstCatNamePrevious ? body.request.payload.qstCatName = qstCatNamePrevious : body.request.payload.qstCatName = this.state.qstCatName;
+        qstCatNamePrevious ? body.request.payload.qstCatName = qstCatNamePrevious : body.request.payload.qstCatName = qstCatName;
         try {
             const response = await axios.post(url, body)
             const res = JSON.parse(JSON.stringify(response))
             this.handleRsponse(res)
         } catch (err) {
             console.log(err)
-            this.props.manageLoader(false)
+            this.props.manageLoader(false);
+            this.setState({ loading: false })
         }
     }
 
@@ -82,6 +64,7 @@ export default class Customer_Feedback extends Component {
             } else {
                 this.props.history.push('/generate_otp')
             }
+            console.log('check')
             return;
         }
         const questions = [...response.data.response.payload.customerResponse[0].qst];
@@ -105,7 +88,6 @@ export default class Customer_Feedback extends Component {
         })
         const { qstCatNamePrevious, qstCatName, qstCatNameNext } = response.data.response.payload;
         const path = qstCatName;
-
         this.props.history.push(path.toLowerCase());
         this.setState({
             questions: parentQuestions,
@@ -116,13 +98,15 @@ export default class Customer_Feedback extends Component {
             qstCatNameNext,
         }, () => {
             // console.log(this.state)
-            this.props.manageLoader(false)
             this.state.questions.forEach(question => {
                 setTimeout(() => {
                     this.manageChildren(question.qstId, question.customerResponse)
                 }, 100);
 
             })
+            this.props.manageLoader(false)
+            window.scrollTo(0, 0)
+            this.setState({ loading: false })
         })
     }
 
@@ -205,6 +189,28 @@ export default class Customer_Feedback extends Component {
         // }, 1000);
     }
 
+    onUserAnswer = (qstId, value) => {
+        const questions = [...this.state.questions]
+        questions.forEach(option => {
+            if (option.qstId === qstId) {
+                option.customerResponse = value;
+                this.setState({
+                    questions
+                }, () => {
+                    if (option.qstType === 'Primary') {
+                        this.manageChildren(qstId, option.customerResponse)
+                    }
+                    if (option.qstType === 'Secondary' && (option.qstOptType === 'checkbox' || option.qstOptType === 'radio')) {
+                        this.manageCheckboxText()
+                    }
+                })
+            }
+        })
+        // setTimeout(() => {
+        //     console.log(this.state)
+        // }, 1000);
+    }
+
     submitAnswers = async () => {
         this.setState({ errorMsg: '' })
         const mandatoryArray = [];
@@ -244,7 +250,7 @@ export default class Customer_Feedback extends Component {
             this.setState({ errorMsg: isValid.error })
             return
         }
-
+        
         const { url, body } = getApiData('saveCustomerResponse')
         const { qstCatName } = this.state;
         body.request.payload.qstCatName = qstCatName;
@@ -258,13 +264,14 @@ export default class Customer_Feedback extends Component {
             console.log(err)
         } finally {
             this.props.manageLoader(false)
+            this.setState({ loading: false })
             this.setState({ allFieldsMandatoryError: false })
         }
     }
 
     gotToPage = (direction) => {
         if (direction === 'previous') {
-            this.getQuestions(this.state.qstCatNamePrevious)
+            this.getQuestions(this.state.qstCatNamePrevious, null, direction)
         } else {
             this.submitAnswers()
         }
@@ -279,10 +286,15 @@ export default class Customer_Feedback extends Component {
 
     render() {
 
+        if(this.state.loading){
+            return <div className="display_text">
+                Please wait...
+            </div>
+        }
 
         return (
             <>
-                <div className="cust_feedback--page">
+                {this.state.questions ? <div className="cust_feedback--page">
 
                     {this.state.qstCatName ? <div style={{ fontSize: '20px', textAlign: 'center', textTransform: 'capitalize' }}>
                         {this.getPageName(this.state.qstCatName)} Related Questions
@@ -340,7 +352,7 @@ export default class Customer_Feedback extends Component {
                         </Fab>
 
                     </div> : null}
-                </div>
+                </div> : null}
             </>
         )
     }
