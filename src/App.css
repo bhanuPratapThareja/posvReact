@@ -5,6 +5,9 @@ body {
     height: 100vh;
 }
 
+button {
+    text-transform: capitalize !important;
+}
 
 :root {
     --main-color: #00236e; 
@@ -90,4 +93,8 @@ form fieldset {
     position: fixed !important;
     top: 70px !important;
     width: 100%;
+}
+
+input[type=number] {
+    -moz-appearance:textfield !important;
 }

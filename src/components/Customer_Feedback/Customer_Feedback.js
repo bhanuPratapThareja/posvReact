@@ -7,8 +7,11 @@ import Product from './Product/Product';
 import Psm from './Psm/Psm';
 import RpSales from './Rp_Sales/Rp_Sales';
 import Cancer from './Cancer/Cancer';
-import Button from '@material-ui/core/Button';
 import './Customer_Feedback.css';
+import { isDateYearValid } from './../../utils/dateYear';
+import Fab from '@material-ui/core/Fab';
+import ChevronLeftTwoToneIcon from '@material-ui/icons/ChevronLeftTwoTone';
+import ChevronRightTwoToneIcon from '@material-ui/icons/ChevronRightTwoTone';
 
 export default class Customer_Feedback extends Component {
     constructor() {
@@ -20,7 +23,8 @@ export default class Customer_Feedback extends Component {
             qstCatName: '',
             qstCatNameNext: '',
             qstCatNamePrevious: '',
-            allFieldsMandatoryError: false
+            errorMsg: '',
+            mandatoryError: 'All fields are mandatory'
         }
     }
 
@@ -112,9 +116,9 @@ export default class Customer_Feedback extends Component {
         children.forEach(child => {
             if (child.length > 1) {
                 for (let i = 0; i < child.length; i++) {
-                    if ((child[i].qstOptType === 'checkbox' && child[i].customerResponse && child[i].customerResponse === 'Yes') || 
+                    if ((child[i].qstOptType === 'checkbox' && child[i].customerResponse && child[i].customerResponse === 'Yes') ||
                         (child[i].qstOptType === 'radio' && child[i].customerResponse && child[i].customerResponse === 'No')) {
-                            
+
                         child.forEach(question => {
                             if (question.qstOptType === 'text') {
                                 question.mandatory = false
@@ -131,9 +135,9 @@ export default class Customer_Feedback extends Component {
                 }
             }
         })
-        setTimeout(() => {
-            console.log(this.state.questions)
-        }, 1000);
+        // setTimeout(() => {
+        //     console.log(this.state.questions)
+        // }, 1000);
     }
 
     getQuestions = async (qstCatNamePrevious) => {
@@ -202,16 +206,13 @@ export default class Customer_Feedback extends Component {
     }
 
     submitAnswers = async () => {
-        this.setState({ allFieldsMandatoryError: false })
+        console.log(this.state.questions)
+        this.setState({ errorMsg: '' })
         const mandatoryArray = [];
         const customerResponseArray = [];
 
-        this.state.questions.forEach(question => {
-            if (question.mandatory === true && !question.customerResponse) mandatoryArray.push(question)
-        })
-        console.log(mandatoryArray)
         if (mandatoryArray.length > 0) {
-            this.setState({ allFieldsMandatoryError: true })
+            this.setState({ errorMsg: this.state.mandatoryError })
         }
 
         this.state.questions.forEach(question => {
@@ -219,14 +220,38 @@ export default class Customer_Feedback extends Component {
             if (question.mandatory === false) customerResponseArray.push('')
         })
 
-        console.log(customerResponseArray.length)
-        console.log(this.state.questions.length)
-
         if (customerResponseArray.length < this.state.questions.length) {
-            this.setState({ allFieldsMandatoryError: true })
+            this.setState({ errorMsg: this.state.mandatoryError })
             return
         }
-   
+
+        let dates = [];
+        this.state.questions.forEach(question => {
+            if (question.qstOptType === 'dateYearMask' && question.customerResponse) {
+                console.log(question.customerResponse)
+                dates.push(question.customerResponse)
+            }
+            if (question.mandatory === true && !question.customerResponse) mandatoryArray.push(question)
+        })
+
+
+        let isValid = true;
+        if (dates.length > 0) {
+            dates.forEach(date => {
+                isValid = isDateYearValid(date);
+            })
+        }
+
+        console.log(isValid)
+        if (isValid.error) {
+            this.setState({ errorMsg: isValid.error })
+            return
+        }
+
+        console.log('going forward');
+
+        // return
+
         const { url, body } = getApiData('saveCustomerResponse')
         const { qstCatName } = this.state;
         body.request.payload.qstCatName = qstCatName;
@@ -266,7 +291,7 @@ export default class Customer_Feedback extends Component {
             <>
                 <div className="cust_feedback--page">
 
-                    {this.state.qstCatName ? <div style={{ textAlign: 'center', textTransform: 'capitalize' }}>
+                    {this.state.qstCatName ? <div style={{ fontSize: '20px', textAlign: 'center', textTransform: 'capitalize' }}>
                         {this.getPageName(this.state.qstCatName)} Related Questions
                     </div> : null}
 
@@ -297,29 +322,31 @@ export default class Customer_Feedback extends Component {
                         onUserAnswer={(value, qstId) => this.onUserAnswer(value, qstId)}
                     /> : null}
 
-                    {this.state.allFieldsMandatoryError ? <div
+                    {this.state.errorMsg ? <div
                         className="required"
                         style={{ textAlign: 'center', marginTop: '1rem' }}
-                    >All fields are mandatory.</div> : null}
+                    >{this.state.errorMsg}</div> : null}
 
                     {this.state.questions.length ? <div className="button_div">
-                        {this.state.qstCatNamePrevious ?
-                            <Button
-                                variant="contained"
-                                onClick={() => this.gotToPage('previous')}
-                                className="default_button"
-                                disabled={this.props.loading}>
-                                Previous
-                            </Button> : null}
 
-                            <Button
-                                variant="contained"
-                                onClick={() => this.gotToPage('next')}
-                                className="default_button"
-                                disabled={this.props.loading}>
-                                Next
-                            </Button>
-                    </div>: null}
+                        <Fab variant="extended"
+                            className="cust_fab"
+                            disabled={this.props.loading || !this.state.qstCatNamePrevious}
+                            onClick={() => this.gotToPage('previous')}>
+                            <ChevronLeftTwoToneIcon />
+                            Pervious
+                         </Fab>
+
+                        <Fab
+                            variant="extended"
+                            className="cust_fab"
+                            onClick={() => this.gotToPage('next')}
+                            disabled={this.props.loading}>
+                            Next
+                            <ChevronRightTwoToneIcon />
+                        </Fab>
+
+                    </div> : null}
                 </div>
             </>
         )
