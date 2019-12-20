@@ -1,22 +1,5 @@
 import React from 'react';
-import MaskedInput from 'react-maskedinput'
-import { dateYearPos0, dateYearPos1 } from './allowedCharCodesDateYearMask';
-
-const handledateYearMask = (event, qstId, el) => {
-    // console.log('here: ', event.keyCode)
-    let len = el.value.length;
-    if (len === 0 && !dateYearPos0.includes(event.keyCode)) {
-        event.preventDefault();
-    }
-    if (len === 1) {
-        console.log(event.keyCode)
-        let posVal0 = el.value.charAt(0);
-        if (posVal0 == '0' && !dateYearPos1.includes(event.keyCode)) {
-            event.preventDefault();
-        }
-    }
-
-}
+import MaskedInput from 'react-maskedinput';
 
 const handleChange = (e, qstId, type) => {
     let value = type === 'checkbox' ? e.target.checked : e.target.value;

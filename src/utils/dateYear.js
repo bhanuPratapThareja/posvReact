@@ -1,6 +1,16 @@
 export const isDateYearValid = dateYear => {
     const month = dateYear.substr(0,2);
     const year = dateYear.substr(3);
+    if(year.indexOf('_') !== -1){
+        return {
+            error: 'Invalid date'
+        }
+    }
+    if(dateYear.length < 7){
+        return {
+            error: 'Invalid date'
+        }
+    }
     if(month === '00'){
         return {
             error: 'Month cannot be 00'
