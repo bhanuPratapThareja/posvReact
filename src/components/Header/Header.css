@@ -10,3 +10,12 @@
     top: 0;
     left: 0;
 }
+
+.MuiLinearProgress-root {
+    height: 5px !important;
+    background-color: transparent !important;
+}
+
+/* .MuiLinearProgress-bar .MuiLinearProgress-barColorPrimary .MuiLinearProgress-bar1Indeterminate {
+    color: red !important;
+} */
