@@ -1,4 +1,4 @@
-export const env = 'mliDev';
+export const env = 'qualTechDev';
 
 // qualTechDev 
 // mliDev

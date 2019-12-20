@@ -24,7 +24,8 @@ export default class Customer_Feedback extends Component {
             qstCatNameNext: '',
             qstCatNamePrevious: '',
             errorMsg: '',
-            mandatoryError: 'All fields are mandatory'
+            mandatoryError: 'All fields are mandatory',
+            loading: false
         }
     }
 
@@ -34,31 +35,79 @@ export default class Customer_Feedback extends Component {
 
     componentDidMount() {
         const qstCatName = this.props.location.pathname.split('/')[2].toUpperCase();
-        this.setState({ qstCatName }, () => {
-            this.getQuestions();
-        })
+        this.getQuestions(null, qstCatName);
     }
 
-    onUserAnswer = (qstId, value) => {
-        const questions = [...this.state.questions]
-        questions.forEach(option => {
-            if (option.qstId === qstId) {
-                option.customerResponse = value;
-                this.setState({
-                    questions
-                }, () => {
-                    if (option.qstType === 'Primary') {
-                        this.manageChildren(qstId, option.customerResponse)
+    
+    getQuestions = async (qstCatNamePrevious, qstCatName, direction) => {
+        this.props.manageLoader(true)
+        if(direction !== 'previous'){
+            await this.setState({ loading: true })
+        }
+        const { url, body } = getApiData('getQuestions');
+        qstCatNamePrevious ? body.request.payload.qstCatName = qstCatNamePrevious : body.request.payload.qstCatName = qstCatName;
+        try {
+            const response = await axios.post(url, body)
+            const res = JSON.parse(JSON.stringify(response))
+            this.handleRsponse(res)
+        } catch (err) {
+            console.log(err)
+            this.props.manageLoader(false);
+            this.setState({ loading: false })
+        }
+    }
+
+    handleRsponse = (response) => {
+        if (response && !response.data.response.payload.customerResponse) {
+            if (localStorage.getItem('channelName').toLowerCase() === 'x') {
+                this.props.history.push('/declaration')
+            } else {
+                this.props.history.push('/generate_otp')
+            }
+            console.log('check')
+            return;
+        }
+        const questions = [...response.data.response.payload.customerResponse[0].qst];
+        // console.log('questions:', questions)
+        let parentQuestions = [];
+        let childQuestions = [];
+        questions.forEach(question => {
+            if (question.qstType === 'Primary') {
+                parentQuestions.push(question)
+            }
+            if (question.qstType === 'Secondary') {
+                if (question.qstOptType && question.qstOptType === 'checkbox') {
+                    if (!question.customerResponse || question.custResponse === 'No') {
+                        question.customerResponse = 'No'
+                    } else if (question.customerResponse && question.customerResponse === 'Yes') {
+                        question.customerResponse = 'Yes'
                     }
-                    if (option.qstType === 'Secondary' && (option.qstOptType === 'checkbox' || option.qstOptType === 'radio')) {
-                        this.manageCheckboxText()
-                    }
-                })
+                }
+                childQuestions.push(question)
             }
         })
-        // setTimeout(() => {
-        //     console.log(this.state)
-        // }, 1000);
+        const { qstCatNamePrevious, qstCatName, qstCatNameNext } = response.data.response.payload;
+        const path = qstCatName;
+        this.props.history.push(path.toLowerCase());
+        this.setState({
+            questions: parentQuestions,
+            parentQuestions,
+            childQuestions,
+            qstCatNamePrevious,
+            qstCatName,
+            qstCatNameNext,
+        }, () => {
+            // console.log(this.state)
+            this.state.questions.forEach(question => {
+                setTimeout(() => {
+                    this.manageChildren(question.qstId, question.customerResponse)
+                }, 100);
+
+            })
+            this.props.manageLoader(false)
+            window.scrollTo(0, 0)
+            this.setState({ loading: false })
+        })
     }
 
     manageChildren = (qstId, custResponse) => {
@@ -140,73 +189,29 @@ export default class Customer_Feedback extends Component {
         // }, 1000);
     }
 
-    getQuestions = async (qstCatNamePrevious) => {
-        this.props.manageLoader(true)
-        const { url, body } = getApiData('getQuestions');
-        qstCatNamePrevious ? body.request.payload.qstCatName = qstCatNamePrevious : body.request.payload.qstCatName = this.state.qstCatName;
-        try {
-            const response = await axios.post(url, body)
-            const res = JSON.parse(JSON.stringify(response))
-            this.handleRsponse(res)
-        } catch (err) {
-            console.log(err)
-        } finally {
-            this.props.manageLoader(false)
-        }
-    }
-
-    handleRsponse = (response) => {
-        if (response && !response.data.response.payload.customerResponse) {
-            if (localStorage.getItem('channelName').toLowerCase() === 'x') {
-                this.props.history.push('/declaration')
-            } else {
-                this.props.history.push('/generate_otp')
-            }
-            return;
-        }
-        const questions = [...response.data.response.payload.customerResponse[0].qst];
-        // console.log('questions:', questions)
-        let parentQuestions = [];
-        let childQuestions = [];
-        questions.forEach(question => {
-            if (question.qstType === 'Primary') {
-                parentQuestions.push(question)
-            }
-            if (question.qstType === 'Secondary') {
-                if (question.qstOptType && question.qstOptType === 'checkbox') {
-                    if (!question.customerResponse || question.custResponse === 'No') {
-                        question.customerResponse = 'No'
-                    } else if (question.customerResponse && question.customerResponse === 'Yes') {
-                        question.customerResponse = 'Yes'
+    onUserAnswer = (qstId, value) => {
+        const questions = [...this.state.questions]
+        questions.forEach(option => {
+            if (option.qstId === qstId) {
+                option.customerResponse = value;
+                this.setState({
+                    questions
+                }, () => {
+                    if (option.qstType === 'Primary') {
+                        this.manageChildren(qstId, option.customerResponse)
                     }
-                }
-                childQuestions.push(question)
+                    if (option.qstType === 'Secondary' && (option.qstOptType === 'checkbox' || option.qstOptType === 'radio')) {
+                        this.manageCheckboxText()
+                    }
+                })
             }
         })
-        const { qstCatNamePrevious, qstCatName, qstCatNameNext } = response.data.response.payload;
-        const path = qstCatName;
-
-        this.props.history.push(path.toLowerCase());
-        this.setState({
-            questions: parentQuestions,
-            parentQuestions,
-            childQuestions,
-            qstCatNamePrevious,
-            qstCatName,
-            qstCatNameNext,
-        }, () => {
-            // console.log(this.state)
-            this.state.questions.forEach(question => {
-                setTimeout(() => {
-                    this.manageChildren(question.qstId, question.customerResponse)
-                }, 100);
-
-            })
-        })
+        // setTimeout(() => {
+        //     console.log(this.state)
+        // }, 1000);
     }
 
     submitAnswers = async () => {
-        console.log(this.state.questions)
         this.setState({ errorMsg: '' })
         const mandatoryArray = [];
         const customerResponseArray = [];
@@ -228,7 +233,6 @@ export default class Customer_Feedback extends Component {
         let dates = [];
         this.state.questions.forEach(question => {
             if (question.qstOptType === 'dateYearMask' && question.customerResponse) {
-                console.log(question.customerResponse)
                 dates.push(question.customerResponse)
             }
             if (question.mandatory === true && !question.customerResponse) mandatoryArray.push(question)
@@ -242,16 +246,11 @@ export default class Customer_Feedback extends Component {
             })
         }
 
-        console.log(isValid)
         if (isValid.error) {
             this.setState({ errorMsg: isValid.error })
             return
         }
-
-        console.log('going forward');
-
-        // return
-
+        
         const { url, body } = getApiData('saveCustomerResponse')
         const { qstCatName } = this.state;
         body.request.payload.qstCatName = qstCatName;
@@ -265,13 +264,14 @@ export default class Customer_Feedback extends Component {
             console.log(err)
         } finally {
             this.props.manageLoader(false)
+            this.setState({ loading: false })
             this.setState({ allFieldsMandatoryError: false })
         }
     }
 
     gotToPage = (direction) => {
         if (direction === 'previous') {
-            this.getQuestions(this.state.qstCatNamePrevious)
+            this.getQuestions(this.state.qstCatNamePrevious, null, direction)
         } else {
             this.submitAnswers()
         }
@@ -286,10 +286,15 @@ export default class Customer_Feedback extends Component {
 
     render() {
 
+        if(this.state.loading){
+            return <div className="display_text">
+                Please wait...
+            </div>
+        }
 
         return (
             <>
-                <div className="cust_feedback--page">
+                {this.state.questions ? <div className="cust_feedback--page">
 
                     {this.state.qstCatName ? <div style={{ fontSize: '20px', textAlign: 'center', textTransform: 'capitalize' }}>
                         {this.getPageName(this.state.qstCatName)} Related Questions
@@ -347,7 +352,7 @@ export default class Customer_Feedback extends Component {
                         </Fab>
 
                     </div> : null}
-                </div>
+                </div> : null}
             </>
         )
     }
