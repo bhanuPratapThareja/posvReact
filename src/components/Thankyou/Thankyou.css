@@ -1,3 +1,9 @@
+:root {
+    --checkmark-background-color: #00236e;
+    --checkmark-color: white;
+    --animation-style: cubic-bezier(0.650, 0.000, 0.450, 1.000);
+}
+
 .cstm-wrap.MuiGrid-container {
     transform: translate(-50%, -50%);
     position: absolute;
@@ -11,10 +17,10 @@
 }
 
 .thank_you {
-    border: 3px solid #ee5c00;
-    padding: 60px;
+    /* border: 3px solid #ee5c00; */
+    padding: 30px;
     border-radius: 10px;
-    text-align: center;
+    /* background-color: #ee5c00; */
 }
 
 .thank_you > p {
@@ -28,4 +34,56 @@
     padding: 8px;
     border-radius: 50%;
     font-weight: 900;
+}
+
+
+.checkmark {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 3;
+  stroke: var(--checkmark-background-color);
+  stroke-miterlimit: 10;
+  box-shadow: inset 0px 0px 0px #f37920;
+  animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+  margin: auto;
+}
+
+.checkmark__circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: #f37920;
+  fill: none;
+  animation: stroke .6s var(--animation-style) forwards;
+}
+
+.checkmark__check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke .3s  var(--animation-style) .8s forwards;
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes scale {
+  0%, 100% {
+    transform: none;
+  }
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+
+@keyframes fill {
+  100% {
+    box-shadow: inset 0px 0px 0px 30px var(--checkmark-color);
+  }
 }
