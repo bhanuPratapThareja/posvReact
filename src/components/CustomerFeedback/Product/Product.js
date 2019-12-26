@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form';
-import createInput from './../../../utils/createInputs';
+import createInput from '../../../utils/createInputs';
+import './Product.css';
 
-class RpSales extends Component {
+class Product extends Component {
     
     componentDidMount() {
         document.addEventListener('emitted', this.updateFunction)
@@ -20,7 +21,7 @@ class RpSales extends Component {
     render() {
         return (
             <form>
-                {this.props.rpSalesQuestions.map(question => {
+                {this.props.productQuestions.map(question => {
                     return (
                         <Field
                             label="Label"
@@ -39,5 +40,5 @@ class RpSales extends Component {
 }
 
 export default reduxForm({
-    form: 'rpSalesForm'
-})(RpSales);
+    form: 'productForm'
+})(Product);

@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { getApiData } from './../../api/api';
+import { getApiData } from '../../api/api';
 import Health1 from './Health-1/Health-1';
 import Health2 from './Health-2/Health-2';
 import Product from './Product/Product';
 import Psm from './Psm/Psm';
 import RpSales from './Rp_Sales/Rp_Sales';
 import Cancer from './Cancer/Cancer';
-import './Customer_Feedback.css';
-import { isDateYearValid } from './../../utils/dateYear';
+import './CustomerFeedback.css';
+import { isDateYearValid } from '../../utils/dateYear';
 import Fab from '@material-ui/core/Fab';
 import ChevronLeftTwoToneIcon from '@material-ui/icons/ChevronLeftTwoTone';
 import ChevronRightTwoToneIcon from '@material-ui/icons/ChevronRightTwoTone';
 
-export default class Customer_Feedback extends Component {
+export default class CustomerFeedback extends Component {
     constructor() {
         super();
         this.state = {
@@ -25,7 +25,8 @@ export default class Customer_Feedback extends Component {
             qstCatNamePrevious: '',
             errorMsg: '',
             mandatoryError: 'All fields are mandatory',
-            loading: false
+            loading: false,
+            disableButtons: false
         }
     }
 
@@ -40,10 +41,8 @@ export default class Customer_Feedback extends Component {
 
     
     getQuestions = async (qstCatNamePrevious, qstCatName, direction) => {
-        this.props.manageLoader(true)
-        if(direction !== 'previous'){
-            await this.setState({ loading: true })
-        }
+        this.props.manageLoader(true);
+        this.setState({ disableButtons: true, loading: true })
         const { url, body } = getApiData('getQuestions');
         qstCatNamePrevious ? body.request.payload.qstCatName = qstCatNamePrevious : body.request.payload.qstCatName = qstCatName;
         try {
@@ -53,7 +52,6 @@ export default class Customer_Feedback extends Component {
         } catch (err) {
             console.log(err)
             this.props.manageLoader(false);
-            this.setState({ loading: false })
         }
     }
 
@@ -105,8 +103,8 @@ export default class Customer_Feedback extends Component {
 
             })
             this.props.manageLoader(false)
-            window.scrollTo(0, 0)
-            this.setState({ loading: false })
+            window.scrollTo(0, 0);
+            this.setState({ loading: false, disableButtons: false })
         })
     }
 
@@ -138,9 +136,9 @@ export default class Customer_Feedback extends Component {
             this.setState({ questions: newArray })
         }
 
-        setTimeout(() => {
-            // console.log(this.state.questions)
-        }, 1000);
+        // setTimeout(() => {
+        //     // console.log(this.state.questions)
+        // }, 1000);
     }
 
     manageCheckboxText = () => {
@@ -255,7 +253,8 @@ export default class Customer_Feedback extends Component {
         const { qstCatName } = this.state;
         body.request.payload.qstCatName = qstCatName;
         body.request.payload.customerResponse.qstCatName = qstCatName;
-        body.request.payload.customerResponse.qst = [...this.state.questions]
+        body.request.payload.customerResponse.qst = [...this.state.questions];
+        this.setState({ disableButtons: true })
         try {
             this.props.manageLoader(true)
             const response = await axios.post(url, body)
@@ -264,8 +263,14 @@ export default class Customer_Feedback extends Component {
             console.log(err)
         } finally {
             this.props.manageLoader(false)
-            this.setState({ loading: false })
-            this.setState({ allFieldsMandatoryError: false })
+            this.setState({ allFieldsMandatoryError: false, loading: false, disableButtons: false });
+            // if(this.state.questions) {
+            //     const page = document.querySelector('.cust_feedback--page');
+            //     page.style.transform = 'translateX(100%)';
+            //     setTimeout(() => {
+            //         page.style.transform = 'translateX(0)';
+            //     }, 50);
+            // }
         }
     }
 
@@ -286,7 +291,7 @@ export default class Customer_Feedback extends Component {
 
     render() {
 
-        if(this.state.loading){
+        if(this.state.loading && !this.state.questions.length){
             return <div className="display_text">
                 Please wait...
             </div>
@@ -336,7 +341,7 @@ export default class Customer_Feedback extends Component {
 
                         <Fab variant="extended"
                             className="cust_fab"
-                            disabled={this.props.loading || !this.state.qstCatNamePrevious}
+                            disabled={this.state.disableButtons || !this.state.qstCatNamePrevious}
                             onClick={() => this.gotToPage('previous')}>
                             <ChevronLeftTwoToneIcon />
                             Pervious
@@ -346,7 +351,7 @@ export default class Customer_Feedback extends Component {
                             variant="extended"
                             className="cust_fab"
                             onClick={() => this.gotToPage('next')}
-                            disabled={this.props.loading}>
+                            disabled={this.state.disableButtons}>
                             Next
                             <ChevronRightTwoToneIcon />
                         </Fab>

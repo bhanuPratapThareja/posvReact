@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form';
-import createInput from './../../../utils/createInputs';
+import createInput from '../../../utils/createInputs';
 
 class Health1 extends Component {
 

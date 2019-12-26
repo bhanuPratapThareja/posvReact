@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form';
-import createInput from './../../../utils/createInputs';
+import createInput from '../../../utils/createInputs';
 
-class Health2 extends Component {
+class Cancer extends Component {
 
     componentDidMount() {
         document.addEventListener('emitted', this.updateFunction)
@@ -24,9 +24,10 @@ class Health2 extends Component {
                     Have you ever had or received medical advice or treatment or advised to undergo medical tests for any of the following?
                 </div>
                 <form>
-                    {this.props.health2Questions.map(question => {
+                    {this.props.cancerQuestions.map(question => {
                         return (
                             <Field
+                                label="Label"
                                 name={question.qstId}
                                 type={question.qstOptType}
                                 key={question.qstId}
@@ -43,5 +44,5 @@ class Health2 extends Component {
 }
 
 export default reduxForm({
-    form: 'health2Form'
-})(Health2);
+    form: 'cancerForm'
+})(Cancer);

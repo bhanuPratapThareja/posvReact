@@ -33,6 +33,7 @@ class Generate_Otp extends Component {
     }
 
     componentDidMount() {
+        window.scrollTo(0, 0)
         document.addEventListener('keyup', this.inputFunction);
     }
 
@@ -56,9 +57,9 @@ class Generate_Otp extends Component {
 
             let generateOtpinterval;
             if (type !== 'call') {
-                this.setState({ showGenerateOtpTime: true })
+                this.setState({ showGenerateOtpTime: true, disableGenerateOtpButton: true })
                 generateOtpinterval = setInterval(() => {
-                    this.setState({ generateOtpTime: --this.state.generateOtpTime, disableGenerateOtpButton: true });
+                    this.setState({ generateOtpTime: --this.state.generateOtpTime });
                     if (this.state.generateOtpTime === 0) {
                         clearInterval(generateOtpinterval);
                         this.setState({ showGenerateOtpTime: false, generateOtpTime: 20, disableGenerateOtpButton: false })
@@ -68,10 +69,10 @@ class Generate_Otp extends Component {
 
             let callInterval;
             if (type === 'call') {
-                this.setState({ showCallTime: true })
+                this.setState({ showCallTime: true, disableCallButton: true })
                 body.request.payload.onCallOTP = 'Yes';
                 callInterval = setInterval(() => {
-                    this.setState({ callOtpTime: --this.state.callOtpTime, disableCallButton: true });
+                    this.setState({ callOtpTime: --this.state.callOtpTime });
                     if (this.state.callOtpTime === 0) {
                         clearInterval(callInterval);
                         this.setState({ showCallTime: false, callOtpTime: 20, disableCallButton: false })
@@ -190,7 +191,7 @@ class Generate_Otp extends Component {
                                 {this.state.showGenerateOtpTime ? <span className="otpTime">{this.state.generateOtpTime}</span> : null}
                             </div>
 
-                            <div className="btn-time">
+                            {this.state.showCallButton ? <div className="btn-time">
                                 <Button
                                     variant="contained"
                                     disabled={this.state.submitting || this.state.disableCallButton}
@@ -200,7 +201,7 @@ class Generate_Otp extends Component {
                                     Get OTP on Call
                                     </Button>
                                 {this.state.showCallTime ? <span className="otpTime">{this.state.callOtpTime}</span> : null}
-                            </div>
+                            </div>: null}
                         </div>
                         {channelName === 'x' ?
                             <Button variant="contained" className="default_button submit_button--generate_otp" onClick={this.SubmitOtp} disabled={this.state.submitting || this.state.disableSubmitButton}>

@@ -3,7 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import './Thankyou.css';
 
 const Thankyou = (props) => {
-
+    window.scrollTo(0, 0)
     props.history.listen((location, action) => {
         // alert(action)
         if (action === 'POP') {

@@ -32,6 +32,9 @@ class Verify extends Component {
         const { url, body } = getApiData('verifyUser');
         body.request.payload.posvRefNumber = txnId;
         try {
+            if(!window.navigator.onLine){
+                throw ('Please check you network connection')
+            }
             const response = await axios.post(url, body);
             if (response.data && response.data.errorMessage) {
                 throw(response.data.errorMessage)
