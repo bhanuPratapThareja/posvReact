@@ -29,7 +29,7 @@
 
 /*-- Radio btn styling --*/
 
-[type="radio"]:checked, [type="radio"]:not(:checked) {
+.cust_feedback--page [type="radio"]:checked, [type="radio"]:not(:checked) {
     /* left: -9999px; */
     position: absolute;
     /* visibility: hidden; */
@@ -41,7 +41,7 @@
     cursor: pointer;
 }
 
-[type="radio"]:checked + label, [type="radio"]:not(:checked) + label {
+.cust_feedback--page [type="radio"]:checked + label, [type="radio"]:not(:checked) + label {
     color: #f37920;
     border: 1px solid #f37920;
     cursor: pointer;
@@ -60,7 +60,7 @@
     -ms-border-radius: 30px;
 }
 
-[type="radio"]:checked + label {
+.cust_feedback--page [type="radio"]:checked + label {
     background: #f37920;
     color: #fff;
 }
@@ -166,8 +166,8 @@ select{
     padding: 16px 0 0;
 }
 
-input[type="radio"]:focus, 
-input[type="checkbox"]:focus {
+.cust_feedback--page input[type="radio"]:focus, 
+.cust_feedback--page input[type="checkbox"]:focus {
     background: transparent;
     box-shadow: none;
     outline: 0!important;

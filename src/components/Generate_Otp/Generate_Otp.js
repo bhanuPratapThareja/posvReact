@@ -27,7 +27,7 @@ class Generate_Otp extends Component {
             showSnackbar: false,
             snackbarMsgType: '',
             snackbarMsg: '',
-            displayMessage: 'Please click on Generate OTP button to get the otp.',
+            displayMessage: 'Please click on Generate OTP button to get the OTP.',
             checkboxValue: false
         }
     }

@@ -1,3 +1,7 @@
 .cstm-wrap .MuiCardContent-root h4 {
     margin: 0 0 20px;
 }
+
+.PrivateSwitchBase-input-206 {
+    position: absolute !important;
+}
