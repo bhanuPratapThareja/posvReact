@@ -6,6 +6,7 @@ import axios from 'axios';
 import { getApiData } from './../../api/api';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Snackbar from './../Snackbar/Snackbar';
+import { getDevice } from './../../utils/getDevice';
 
 export default class Selfie extends Component {
     localStream;
@@ -34,7 +35,9 @@ export default class Selfie extends Component {
         Promise.all([
             faceapi.nets.tinyFaceDetector.loadFromUri('/models')
         ]).then(() => {
-            this.startVideo()
+            if (getDevice() === 'desktop') {
+                this.startVideo()
+            }
         })
     }
 
@@ -54,9 +57,9 @@ export default class Selfie extends Component {
             faceapi.matchDimensions(canvas, displaySize)
             this.videoInterval = setInterval(async () => {
                 const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
-                console.log(detections)
+                // console.log(detections)
                 let detectionScore;
-                if(detections.length){
+                if (detections.length) {
                     detectionScore = detections[0].score;
                 }
                 this.setState({ noOfFacesDetected: detections.length, detectionScore }, () => {
@@ -70,13 +73,53 @@ export default class Selfie extends Component {
     }
 
     takeSelfie = () => {
+        if (getDevice() === 'mobile') {
+            const cameraInput = document.querySelector("[capture='camera']");
+            cameraInput.click();
+            cameraInput.addEventListener('change', (event) => {
+                // var myImage = new Image(100, 200);
+                console.log(event)
+                // myImage.src = event.target.files[0];
+                // console.log(myImage)
+                // document.body.appendChild(myImage);
+                // let canvas = document.createElement('canvas');
+                // canvas.style.position = 'static';
+                // const context = canvas.getContext('2d');
+                // context.drawImage(myImage, 0, 0, 320, 240);
+                // document.body.appendChild(canvas);
+                var reader = new FileReader(event.srcElement.files[0]);
+                console.log(reader)
+                reader.onload = readSuccess;
+                function readSuccess(evt){
+                    console.log(evt)
+                    console.log(evt.target)
+                    console.log(evt.target.result)
+                }
+                reader.readAsDataURL(event.srcElement.files[0]);
+                // let imgTag = document.createElement('img');
+                // console.log(event)
+                // imgTag.src = event.target.value.replace("C:\\fakepath\\", "");
+                // console.log(imgTag)
+                // imgTag.width = '340';
+                // imgTag.height = '240';
+                // console.log(imgTag)
+                // document.body.appendChild(imgTag);
+                // let canvas = document.getElementById('canvas');
+                // canvas.style.position = 'static';
+                // const context = canvas.getContext('2d');
+                // context.drawImage(tempVideo, 0, 0, width, height);
+            });
+            return;
+        }
+
+
         if (this.state.noOfFacesDetected !== 1) {
             const error = this.state.noOfFacesDetected === 0 ? 'No face detected' : `${this.state.noOfFacesDetected} faces detected`;
             this.handleSnackbar(true, 'error', error)
             return
         }
-        if(this.state.detectionScore < 0.65){
-            const error = 'Picture not clear. Please retake selfie. Be sure to keep picture percentage over 65%';
+        if (this.state.detectionScore < 0.65) {
+            const error = 'Picture not clear or face is sideways. Please retake selfie.';
             this.handleSnackbar(true, 'error', error)
             return
         }
@@ -156,7 +199,7 @@ export default class Selfie extends Component {
         return (
             <>
                 <LinearProgress style={{ visibility: this.state.submitting ? 'visible' : 'hidden' }} />
-                <input type="file" accept="image/*" capture="camera"/>
+                <input type="file" accept="image/*" capture="camera" style={{ visibility: 'hidden' }} />
                 {this.state.showSnackbar ? <Snackbar
                     closeSnackbar={this.closeSnackbar}
                     snackbarMsgType={this.state.snackbarMsgType}
