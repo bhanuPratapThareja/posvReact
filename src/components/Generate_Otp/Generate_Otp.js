@@ -204,7 +204,8 @@ class Generate_Otp extends Component {
                             </div>: null}
                         </div>
                         {channelName === 'x' ?
-                            <Button variant="contained" className="default_button submit_button--generate_otp" onClick={this.SubmitOtp} disabled={this.state.submitting || this.state.disableSubmitButton}>
+                            
+                            <Button style={{justifyContent: 'center', display:'flex' }} variant="contained" className="default_button submit_button--generate_otp" onClick={this.SubmitOtp} disabled={this.state.submitting || this.state.disableSubmitButton}>
                                 Submit
                             </Button> : null}
                     </div>
