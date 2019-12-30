@@ -40,7 +40,10 @@ button {
 button:disabled {
     opacity: 0.5;
 }
-
+.btnCenter{
+    text-align: center;
+    margin: 0 auto !important;
+  }
 /*-- Checkboxes Styling --*/
 input[type="checkbox"]:checked, 
 input[type="checkbox"]:not(:checked) {

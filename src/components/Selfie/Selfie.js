@@ -5,20 +5,32 @@ import * as faceapi from 'face-api.js';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import Snackbar from './../Snackbar/Snackbar';
 
 export default class Selfie extends Component {
     localStream;
+    videoInterval;
 
     constructor() {
         super();
         this.state = {
             video: undefined,
             pictureTaken: false,
-            submitting: false
+            submitting: false,
+            showSnackbar: false,
+            snackbarMsgType: '',
+            snackbarMsg: '',
+            videoInterval: undefined,
+            noOfFacesDetected: undefined,
+            detectionScore: undefined
         }
     }
 
     componentDidMount() {
+        this.initializeVideo();
+    }
+
+    initializeVideo = () => {
         Promise.all([
             faceapi.nets.tinyFaceDetector.loadFromUri('/models')
         ]).then(() => {
@@ -26,18 +38,12 @@ export default class Selfie extends Component {
         })
     }
 
-    startVideo = () => {
+    startVideo = async () => {
         const video = document.getElementById('video');
-        navigator.getMedia = navigator.getUserMedia ||
-            navigator.webkitGetUserMedia ||
-            navigator.mozGetUserMedia ||
-            navigator.msGetUserMedia;
-
-        navigator.getMedia(
-            { video: {} },
-            stream => video.srcObject = stream,
-            err => console.log(err)
-        )
+        let stream = null;
+        const constraints = { audio: false, video: true };
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream
 
         video.addEventListener('play', () => {
             this.localStream = video.srcObject;
@@ -46,16 +52,34 @@ export default class Selfie extends Component {
             selfie_page.append(canvas)
             const displaySize = { width: video.width, height: video.height };
             faceapi.matchDimensions(canvas, displaySize)
-            setInterval(async () => {
+            this.videoInterval = setInterval(async () => {
                 const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
-                const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
-                faceapi.draw.drawDetections(canvas, resizedDetections)
+                console.log(detections)
+                let detectionScore;
+                if(detections.length){
+                    detectionScore = detections[0].score;
+                }
+                this.setState({ noOfFacesDetected: detections.length, detectionScore }, () => {
+                    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
+                    faceapi.draw.drawDetections(canvas, resizedDetections)
+                })
             }, 100);
         })
+
     }
 
     takeSelfie = () => {
+        if (this.state.noOfFacesDetected !== 1) {
+            const error = this.state.noOfFacesDetected === 0 ? 'No face detected' : `${this.state.noOfFacesDetected} faces detected`;
+            this.handleSnackbar(true, 'error', error)
+            return
+        }
+        if(this.state.detectionScore < 0.65){
+            const error = 'Picture not clear. Please retake selfie. Be sure to keep picture percentage over 65%';
+            this.handleSnackbar(true, 'error', error)
+            return
+        }
         const video = document.getElementById('video');
         let canvas = document.querySelector('canvas');
         const height = video.height;
@@ -64,6 +88,7 @@ export default class Selfie extends Component {
         const tempVideo = video;
         video.parentNode.removeChild(video);
         this.setState({ pictureTaken: true }, () => {
+            clearInterval(this.videoInterval);
             canvas = document.getElementById('canvas');
             canvas.style.position = 'static';
             const context = canvas.getContext('2d');
@@ -84,9 +109,19 @@ export default class Selfie extends Component {
 
         try {
             const response = await axios.post(url, body)
-            this.setState({ submitting: false })
+            this.setState({ submitting: true })
+            if (response.data && response.data.response && !response.data.response.payload.isImageValid) {
+                this.handleSnackbar(true, 'error', response.data.response.payload.businessMsg)
+                this.setState({ submitting: false });
+                // this.initializeVideo();
+                setTimeout(() => {
+                    this.props.history.push('/')
+                    this.props.history.push('/selfie')
+                }, 2500);
+                return
+            }
             if (this.localStream != null) {
-                this.localStream.getTracks().map(function (val) {
+                this.localStream.getTracks().forEach(function (val) {
                     val.stop();
                 });
             }
@@ -98,6 +133,22 @@ export default class Selfie extends Component {
     }
 
 
+    handleSnackbar = (showSnackbar, snackbarMsgType, snackbarMsg) => {
+        this.setState({ showSnackbar, snackbarMsgType, snackbarMsg })
+        setTimeout(() => {
+            this.closeSnackbar()
+        }, 3000);
+    }
+
+    closeSnackbar = () => {
+        this.setState({
+            showSnackbar: false,
+            snackbarMsgType: '',
+            snackbarMsg: ''
+        })
+    }
+
+
     render() {
         const imgStyles = { width: '320', height: '240' };
         const buttonText = !this.state.pictureTaken ? 'Take Selfie' : 'Submit';
@@ -105,6 +156,12 @@ export default class Selfie extends Component {
         return (
             <>
                 <LinearProgress style={{ visibility: this.state.submitting ? 'visible' : 'hidden' }} />
+                <input type="file" accept="image/*" capture="camera"/>
+                {this.state.showSnackbar ? <Snackbar
+                    closeSnackbar={this.closeSnackbar}
+                    snackbarMsgType={this.state.snackbarMsgType}
+                    snackbarMsg={this.state.snackbarMsg}
+                /> : null}
                 <div className="selfie_page" id="selfie_page">
                     <div className="booth" id="booth">
                         <video id="video" autoPlay muted {...imgStyles}></video>
