@@ -117,10 +117,10 @@ export default class Selfie extends Component {
         const type = base64.substring(base64.indexOf('/') + 1, base64.indexOf(';base64'));
         const { url, body } = getApiData('verifyCustomerImage');
         // const type = this.state.type;
-        // const imgString = base64.split(",")[1]
-        body.request.payload.imageFile = this.state.picture;
+        const imgString = this.state.picture.split(",")[1]
+        body.request.payload.imageFile = imgString;
         body.request.payload.fileExtension = type;
-
+console.log(this.state.picture)
         try {
             const response = await axios.post(url, body)
             this.setState({ submitting: true })
