@@ -21,23 +21,22 @@ export default class Selfie extends Component {
             showSnackbar: false,
             snackbarMsgType: '',
             snackbarMsg: '',
-            videoInterval: undefined,
-            noOfFacesDetected: undefined,
-            detectionScore: undefined
+            videoInterval: undefined
         }
     }
 
     componentDidMount() {
-        this.initializeVideo();
+        window.scrollTo(0, 0);
+        if(getDevice() === 'desktop'){
+            this.initializeVideo();
+        }
     }
 
     initializeVideo = () => {
         Promise.all([
             faceapi.nets.tinyFaceDetector.loadFromUri('/models')
         ]).then(() => {
-            if (getDevice() === 'desktop') {
-                this.startVideo()
-            }
+            this.startVideo()
         })
     }
 
@@ -57,16 +56,10 @@ export default class Selfie extends Component {
             faceapi.matchDimensions(canvas, displaySize)
             this.videoInterval = setInterval(async () => {
                 const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
-                // console.log(detections)
-                let detectionScore;
-                if (detections.length) {
-                    detectionScore = detections[0].score;
-                }
-                this.setState({ noOfFacesDetected: detections.length, detectionScore }, () => {
-                    const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
-                    faceapi.draw.drawDetections(canvas, resizedDetections)
-                })
+                const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
+                faceapi.draw.drawDetections(canvas, resizedDetections)
+
             }, 100);
         })
 
@@ -77,52 +70,28 @@ export default class Selfie extends Component {
             const cameraInput = document.querySelector("[capture='camera']");
             cameraInput.click();
             cameraInput.addEventListener('change', (event) => {
-                // var myImage = new Image(100, 200);
-                console.log(event)
-                // myImage.src = event.target.files[0];
-                // console.log(myImage)
-                // document.body.appendChild(myImage);
-                // let canvas = document.createElement('canvas');
-                // canvas.style.position = 'static';
-                // const context = canvas.getContext('2d');
-                // context.drawImage(myImage, 0, 0, 320, 240);
-                // document.body.appendChild(canvas);
                 var reader = new FileReader(event.srcElement.files[0]);
-                console.log(reader)
                 reader.onload = readSuccess;
-                function readSuccess(evt){
-                    console.log(evt)
-                    console.log(evt.target)
-                    console.log(evt.target.result)
+                const that = this;
+                function readSuccess(evt) {
+                    that.setState({ picture: evt.target.result }, () => {
+                        const img = document.createElement('img');
+                        img.src = that.state.picture;
+                        img.alt = 'Selfie';
+                        img.width = '320';
+                        img.height = '240';
+                        const booth = document.getElementById('booth');
+                        booth.append(img);
+                        that.setState({ pictureTaken: true }, () => {
+                            booth.style.transform = 'rotate(-90deg)'
+                        })
+                    })
                 }
                 reader.readAsDataURL(event.srcElement.files[0]);
-                // let imgTag = document.createElement('img');
-                // console.log(event)
-                // imgTag.src = event.target.value.replace("C:\\fakepath\\", "");
-                // console.log(imgTag)
-                // imgTag.width = '340';
-                // imgTag.height = '240';
-                // console.log(imgTag)
-                // document.body.appendChild(imgTag);
-                // let canvas = document.getElementById('canvas');
-                // canvas.style.position = 'static';
-                // const context = canvas.getContext('2d');
-                // context.drawImage(tempVideo, 0, 0, width, height);
             });
             return;
         }
 
-
-        if (this.state.noOfFacesDetected !== 1) {
-            const error = this.state.noOfFacesDetected === 0 ? 'No face detected' : `${this.state.noOfFacesDetected} faces detected`;
-            this.handleSnackbar(true, 'error', error)
-            return
-        }
-        if (this.state.detectionScore < 0.65) {
-            const error = 'Picture not clear or face is sideways. Please retake selfie.';
-            this.handleSnackbar(true, 'error', error)
-            return
-        }
         const video = document.getElementById('video');
         let canvas = document.querySelector('canvas');
         const height = video.height;
@@ -136,18 +105,20 @@ export default class Selfie extends Component {
             canvas.style.position = 'static';
             const context = canvas.getContext('2d');
             context.drawImage(tempVideo, 0, 0, width, height);
+            const base64 = canvas.toDataURL();
+            this.setState({ picture: base64 })
         })
     }
 
     submitSelfie = async () => {
         await this.setState({ submitting: true })
-        const canvas = document.getElementById('canvas');
-        const base64 = canvas.toDataURL();
-        const { url, body } = getApiData('verifyCustomerImage');
+        // const canvas = document.getElementById('canvas');
+        const base64 = this.state.picture
         const type = base64.substring(base64.indexOf('/') + 1, base64.indexOf(';base64'));
-        const imgString = base64.split(",")[1]
-
-        body.request.payload.imageFile = imgString;
+        const { url, body } = getApiData('verifyCustomerImage');
+        // const type = this.state.type;
+        // const imgString = base64.split(",")[1]
+        body.request.payload.imageFile = this.state.picture;
         body.request.payload.fileExtension = type;
 
         try {
@@ -169,6 +140,10 @@ export default class Selfie extends Component {
                 });
             }
             const path = response.data.response.payload.qstCatName.toLowerCase();
+            if (!path) {
+                this.props.history.push('/generate_otp')
+                return
+            }
             this.props.history.push(`/customer_feedback/${path}`)
         } catch (err) {
             this.setState({ submitting: false })
@@ -191,15 +166,33 @@ export default class Selfie extends Component {
         })
     }
 
+    getHtml = () => {
+        if (getDevice() === 'mobile') {
+            return (
+                <>
+                    <input type="file" accept="image/*" capture="camera" style={{ visibility: 'hidden', position: 'fixed', top: '0', left: '0' }} />
+                </>
+            )
+        } else {
+            const imgStyles = { width: '320', height: '240' };
+            return (
+                <>
+                    <video id="video" autoPlay muted {...imgStyles}></video>
+                    <div className="canvas">
+                        {this.state.pictureTaken ? <canvas id="canvas" {...imgStyles}></canvas> : null}
+                    </div>
+                </>
+            )
+        }
+    }
 
     render() {
-        const imgStyles = { width: '320', height: '240' };
         const buttonText = !this.state.pictureTaken ? 'Take Selfie' : 'Submit';
 
         return (
             <>
                 <LinearProgress style={{ visibility: this.state.submitting ? 'visible' : 'hidden' }} />
-                <input type="file" accept="image/*" capture="camera" style={{ visibility: 'hidden' }} />
+
                 {this.state.showSnackbar ? <Snackbar
                     closeSnackbar={this.closeSnackbar}
                     snackbarMsgType={this.state.snackbarMsgType}
@@ -207,11 +200,7 @@ export default class Selfie extends Component {
                 /> : null}
                 <div className="selfie_page" id="selfie_page">
                     <div className="booth" id="booth">
-                        <video id="video" autoPlay muted {...imgStyles}></video>
-                        <div className="canvas">
-                            {this.state.pictureTaken ? <canvas id="canvas" {...imgStyles}></canvas> : null}
-                        </div>
-
+                        {this.getHtml()}
                     </div>
                     <div>
                         {!this.state.pictureTaken ? <Button onClick={(event) => this.takeSelfie(event)} variant="contained" id="selfie_button" className="default_button" style={{ width: '320px' }}>
