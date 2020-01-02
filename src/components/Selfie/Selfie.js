@@ -16,6 +16,7 @@ export default class Selfie extends Component {
         this.state = {
             video: undefined,
             pictureTaken: false,
+            pictureTakenOnce: false,
             submitting: false,
             showSnackbar: false,
             snackbarMsgType: '',
@@ -27,10 +28,17 @@ export default class Selfie extends Component {
 
     componentDidMount() {
         window.scrollTo(0, 0);
+        this.props.history.listen((location, action) => {
+            // alert(action)
+            if (action === 'POP') {
+                this.props.history.push('/selfie')
+            }
+        });
         if (getDevice() === 'desktop') {
-            this.props.manageLoader(true)
-            this.setState({ loadingVideo: true })
-            this.initializeVideo();
+            // this.props.manageLoader(true)
+            this.setState({ loadingVideo: true }, () => {
+                this.initializeVideo();
+            })
         }
     }
 
@@ -42,56 +50,66 @@ export default class Selfie extends Component {
         })
     }
 
-    startVideo = async () => {
-        const video = document.getElementById('video');
-        let stream = null;
-        const constraints = { audio: false, video: true };
-        stream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = stream
-        video.addEventListener('play', () => {
-            this.props.manageLoader(false);
-            this.setState({ loadingVideo: false })
-            this.localStream = video.srcObject;
-            const canvas = faceapi.createCanvasFromMedia(video);
-            const selfie_page = document.getElementById('selfie_page');
-            selfie_page.append(canvas)
-            const displaySize = { width: video.width, height: video.height };
-            faceapi.matchDimensions(canvas, displaySize)
-            this.videoInterval = setInterval(async () => {
-                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
-                const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
-                faceapi.draw.drawDetections(canvas, resizedDetections)
+    createVideoTag = () => {
+        const video = document.createElement('video');
+        video.setAttribute("width", "320px");
+        video.setAttribute("height", "240px");
+        video.setAttribute("id", "video")
+        video.setAttribute("autoplay", "");
+        const booth = document.getElementById('booth');
+        booth.prepend(video);
+        return video;
+    }
 
-            }, 100);
-        })
+    startVideo = async () => {
+        let video = document.getElementById('video');
+        if (!video) {
+            video = this.createVideoTag();
+            let stream = null;
+            const constraints = { audio: false, video: true };
+            stream = await navigator.mediaDevices.getUserMedia(constraints);
+            video.srcObject = stream;
+            if (this.localStream) {
+                this.localStream.getTracks().map(function (val) {
+                    val.stop();
+                    val.enabled = false;
+                });
+                this.localStream = null;
+            }
+            video.addEventListener('play', () => {
+                this.localStream = video.srcObject;
+                const canvas = faceapi.createCanvasFromMedia(video);
+                const selfie_page = document.getElementById('selfie_page');
+                selfie_page.append(canvas);
+                const displaySize = { width: video.width, height: video.height };
+                faceapi.matchDimensions(canvas, displaySize);
+                // this.props.manageLoader(false);
+                this.videoInterval = setInterval(async () => {
+                    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 416 }));
+                    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
+                    faceapi.draw.drawDetections(canvas, resizedDetections);
+                    faceapi.draw.drawDetections(canvas, resizedDetections);
+                    this.setState({ loadingVideo: false });
+                }, 250);
+            })
+
+        }
 
     }
 
     takeSelfie = () => {
+        if (this.state.pictureTaken) {
+            this.setState({ pictureTaken: false });
+            if (getDevice() === 'desktop') {
+                this.initializeVideo();
+            } else {
+                this.takeSelfieFromPhone();
+            }
+            return;
+        }
         if (getDevice() === 'mobile') {
-            const cameraInput = document.querySelector("[capture='camera']");
-            cameraInput.click();
-            cameraInput.addEventListener('change', (event) => {
-                var reader = new FileReader(event.srcElement.files[0]);
-                reader.onload = readSuccess;
-                const that = this;
-                function readSuccess(evt) {
-                    that.setState({ picture: evt.target.result }, () => {
-                        const img = document.createElement('img');
-                        img.src = that.state.picture;
-                        img.alt = 'Selfie';
-                        img.width = '320';
-                        img.height = '240';
-                        const booth = document.getElementById('booth');
-                        booth.append(img);
-                        that.setState({ pictureTaken: true }, () => {
-                            booth.style.transform = 'rotate(-90deg)'
-                        })
-                    })
-                }
-                reader.readAsDataURL(event.srcElement.files[0]);
-            });
+            this.takeSelfieFromPhone();
             return;
         }
 
@@ -102,7 +120,7 @@ export default class Selfie extends Component {
         canvas.parentNode.removeChild(canvas);
         const tempVideo = video;
         video.parentNode.removeChild(video);
-        this.setState({ pictureTaken: true }, () => {
+        this.setState({ pictureTaken: true, pictureTakenOnce: true }, () => {
             clearInterval(this.videoInterval);
             canvas = document.getElementById('canvas');
             canvas.style.position = 'static';
@@ -113,6 +131,33 @@ export default class Selfie extends Component {
         })
     }
 
+    takeSelfieFromPhone = () => {
+        const cameraInput = document.querySelector("[capture='camera']");
+        cameraInput.click();
+        cameraInput.addEventListener('change', (event) => {
+            var reader = new FileReader(event.srcElement.files[0]);
+            reader.onload = readSuccess;
+            const that = this;
+            function readSuccess(evt) {
+                that.setState({ picture: evt.target.result }, () => {
+                    let img = document.getElementById('selfie');
+                    if(!img){
+                       img = document.createElement('img');
+                    }
+                    img.setAttribute('id', 'selfie');
+                    img.src = that.state.picture;
+                    img.alt = 'Selfie';
+                    img.width = '320';
+                    img.height = '240';
+                    const booth = document.getElementById('booth');
+                    booth.append(img);
+                    that.setState({ pictureTaken: true })
+                })
+            }
+            reader.readAsDataURL(event.srcElement.files[0]);
+        });
+    }
+    
     submitSelfie = async () => {
         this.props.manageLoader(true)
         await this.setState({ submitting: true })
@@ -133,15 +178,12 @@ export default class Selfie extends Component {
                 this.setState({ submitting: false });
                 // this.initializeVideo();
                 setTimeout(() => {
-                    this.props.history.push('/')
-                    this.props.history.push('/selfie')
+                    if (getDevice() === 'desktop') {
+                        this.setState({ pictureTaken: false });
+                        this.initializeVideo();
+                    }
                 }, 2500);
                 return
-            }
-            if (this.localStream != null) {
-                this.localStream.getTracks().forEach(function (val) {
-                    val.stop();
-                });
             }
             const path = response.data.response.payload.qstCatName.toLowerCase();
             if (!path) {
@@ -155,6 +197,18 @@ export default class Selfie extends Component {
         }
     }
 
+    componentWillUnmount() {
+        if(getDevice() === 'desktop'){
+            this.closeWebcam();
+        }
+    }
+
+    closeWebcam = () => {
+        this.localStream.getTracks().map(function (val) {
+            val.stop();
+            val.enabled = false;
+        });
+    }
 
     handleSnackbar = (showSnackbar, snackbarMsgType, snackbarMsg) => {
         this.setState({ showSnackbar, snackbarMsgType, snackbarMsg })
@@ -182,7 +236,7 @@ export default class Selfie extends Component {
             const imgStyles = { width: '320', height: '240' };
             return (
                 <>
-                    <video id="video" autoPlay muted {...imgStyles}></video>
+                    {/* <video id="video" autoPlay muted {...imgStyles}></video> */}
                     <div className="canvas">
                         {this.state.pictureTaken ? <canvas id="canvas" {...imgStyles}></canvas> : null}
                     </div>
@@ -192,11 +246,11 @@ export default class Selfie extends Component {
     }
 
     render() {
-        const buttonText = !this.state.pictureTaken ? 'Take Selfie' : 'Submit';
+        const buttonText = !this.state.pictureTaken ? 'Take Selfie' : 'Retake Selfie';
         return (
             <>
 
-                <div className="display_text" style={{visibility : this.state.loadingVideo ? 'visible' : 'hidden'}}>
+                <div className="display_text" style={{ visibility: this.state.loadingVideo ? 'visible' : 'hidden' }}>
                     Please wait ...
                 </div>
 
@@ -207,20 +261,24 @@ export default class Selfie extends Component {
                 /> : null}
 
 
-                <div className="selfie_page" id="selfie_page" style={{visibility : !this.state.loadingVideo ? 'visible' : 'hidden'}}>
+                <div className="selfie_page" id="selfie_page" style={{ visibility: !this.state.loadingVideo ? 'visible' : 'hidden' }}>
                     <div className="booth" id="booth">
                         {this.getHtml()}
                     </div>
                     <div>
-                        {!this.state.pictureTaken ? <Button onClick={(event) => this.takeSelfie(event)} variant="contained" id="selfie_button" className="default_button" style={{ width: '320px' }}>
+                        <p>Position your face inside the frame and click on Take Selfie button</p>
+
+                        <Button disabled={this.state.submitting} onClick={(event) => this.takeSelfie(event)} variant="contained" id="selfie_button" className="default_button" style={{ width: '320px' }}>
                             {buttonText}
-                        </Button> : null}
-                        {this.state.pictureTaken ? <Button disabled={this.state.submitting} onClick={this.submitSelfie} variant="contained" className="default_button" style={{ width: '320px' }}>
+                        </Button>
+
+
+                        <Button disabled={this.state.submitting || !this.state.pictureTaken} onClick={this.submitSelfie} variant="contained" className="default_button" style={{ width: '320px' }}>
                             Submit
-                </Button> : null}
+                        </Button>
                     </div>
 
-                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+
                 </div>
             </>
         )
