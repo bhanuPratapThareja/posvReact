@@ -6,6 +6,7 @@ import axios from 'axios';
 import { getApiData } from './../../api/api';
 import Otp from './Otp/Otp';
 import Snackbar from './../Snackbar/Snackbar';
+import { otp_top_img } from './../../images/images';
 
 class Generate_Otp extends Component {
     constructor() {
@@ -102,6 +103,11 @@ class Generate_Otp extends Component {
                     clearInterval(callInterval)
                 }
 
+                this.setState({ showGenerateOtpTime: false, generateOtpTime: 20, disableGenerateOtpButton: false })
+                if(this.state.callAttemptsSuccess >= 3){
+                    this.setState({ showCallTime: false, callOtpTime: 20, disableCallButton: false })
+                }
+
                 this.handleSnackbar(true, 'error', 'Please try again')
             } finally {
                 this.setState({ generatingOtp: false, showCallButton: true, otpButtonText: 'Regenerate OTP' });
@@ -171,6 +177,7 @@ class Generate_Otp extends Component {
                     <div className="generate-otp__grid">
                         <div>
                             <p className="default_text">{this.state.displayMessage}</p>
+                            <img src={otp_top_img} alt="Cell Phone" />
                             <h4 className="default_text">Enter 4 - Digit code</h4>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'center' }}>

@@ -120,7 +120,7 @@ export default class Selfie extends Component {
         const imgString = this.state.picture.split(",")[1]
         body.request.payload.imageFile = imgString;
         body.request.payload.fileExtension = type;
-console.log(this.state.picture)
+
         try {
             const response = await axios.post(url, body)
             this.setState({ submitting: true })
