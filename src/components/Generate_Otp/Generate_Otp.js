@@ -102,6 +102,11 @@ class Generate_Otp extends Component {
                     clearInterval(callInterval)
                 }
 
+                this.setState({ showGenerateOtpTime: false, generateOtpTime: 20, disableGenerateOtpButton: false })
+                if(this.state.callAttemptsSuccess >= 3){
+                    this.setState({ showCallTime: false, callOtpTime: 20, disableCallButton: false })
+                }
+
                 this.handleSnackbar(true, 'error', 'Please try again')
             } finally {
                 this.setState({ generatingOtp: false, showCallButton: true, otpButtonText: 'Regenerate OTP' });
