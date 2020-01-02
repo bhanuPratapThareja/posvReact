@@ -30,8 +30,8 @@ export default class Routes extends Component {
                     <Route path='/customer_feedback/psm' render={props => <CustomerFeedback {...props} manageLoader={loading => this.props.manageLoader(loading)} />} />
                     <Route path='/customer_feedback/rpsales' render={props => <CustomerFeedback {...props} manageLoader={loading => this.props.manageLoader(loading)} />} />
                     <Route path='/customer_feedback/cancer' render={props => <CustomerFeedback {...props} manageLoader={loading => this.props.manageLoader(loading)} />} />
-                    <Route path='/generate_otp' component={Generate_Otp} />
-                    <Route path='/selfie' component={Selfie} />
+                    <Route path='/generate_otp' component={Generate_Otp} manageLoader={loading => this.props.manageLoader(loading)} />
+                    <Route path='/selfie' render={props => <Selfie {...props} txnId={txnId} manageLoader={loading => this.props.manageLoader(loading)} loading={this.props.loading} />} />
                     <Route path='/declaration' component={Declaration} />
                     <Route path='/thankyou' component={Thankyou} />
                 </Switch>
