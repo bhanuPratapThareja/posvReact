@@ -43,11 +43,7 @@ export default class Selfie extends Component {
     }
 
     initializeVideo = () => {
-        Promise.all([
-            faceapi.nets.tinyFaceDetector.loadFromUri('/models')
-        ]).then(() => {
-            this.startVideo()
-        })
+        this.startVideo()
     }
 
     createVideoTag = () => {
@@ -55,46 +51,67 @@ export default class Selfie extends Component {
         video.setAttribute("width", "320px");
         video.setAttribute("height", "240px");
         video.setAttribute("id", "video")
+        video.setAttribute("preload", "");
         video.setAttribute("autoplay", "");
+        video.setAttribute("loop", "");
+        video.setAttribute("muted", "");
         const booth = document.getElementById('booth');
         booth.prepend(video);
         return video;
     }
 
     startVideo = async () => {
-        let video = document.getElementById('video');
-        if (!video) {
-            video = this.createVideoTag();
-            let stream = null;
-            const constraints = { audio: false, video: true };
-            stream = await navigator.mediaDevices.getUserMedia(constraints);
-            video.srcObject = stream;
-            if (this.localStream) {
-                this.localStream.getTracks().map(function (val) {
-                    val.stop();
-                    val.enabled = false;
-                });
-                this.localStream = null;
-            }
-            video.addEventListener('play', () => {
-                this.localStream = video.srcObject;
-                const canvas = faceapi.createCanvasFromMedia(video);
-                const selfie_page = document.getElementById('selfie_page');
-                selfie_page.append(canvas);
-                const displaySize = { width: video.width, height: video.height };
-                faceapi.matchDimensions(canvas, displaySize);
-                // this.props.manageLoader(false);
-                this.videoInterval = setInterval(async () => {
-                    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 416 }));
-                    const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
-                    faceapi.draw.drawDetections(canvas, resizedDetections);
-                    faceapi.draw.drawDetections(canvas, resizedDetections);
-                    this.setState({ loadingVideo: false });
-                }, 250);
-            })
+        await this.setState({ loadingVideo: false })
+        var video = document.getElementById('video');
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
 
-        }
+        console.log(video)
+        console.log(canvas)
+        await window.Webcam.set({});
+        await window.Webcam.attach('.booth');
+        const tracking = window.tracking;
+
+
+        var tracker = new window.tracking.ObjectTracker('face');
+        tracker.setInitialScale(4);
+        tracker.setStepSize(2);
+        tracker.setEdgesDensity(0.1);
+        setTimeout(() => {
+            tracking.track('#canvas', tracker, { camera: true });
+
+            tracker.on('track', function (event) {
+                console.log(event)
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                let xAxis = false;
+                event.data.forEach(function (rect) {
+                    context.strokeStyle = '#FFFFFF';
+                    context.strokeRect(rect.x + 20, rect.y + 20, rect.width - 30, rect.height - 30);
+                    context.font = '11px Helvetica';
+                    context.fillStyle = "#fff";
+                    //  context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
+                    //  context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
+                    xAxis = (rect.x != null) ? true : false;
+                });
+            });
+        }, 3000);
+
+
+        // const canvas = faceapi.createCanvasFromMedia(video);
+        // const selfie_page = document.getElementById('selfie_page');
+        // selfie_page.append(canvas);
+        // const displaySize = { width: video.width, height: video.height };
+        // faceapi.matchDimensions(canvas, displaySize);
+        // this.props.manageLoader(false);
+        // this.videoInterval = setInterval(async () => {
+        // const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 416 }));
+        // const resizedDetections = faceapi.resizeResults(detections, displaySize);
+        // canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
+        // faceapi.draw.drawDetections(canvas, resizedDetections);
+        // faceapi.draw.drawDetections(canvas, resizedDetections);
+        // this.setState({ loadingVideo: false });
+        // }, 250);
+
 
     }
 
@@ -141,8 +158,8 @@ export default class Selfie extends Component {
             function readSuccess(evt) {
                 that.setState({ picture: evt.target.result }, () => {
                     let img = document.getElementById('selfie');
-                    if(!img){
-                       img = document.createElement('img');
+                    if (!img) {
+                        img = document.createElement('img');
                     }
                     img.setAttribute('id', 'selfie');
                     img.src = that.state.picture;
@@ -157,7 +174,7 @@ export default class Selfie extends Component {
             reader.readAsDataURL(event.srcElement.files[0]);
         });
     }
-    
+
     submitSelfie = async () => {
         this.props.manageLoader(true)
         await this.setState({ submitting: true })
@@ -198,7 +215,7 @@ export default class Selfie extends Component {
     }
 
     componentWillUnmount() {
-        if(getDevice() === 'desktop'){
+        if (getDevice() === 'desktop') {
             this.closeWebcam();
         }
     }
@@ -236,16 +253,16 @@ export default class Selfie extends Component {
             const imgStyles = { width: '320', height: '240' };
             return (
                 <>
-                    {/* <video id="video" autoPlay muted {...imgStyles}></video> */}
-                    <div className="canvas">
-                        {this.state.pictureTaken ? <canvas id="canvas" {...imgStyles}></canvas> : null}
-                    </div>
+                    <video id="video" width="320" height="240" style={imgStyles} autoPlay loop
+                        muted></video>
+                    <canvas id="canvas" width="320" height="240" style={imgStyles}></canvas>
                 </>
             )
         }
     }
 
     render() {
+        const imgStyles = { width: '320', height: '240' };
         const buttonText = !this.state.pictureTaken ? 'Take Selfie' : 'Retake Selfie';
         return (
             <>
@@ -263,7 +280,8 @@ export default class Selfie extends Component {
 
                 <div className="selfie_page" id="selfie_page" style={{ visibility: !this.state.loadingVideo ? 'visible' : 'hidden' }}>
                     <div className="booth" id="booth">
-                        {this.getHtml()}
+                        <video id="video" width="320" height="240" style={imgStyles} preload={'auto'} autoPlay loop muted></video>
+                        <canvas id="canvas" width="320" height="240" style={imgStyles}></canvas>
                     </div>
                     <div>
                         <p>Position your face inside the frame and click on Take Selfie button</p>
