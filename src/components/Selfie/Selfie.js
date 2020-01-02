@@ -4,7 +4,6 @@ import Button from '@material-ui/core/Button';
 import * as faceapi from 'face-api.js';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import Snackbar from './../Snackbar/Snackbar';
 import { getDevice } from './../../utils/getDevice';
 
@@ -21,13 +20,16 @@ export default class Selfie extends Component {
             showSnackbar: false,
             snackbarMsgType: '',
             snackbarMsg: '',
-            videoInterval: undefined
+            videoInterval: undefined,
+            loadingVideo: undefined
         }
     }
 
     componentDidMount() {
         window.scrollTo(0, 0);
-        if(getDevice() === 'desktop'){
+        if (getDevice() === 'desktop') {
+            this.props.manageLoader(true)
+            this.setState({ loadingVideo: true })
             this.initializeVideo();
         }
     }
@@ -46,8 +48,9 @@ export default class Selfie extends Component {
         const constraints = { audio: false, video: true };
         stream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = stream
-
         video.addEventListener('play', () => {
+            this.props.manageLoader(false);
+            this.setState({ loadingVideo: false })
             this.localStream = video.srcObject;
             const canvas = faceapi.createCanvasFromMedia(video);
             const selfie_page = document.getElementById('selfie_page');
@@ -111,6 +114,7 @@ export default class Selfie extends Component {
     }
 
     submitSelfie = async () => {
+        this.props.manageLoader(true)
         await this.setState({ submitting: true })
         // const canvas = document.getElementById('canvas');
         const base64 = this.state.picture
@@ -123,9 +127,9 @@ export default class Selfie extends Component {
 
         try {
             const response = await axios.post(url, body)
-            this.setState({ submitting: true })
             if (response.data && response.data.response && !response.data.response.payload.isImageValid) {
                 this.handleSnackbar(true, 'error', response.data.response.payload.businessMsg)
+                this.props.manageLoader(false)
                 this.setState({ submitting: false });
                 // this.initializeVideo();
                 setTimeout(() => {
@@ -146,6 +150,7 @@ export default class Selfie extends Component {
             }
             this.props.history.push(`/customer_feedback/${path}`)
         } catch (err) {
+            this.props.manageLoader(false)
             this.setState({ submitting: false })
         }
     }
@@ -188,17 +193,21 @@ export default class Selfie extends Component {
 
     render() {
         const buttonText = !this.state.pictureTaken ? 'Take Selfie' : 'Submit';
-
         return (
             <>
-                <LinearProgress style={{ visibility: this.state.submitting ? 'visible' : 'hidden' }} />
+
+                <div className="display_text" style={{visibility : this.state.loadingVideo ? 'visible' : 'hidden'}}>
+                    Please wait ...
+                </div>
 
                 {this.state.showSnackbar ? <Snackbar
                     closeSnackbar={this.closeSnackbar}
                     snackbarMsgType={this.state.snackbarMsgType}
                     snackbarMsg={this.state.snackbarMsg}
                 /> : null}
-                <div className="selfie_page" id="selfie_page">
+
+
+                <div className="selfie_page" id="selfie_page" style={{visibility : !this.state.loadingVideo ? 'visible' : 'hidden'}}>
                     <div className="booth" id="booth">
                         {this.getHtml()}
                     </div>
