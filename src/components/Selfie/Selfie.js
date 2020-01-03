@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './Selfie.css';
 import Button from '@material-ui/core/Button';
 import axios from 'axios';
-import * as faceapi from 'face-api';
+import * as faceapi from 'face-api.js';
 import { getApiData } from './../../api/api';
 import Snackbar from './../Snackbar/Snackbar';
 import { getDevice } from './../../utils/getDevice';
@@ -37,9 +37,7 @@ export default class Selfie extends Component {
         if (getDevice() === 'desktop') {
             // this.props.manageLoader(true)
             this.setState({ loadingVideo: true }, () => {
-                setTimeout(() => {
-                    this.initializeVideo();
-                }, 3000);
+                this.initializeVideo();
             })
         }
     }
@@ -65,12 +63,14 @@ export default class Selfie extends Component {
     startVideo = async () => {
         this.setState({ loadingVideo: false })
         let video = document.getElementById('video');
-        var canvas = document.getElementById('canvas');
-        var context = canvas.getContext('2d');
+        // var canvas = document.getElementById('canvas');
+        // var context = canvas.getContext('2d');
 
         if (!video) {
             video = this.createVideoTag();
-            let stream = null;
+        }
+
+        let stream = null;
             const constraints = { audio: false, video: true };
             stream = await navigator.mediaDevices.getUserMedia(constraints);
             video.srcObject = stream;
@@ -81,7 +81,6 @@ export default class Selfie extends Component {
                 });
                 this.localStream = null;
             }
-        }
 
         video.addEventListener('play', () => {
             this.localStream = video.srcObject;
