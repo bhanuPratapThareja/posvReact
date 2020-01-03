@@ -1,5 +1,7 @@
 .cstm-wrap .MuiCardContent-root h4 {
     margin: 0 0 20px;
+    font-weight: 400;
+    font-size: 20px;
 }
 
 .MuiIconButton-label input {

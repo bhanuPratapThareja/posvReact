@@ -268,12 +268,12 @@ export default class Selfie extends Component {
                     <div>
                         <p>Position your face inside the frame and click on Take Selfie button</p>
 
-                        <Button disabled={this.state.submitting} onClick={(event) => this.takeSelfie(event)} variant="contained" id="selfie_button" className="default_button" style={{ width: '320px' }}>
+                        <Button disabled={this.state.submitting} onClick={(event) => this.takeSelfie(event)} variant="contained" id="selfie_button" className="default_button">
                             {buttonText}
                         </Button>
 
 
-                        <Button disabled={this.state.submitting || !this.state.pictureTaken} onClick={this.submitSelfie} variant="contained" className="default_button" style={{ width: '320px' }}>
+                        <Button disabled={this.state.submitting || !this.state.pictureTaken} onClick={this.submitSelfie} variant="contained" className="default_button">
                             Submit
                         </Button>
                     </div>
