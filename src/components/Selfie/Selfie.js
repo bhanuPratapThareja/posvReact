@@ -170,8 +170,10 @@ export default class Selfie extends Component {
         body.request.payload.imageFile = imgString;
         body.request.payload.fileExtension = type;
 
+        alert(JSON.stringify(body));
         try {
             const response = await axios.post(url, body)
+            alert(JSON.stringify(response.data.response))
             if (response.data && response.data.response && !response.data.response.payload.isImageValid) {
                 this.handleSnackbar(true, 'error', response.data.response.payload.businessMsg)
                 this.props.manageLoader(false)
