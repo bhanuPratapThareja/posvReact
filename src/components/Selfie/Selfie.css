@@ -89,10 +89,7 @@ canvas {
         height: auto;
     }
 
-    button#selfie_button {
-        width: 90% !important;
-        max-width: 320px;
-    }
+   
 
 }
 
