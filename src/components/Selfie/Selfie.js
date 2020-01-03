@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './Selfie.css';
 import Button from '@material-ui/core/Button';
-import * as faceapi from 'face-api.js';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
 import Snackbar from './../Snackbar/Snackbar';
@@ -37,7 +36,9 @@ export default class Selfie extends Component {
         if (getDevice() === 'desktop') {
             // this.props.manageLoader(true)
             this.setState({ loadingVideo: true }, () => {
-                this.initializeVideo();
+                setTimeout(() => {
+                    this.initializeVideo();
+                }, 3000);
             })
         }
     }
@@ -61,15 +62,15 @@ export default class Selfie extends Component {
     }
 
     startVideo = async () => {
-        await this.setState({ loadingVideo: false })
+        this.setState({ loadingVideo: false })
         var video = document.getElementById('video');
         var canvas = document.getElementById('canvas');
         var context = canvas.getContext('2d');
 
         console.log(video)
         console.log(canvas)
-        await window.Webcam.set({});
-        await window.Webcam.attach('.booth');
+        window.Webcam.set({});
+        window.Webcam.attach('.booth');
         const tracking = window.tracking;
 
 
@@ -77,24 +78,24 @@ export default class Selfie extends Component {
         tracker.setInitialScale(4);
         tracker.setStepSize(2);
         tracker.setEdgesDensity(0.1);
-        setTimeout(() => {
-            tracking.track('#canvas', tracker, { camera: true });
 
-            tracker.on('track', function (event) {
-                console.log(event)
-                context.clearRect(0, 0, canvas.width, canvas.height);
-                let xAxis = false;
-                event.data.forEach(function (rect) {
-                    context.strokeStyle = '#FFFFFF';
-                    context.strokeRect(rect.x + 20, rect.y + 20, rect.width - 30, rect.height - 30);
-                    context.font = '11px Helvetica';
-                    context.fillStyle = "#fff";
-                    //  context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
-                    //  context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
-                    xAxis = (rect.x != null) ? true : false;
-                });
+        tracking.track('#video', tracker, { camera: true });
+
+        tracker.on('track', function (event) {
+            console.log(event)
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            let xAxis = false;
+            event.data.forEach(function (rect) {
+                context.strokeStyle = '#FFFFFF';
+                context.strokeRect(rect.x + 20, rect.y + 20, rect.width - 30, rect.height - 30);
+                context.font = '11px Helvetica';
+                context.fillStyle = "#fff";
+                //  context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
+                //  context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
+                xAxis = (rect.x != null) ? true : false;
             });
-        }, 3000);
+        });
+
 
 
         // const canvas = faceapi.createCanvasFromMedia(video);
@@ -278,7 +279,7 @@ export default class Selfie extends Component {
                 /> : null}
 
 
-                <div className="selfie_page" id="selfie_page" style={{ visibility: !this.state.loadingVideo ? 'visible' : 'hidden' }}>
+                <div className="selfie_page" id="selfie_page" >
                     <div className="booth" id="booth">
                         <video id="video" width="320" height="240" style={imgStyles} preload={'auto'} autoPlay loop muted></video>
                         <canvas id="canvas" width="320" height="240" style={imgStyles}></canvas>
