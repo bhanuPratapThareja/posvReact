@@ -61,35 +61,16 @@ export default class Selfie extends Component {
     }
 
     startVideo = async () => {
-        this.setState({ loadingVideo: false })
-        let video = document.getElementById('video');
-        // var canvas = document.getElementById('canvas');
-        // var context = canvas.getContext('2d');
+        this.setState({ loadingVideo: false }, () => {
+            var video = document.getElementById('video');
+            var canvas = document.getElementById('canvas');
+            var context = canvas.getContext('2d');
 
-        if (!video) {
-            video = this.createVideoTag();
-        }
+            window.Webcam.set({});
+            window.Webcam.attach('.video');
 
-        let stream = null;
-            const constraints = { audio: false, video: true };
-            stream = await navigator.mediaDevices.getUserMedia(constraints);
-            video.srcObject = stream;
-            if (this.localStream) {
-                this.localStream.getTracks().map(function (val) {
-                    val.stop();
-                    val.enabled = false;
-                });
-                this.localStream = null;
-            }
-
-        video.addEventListener('play', () => {
-            this.localStream = video.srcObject;
-            const canvas = faceapi.createCanvasFromMedia(video);
-            const selfie_page = document.getElementById('selfie_page');
-            selfie_page.append(canvas);
             const tracking = window.tracking;
-
-            var tracker = new window.tracking.ObjectTracker('face');
+            var tracker = new tracking.ObjectTracker('face');
             tracker.setInitialScale(4);
             tracker.setStepSize(2);
             tracker.setEdgesDensity(0.1);
@@ -97,7 +78,6 @@ export default class Selfie extends Component {
             tracking.track('#video', tracker, { camera: true });
 
             tracker.on('track', function (event) {
-                console.log(event)
                 context.clearRect(0, 0, canvas.width, canvas.height);
                 let xAxis = false;
                 event.data.forEach(function (rect) {
@@ -105,46 +85,68 @@ export default class Selfie extends Component {
                     context.strokeRect(rect.x + 20, rect.y + 20, rect.width - 30, rect.height - 30);
                     context.font = '11px Helvetica';
                     context.fillStyle = "#fff";
-                    //  context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
-                    //  context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
                     xAxis = (rect.x != null) ? true : false;
                 });
             });
         })
-
     }
 
-    takeSelfie = () => {
-        if (this.state.pictureTaken) {
-            this.setState({ pictureTaken: false });
-            if (getDevice() === 'desktop') {
-                this.initializeVideo();
-            } else {
-                this.takeSelfieFromPhone();
-            }
-            return;
-        }
-        if (getDevice() === 'mobile') {
-            this.takeSelfieFromPhone();
-            return;
-        }
-
+    takeSelfie = async () => {
         const video = document.getElementById('video');
-        let canvas = document.querySelector('canvas');
-        const height = video.height;
-        const width = video.width;
-        canvas.parentNode.removeChild(canvas);
-        const tempVideo = video;
+        const canvas = document.getElementById('canvas');
+        var ctx = canvas.getContext("2d");
+        // canvas.getContext('2d').drawImage(video, 0, 0, video.videoWidth,
+        //     video.videoHeight);
+
         video.parentNode.removeChild(video);
-        this.setState({ pictureTaken: true, pictureTakenOnce: true }, () => {
-            clearInterval(this.videoInterval);
-            canvas = document.getElementById('canvas');
-            canvas.style.position = 'static';
-            const context = canvas.getContext('2d');
-            context.drawImage(tempVideo, 0, 0, width, height);
-            const base64 = canvas.toDataURL();
-            this.setState({ picture: base64 })
-        })
+        const base64 = canvas.toDataURL();
+
+        var image = new Image();
+        image.onload = function () {
+            ctx.drawImage(image, 0, 0);
+        };
+        image.src = base64;
+        console.log(image)
+        // let img = document.createElement('img');
+        // img.src = `${this.state.picture}.png`;
+        // img.height = '320';
+        // img.width = '240';
+        // console.log(img)
+        // const booth = document.getElementById('booth');
+        // booth.append(img);
+        // this.setState({ picture: base64 })
+
+        // if (this.state.pictureTaken) {
+        //     this.setState({ pictureTaken: false });
+        //     if (getDevice() === 'desktop') {
+        //         this.initializeVideo();
+        //     } else {
+        //         this.takeSelfieFromPhone();
+        //     }
+        //     return;
+        // }
+        // if (getDevice() === 'mobile') {
+        //     this.takeSelfieFromPhone();
+        //     return;
+        // }
+
+        // const video = document.getElementById('video');
+        // let canvas = document.querySelector('canvas');
+        // console.log('canvas: ', canvas)
+        // const height = video.height;
+        // const width = video.width;
+
+        // const tempVideo = video;
+        // video.parentNode.removeChild(video);
+        // this.setState({ pictureTaken: true, pictureTakenOnce: true }, () => {
+
+        //     canvas = document.getElementById('canvas');
+        //     canvas.style.position = 'static';
+        //     const context = canvas.getContext('2d');
+        //     context.drawImage(video, 0, 0, width, height);
+        //     const base64 = canvas.toDataURL();
+        //     this.setState({ picture: base64 })
+        // })
     }
 
     takeSelfieFromPhone = () => {
@@ -280,7 +282,7 @@ export default class Selfie extends Component {
                 <div className="selfie_page" id="selfie_page" >
                     <div className="booth" id="booth">
                         <video id="video" width="320" height="240" style={imgStyles} preload={'auto'} autoPlay loop muted></video>
-                        <canvas id="canvas" width="320" height="240" style={imgStyles}></canvas>
+
                     </div>
                     <div>
                         <p>Position your face inside the frame and click on Take Selfie button</p>
@@ -293,6 +295,7 @@ export default class Selfie extends Component {
                         <Button disabled={this.state.submitting || !this.state.pictureTaken} onClick={this.submitSelfie} variant="contained" className="default_button" style={{ width: '320px' }}>
                             Submit
                         </Button>
+                        <canvas id="canvas" width="320" height="240" style={imgStyles}></canvas>
                     </div>
 
 
