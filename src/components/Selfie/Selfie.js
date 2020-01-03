@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './Selfie.css';
 import Button from '@material-ui/core/Button';
 import axios from 'axios';
+import * as faceapi from 'face-api';
 import { getApiData } from './../../api/api';
 import Snackbar from './../Snackbar/Snackbar';
 import { getDevice } from './../../utils/getDevice';
@@ -63,56 +64,54 @@ export default class Selfie extends Component {
 
     startVideo = async () => {
         this.setState({ loadingVideo: false })
-        var video = document.getElementById('video');
+        let video = document.getElementById('video');
         var canvas = document.getElementById('canvas');
         var context = canvas.getContext('2d');
 
-        console.log(video)
-        console.log(canvas)
-        window.Webcam.set({});
-        window.Webcam.attach('.booth');
-        const tracking = window.tracking;
+        if (!video) {
+            video = this.createVideoTag();
+            let stream = null;
+            const constraints = { audio: false, video: true };
+            stream = await navigator.mediaDevices.getUserMedia(constraints);
+            video.srcObject = stream;
+            if (this.localStream) {
+                this.localStream.getTracks().map(function (val) {
+                    val.stop();
+                    val.enabled = false;
+                });
+                this.localStream = null;
+            }
+        }
 
+        video.addEventListener('play', () => {
+            this.localStream = video.srcObject;
+            const canvas = faceapi.createCanvasFromMedia(video);
+            const selfie_page = document.getElementById('selfie_page');
+            selfie_page.append(canvas);
+            const tracking = window.tracking;
 
-        var tracker = new window.tracking.ObjectTracker('face');
-        tracker.setInitialScale(4);
-        tracker.setStepSize(2);
-        tracker.setEdgesDensity(0.1);
+            var tracker = new window.tracking.ObjectTracker('face');
+            tracker.setInitialScale(4);
+            tracker.setStepSize(2);
+            tracker.setEdgesDensity(0.1);
 
-        tracking.track('#video', tracker, { camera: true });
+            tracking.track('#video', tracker, { camera: true });
 
-        tracker.on('track', function (event) {
-            console.log(event)
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            let xAxis = false;
-            event.data.forEach(function (rect) {
-                context.strokeStyle = '#FFFFFF';
-                context.strokeRect(rect.x + 20, rect.y + 20, rect.width - 30, rect.height - 30);
-                context.font = '11px Helvetica';
-                context.fillStyle = "#fff";
-                //  context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
-                //  context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
-                xAxis = (rect.x != null) ? true : false;
+            tracker.on('track', function (event) {
+                console.log(event)
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                let xAxis = false;
+                event.data.forEach(function (rect) {
+                    context.strokeStyle = '#FFFFFF';
+                    context.strokeRect(rect.x + 20, rect.y + 20, rect.width - 30, rect.height - 30);
+                    context.font = '11px Helvetica';
+                    context.fillStyle = "#fff";
+                    //  context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
+                    //  context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
+                    xAxis = (rect.x != null) ? true : false;
+                });
             });
-        });
-
-
-
-        // const canvas = faceapi.createCanvasFromMedia(video);
-        // const selfie_page = document.getElementById('selfie_page');
-        // selfie_page.append(canvas);
-        // const displaySize = { width: video.width, height: video.height };
-        // faceapi.matchDimensions(canvas, displaySize);
-        // this.props.manageLoader(false);
-        // this.videoInterval = setInterval(async () => {
-        // const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 416 }));
-        // const resizedDetections = faceapi.resizeResults(detections, displaySize);
-        // canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
-        // faceapi.draw.drawDetections(canvas, resizedDetections);
-        // faceapi.draw.drawDetections(canvas, resizedDetections);
-        // this.setState({ loadingVideo: false });
-        // }, 250);
-
+        })
 
     }
 
