@@ -16,7 +16,7 @@ export default class Selfie extends Component {
         this.state = {
             video: undefined,
             pictureTaken: false,
-            pictureTakenOnce: false,
+            retakeMode: false,
             submitting: false,
             showSnackbar: false,
             snackbarMsgType: '',
@@ -43,6 +43,7 @@ export default class Selfie extends Component {
     }
 
     initializeVideo = () => {
+        window.Webcam.attach('#canvas');
         this.startVideo()
     }
 
@@ -60,14 +61,10 @@ export default class Selfie extends Component {
         return video;
     }
 
-    startVideo = async () => {
-        this.setState({ loadingVideo: false }, () => {
-            var video = document.getElementById('video');
+    startVideo = () => {
+        this.setState({ loadingVideo: false }, async () => {
             var canvas = document.getElementById('canvas');
             var context = canvas.getContext('2d');
-
-            window.Webcam.set({});
-            window.Webcam.attach('.video');
 
             const tracking = window.tracking;
             var tracker = new tracking.ObjectTracker('face');
@@ -92,21 +89,58 @@ export default class Selfie extends Component {
     }
 
     takeSelfie = async () => {
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        var ctx = canvas.getContext("2d");
-        // canvas.getContext('2d').drawImage(video, 0, 0, video.videoWidth,
-        //     video.videoHeight);
+        if (this.state.pictureTaken) {
+            this.setState({ pictureTaken: false });
+            if (getDevice() === 'desktop') {
+                this.initializeVideo();
+            } else {
+                this.takeSelfieFromPhone();
+            }
+            return;
+        }
 
-        video.parentNode.removeChild(video);
-        const base64 = canvas.toDataURL();
+        if (getDevice() === 'mobile') {
+            this.takeSelfieFromPhone();
+            return;
+        }
 
-        var image = new Image();
-        image.onload = function () {
-            ctx.drawImage(image, 0, 0);
-        };
-        image.src = base64;
-        console.log(image)
+        window.Webcam.snap(function (imgData, event) {
+            console.log('event: ', event)
+            console.log(imgData)
+            const video = document.getElementById('video');
+            const canvas = event;
+            const height = video.height;
+            const width = video.width;
+            canvas.style.position = 'static';
+            var ctx = canvas.getContext('2d');
+            // ctx.drawImage(imgData, 0, 0, width, height);
+
+            var image = new Image();
+            image.onload = function () {
+                ctx.drawImage(image, 0, 0);
+            };
+            image.src = `${imgData}`;
+
+            const img = document.createElement('img');
+            video.append(image)
+            
+            // document.body.append(canvas);
+
+            // img.src = imgData;
+            // img.height = '320';
+            // img.width = '240';
+            // // const video = document.getElementById('video');
+            video.parentNode.removeChild(video);
+            // const booth = document.getElementById('booth');
+            // booth.append(img)
+
+        })
+
+        // const video = document.getElementById('video');
+        // const canvas = document.getElementById('canvas');
+        // const context = canvas.getContext("2d");
+        // canvas.style.position = 'static';
+        // context.drawImage(video, 0, 0, video.width, video.height);
         // let img = document.createElement('img');
         // img.src = `${this.state.picture}.png`;
         // img.height = '320';
@@ -257,6 +291,10 @@ export default class Selfie extends Component {
                     <video id="video" width="320" height="240" style={imgStyles} autoPlay loop
                         muted></video>
                     <canvas id="canvas" width="320" height="240" style={imgStyles}></canvas>
+                    <div className="my_camera" id="my_camera"
+                        style={{ width: '240px', height: '240px' }}></div>
+
+                    <input type="hidden" id="selfiImage" name="selfiImage" value="" />
                 </>
             )
         }
@@ -282,7 +320,7 @@ export default class Selfie extends Component {
                 <div className="selfie_page" id="selfie_page" >
                     <div className="booth" id="booth">
                         <video id="video" width="320" height="240" style={imgStyles} preload={'auto'} autoPlay loop muted></video>
-
+                        <canvas id="canvas" {...imgStyles}></canvas>
                     </div>
                     <div>
                         <p>Position your face inside the frame and click on Take Selfie button</p>
@@ -295,7 +333,7 @@ export default class Selfie extends Component {
                         <Button disabled={this.state.submitting || !this.state.pictureTaken} onClick={this.submitSelfie} variant="contained" className="default_button" style={{ width: '320px' }}>
                             Submit
                         </Button>
-                        <canvas id="canvas" width="320" height="240" style={imgStyles}></canvas>
+
                     </div>
 
 
