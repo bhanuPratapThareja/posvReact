@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import './Selfie.css';
 import Button from '@material-ui/core/Button';
 import axios from 'axios';
-import * as faceapi from 'face-api.js';
 import { getApiData } from './../../api/api';
 import Snackbar from './../Snackbar/Snackbar';
 import { getDevice } from './../../utils/getDevice';
@@ -10,6 +9,9 @@ import { getDevice } from './../../utils/getDevice';
 export default class Selfie extends Component {
     localStream;
     videoInterval;
+    trackerTask;
+    context;
+    Webcam;
 
     constructor() {
         super();
@@ -44,63 +46,38 @@ export default class Selfie extends Component {
     }
 
     initializeVideo = () => {
-        window.Webcam.attach('#canvas');
         this.startVideo()
     }
 
-    createVideoTag = () => {
-        const video = document.createElement('video');
-        video.setAttribute("width", "320px");
-        video.setAttribute("height", "240px");
-        video.setAttribute("id", "video")
-        video.setAttribute("preload", "");
-        video.setAttribute("autoplay", "");
-        video.setAttribute("loop", "");
-        video.setAttribute("muted", "");
-        const booth = document.getElementById('booth');
-        booth.prepend(video);
-        return video;
-    }
-
-    createCanvas = () => {
-        const canvas = document.createElement('canvas');
-        canvas.setAttribute("width", "320px");
-        canvas.setAttribute("height", "240px");
-        canvas.setAttribute("id", "canvas");
-        const booth = document.getElementById('booth');
-        booth.prepend(canvas);
-        return canvas;
-    }
 
     startVideo = () => {
         if (getDevice() === 'desktop') {
+            this.Webcam = window.Webcam;
+            let img = document.getElementById('img');
+            if (img) {
+                img.parentNode.removeChild(img);
+            }
             let video = document.getElementById('video');
             let canvas = document.getElementById('canvas');
-            if (!video) {
-                video = this.createVideoTag();
-                canvas = this.createCanvas();
-            }
+            video.style.display = 'block';
+            canvas.style.visibility = 'visible';
+            this.Webcam.attach(document.getElementById('canvas'));
             this.setState({ loadingVideo: false }, async () => {
                 var context = canvas.getContext('2d');
-
-                const tracking = window.tracking;
+                var tracking = window.tracking;
                 var tracker = new tracking.ObjectTracker('face');
                 tracker.setInitialScale(4);
                 tracker.setStepSize(2);
                 tracker.setEdgesDensity(0.1);
-
-                tracking.track('#video', tracker, { camera: true });
-                // console.log(context)
+                this.trackerTask = tracking.track('#video', tracker, { camera: true });
+                const that = this;
                 tracker.on('track', function (event) {
                     context.clearRect(0, 0, canvas.width, canvas.height);
-                    let xAxis = false;
                     event.data.forEach(function (rect) {
-
                         context.strokeStyle = '#fff';
                         context.strokeRect(rect.x + 20, rect.y + 20, rect.width - 30, rect.height - 30);
                         context.font = '11px Helvetica';
                         context.fillStyle = "#fff";
-                        xAxis = (rect.x != null) ? true : false;
                     });
                 });
             })
@@ -126,16 +103,18 @@ export default class Selfie extends Component {
         }
 
         const that = this;
-        window.Webcam.snap(function (imgData, event) {
+        this.Webcam.snap(function (imgData, event) {
+            that.trackerTask.stop();
             const video = document.getElementById('video');
-            const canvas = document.getElementById('canvas');;
-            canvas.style.position = 'static';
-
+            const canvas = document.getElementById('canvas');
+            // that.context.clearRect(0, 0, canvas.width, canvas.height);
+            // that.context.strokeStyle = 'transparent';
+            // that.context.fillStyle = "transparent";
+            canvas.style.visibility = 'hidden';
+            video.style.display = 'none';
             const img = document.createElement('img');
             img.setAttribute('id', 'img');
             img.src = imgData;
-            video.parentNode.removeChild(video);
-            canvas.parentNode.removeChild(canvas);
             const booth = document.getElementById('booth');
             booth.append(img);
             that.setState({ pictureTaken: true, picture: imgData })
@@ -180,7 +159,8 @@ export default class Selfie extends Component {
         body.request.payload.fileExtension = type;
 
         try {
-            const response = await axios.post(url, body)
+            const response = await axios.post(url, body);
+            console.log('response: ', response)
             if (response.data && response.data.response && !response.data.response.payload.isImageValid) {
                 this.handleSnackbar(true, 'error', response.data.response.payload.businessMsg)
                 this.props.manageLoader(false)
@@ -214,10 +194,7 @@ export default class Selfie extends Component {
     }
 
     closeWebcam = () => {
-        this.localStream.getTracks().map(function (val) {
-            val.stop();
-            val.enabled = false;
-        });
+        this.Webcam.reset()
     }
 
     handleSnackbar = (showSnackbar, snackbarMsgType, snackbarMsg) => {
@@ -248,7 +225,7 @@ export default class Selfie extends Component {
                 <>
                     <video id="video" width="320" height="240" style={imgStyles} preload={'auto'} autoPlay loop muted></video>
                     <canvas id="canvas" {...imgStyles}></canvas>
-                    <input type="hidden" name="txnId" value="" id="selfiImage" />
+                    <div id="my_cam"></div>
                 </>
             )
         }
