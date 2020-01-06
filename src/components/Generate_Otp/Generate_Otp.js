@@ -34,6 +34,10 @@ class Generate_Otp extends Component {
     }
 
     componentDidMount() {
+        if(localStorage.getItem('selfie')){
+            localStorage.removeItem('selfie')
+            window.location.reload();
+        }
         window.scrollTo(0, 0)
         document.addEventListener('keyup', this.inputFunction);
     }

@@ -35,6 +35,10 @@ export default class CustomerFeedback extends Component {
     }
 
     componentDidMount() {
+        if(localStorage.getItem('selfie')){
+            localStorage.removeItem('selfie')
+            window.location.reload();
+        }
         const qstCatName = this.props.location.pathname.split('/')[2].toUpperCase();
         this.getQuestions(null, qstCatName);
     }

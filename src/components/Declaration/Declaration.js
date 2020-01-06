@@ -18,6 +18,10 @@ class Declaration extends Component {
             checked: false,
             proceeding: false
         }
+        if(localStorage.getItem('selfie')){
+            localStorage.removeItem('selfie')
+            window.location.reload();
+        }
     }
 
     handleChange = (checked) => {
