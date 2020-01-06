@@ -12,10 +12,6 @@ export default class Pdf extends Component {
     }
 
     componentDidMount() {
-        if(localStorage.getItem('selfie')){
-            localStorage.removeItem('selfie')
-            window.location.reload();
-        }
         this.getPdf();
     }
 
