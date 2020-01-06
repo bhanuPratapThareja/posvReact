@@ -61,6 +61,7 @@ export default class Selfie extends Component {
             let canvas = document.getElementById('canvas');
             video.style.display = 'block';
             canvas.style.visibility = 'visible';
+            
             window.Webcam.reset();
             window.Webcam.attach(document.getElementById('canvas'));
             
@@ -94,8 +95,6 @@ export default class Selfie extends Component {
         if (this.state.pictureTaken) {
             this.setState({ pictureTaken: false });
             if (this.state.mediaSupport) {
-                const video = document.getElementById('video');
-                video.pause(); video.srcObject.getVideoTracks()[0].stop();
                 const img = document.getElementById('img');
                 if(img){
                     img.parentNode.removeChild(img);
