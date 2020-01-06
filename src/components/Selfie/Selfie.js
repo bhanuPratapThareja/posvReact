@@ -37,12 +37,12 @@ export default class Selfie extends Component {
                 this.props.history.push('/selfie')
             }
         });
-        if (getDevice() === 'desktop') {
+        // if (getDevice() === 'desktop') {
             // this.props.manageLoader(true)
             this.setState({ loadingVideo: true }, () => {
                 this.initializeVideo();
             })
-        }
+        // }
     }
 
     initializeVideo = () => {
@@ -51,7 +51,7 @@ export default class Selfie extends Component {
 
 
     startVideo = () => {
-        if (getDevice() === 'desktop') {
+        // if (getDevice() === 'desktop') {
             this.Webcam = window.Webcam;
             let img = document.getElementById('img');
             if (img) {
@@ -71,34 +71,43 @@ export default class Selfie extends Component {
                 tracker.setEdgesDensity(0.1);
                 this.trackerTask = tracking.track('#video', tracker, { camera: true });
                 const that = this;
+                let xAxis = false;
+                this.setState({ xAxis: null });
                 tracker.on('track', function (event) {
+                    that.setState({ xAxis: event.data.length })
                     context.clearRect(0, 0, canvas.width, canvas.height);
                     event.data.forEach(function (rect) {
                         context.strokeStyle = '#fff';
                         context.strokeRect(rect.x + 20, rect.y + 20, rect.width - 30, rect.height - 30);
                         context.font = '11px Helvetica';
                         context.fillStyle = "#fff";
+                        xAxis = rect.x
                     });
                 });
             })
-        }
+        // }
     }
 
     takeSelfie = async () => {
         if (this.state.pictureTaken) {
             this.setState({ pictureTaken: false });
-            if (getDevice() === 'desktop') {
+            // if (getDevice() === 'desktop') {
                 const img = document.getElementById('img');
                 img.parentNode.removeChild(img);
                 this.startVideo();
-            } else {
-                this.takeSelfieFromPhone();
-            }
+            // } else {
+            //     this.takeSelfieFromPhone();
+            // }
             return;
         }
 
-        if (getDevice() === 'mobile') {
-            this.takeSelfieFromPhone();
+        // if (getDevice() === 'mobile') {
+        //     this.takeSelfieFromPhone();
+        //     return;
+        // }
+
+        if(!this.state.xAxis){
+            this.handleSnackbar(true, 'error', 'Take selfie when blinking box appears on your face.')
             return;
         }
 
@@ -107,9 +116,6 @@ export default class Selfie extends Component {
             that.trackerTask.stop();
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');
-            // that.context.clearRect(0, 0, canvas.width, canvas.height);
-            // that.context.strokeStyle = 'transparent';
-            // that.context.fillStyle = "transparent";
             canvas.style.visibility = 'hidden';
             video.style.display = 'none';
             const img = document.createElement('img');
@@ -158,10 +164,9 @@ export default class Selfie extends Component {
         body.request.payload.imageFile = imgString;
         body.request.payload.fileExtension = type;
 
-        
+
         try {
             const response = await axios.post(url, body)
-            console.log('response: ', response)
             if (response.data && response.data.response && !response.data.response.payload.isImageValid) {
                 this.handleSnackbar(true, 'error', response.data.response.payload.businessMsg)
                 this.props.manageLoader(false)
@@ -215,9 +220,13 @@ export default class Selfie extends Component {
 
     getHtml = () => {
         if (getDevice() === 'mobile') {
+            const imgStyles = { width: '320', height: '240' };
             return (
                 <>
-                    <input type="file" accept="image/*" capture="camera" style={{ visibility: 'hidden', position: 'fixed', top: '0', left: '0' }} />
+                    {/* <input type="file" accept="image/*" capture="camera" style={{ visibility: 'hidden', position: 'fixed', top: '0', left: '0' }} /> */}
+                    <video id="video" width="320" height="240" style={imgStyles} preload={'auto'} autoPlay loop muted></video>
+                    <canvas id="canvas" {...imgStyles}></canvas>
+                    <div id="my_cam"></div>
                 </>
             )
         } else {
