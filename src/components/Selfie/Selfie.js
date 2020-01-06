@@ -27,11 +27,14 @@ export default class Selfie extends Component {
             snackbarMsg: '',
             videoInterval: undefined,
             loadingVideo: undefined,
-            trackingColor: '#ffffff'
+            trackingColor: '#ffffff',
+            tracking: true
         }
     }
 
     componentDidMount() {
+        // const script = document.createElement('script');
+        // document.head.append(script);
         window.scrollTo(0, 0);
         this.props.history.listen((location, action) => {
             // alert(action)
@@ -49,16 +52,6 @@ export default class Selfie extends Component {
 
     initializeVideo = () => {
         this.startVideo()
-    }
-
-    myWebcam = {
-        webcam: window.Webcam,
-        start() {
-            this.webcam.attach(document.getElementById('canvas'));
-        },
-        stop() {
-            this.webcam.reset();
-        }
     }
 
 
@@ -122,7 +115,7 @@ export default class Selfie extends Component {
         }
 
         const that = this;
-        this.Webcam.snap(function (imgData, event) {
+        window.Webcam.snap(function (imgData, event) {
             that.trackerTask.stop();
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');
@@ -192,7 +185,6 @@ export default class Selfie extends Component {
                 return
             }
             const path = response.data.response.payload.qstCatName.toLowerCase();
-            localStorage.setItem('selfie', true)
             if (!path) {
                 this.props.history.push('/generate_otp')
                 return
@@ -211,7 +203,12 @@ export default class Selfie extends Component {
     }
 
     closeWebcam = () => {
-        this.Webcam.reset()
+        const video = document.getElementById('video')
+        setTimeout(function () { 
+            window.Webcam.reset();
+            video.pause(); video.srcObject.getVideoTracks()[0].stop(); 
+        }, 100);
+        
     }
 
     handleSnackbar = (showSnackbar, snackbarMsgType, snackbarMsg) => {
