@@ -12,6 +12,8 @@ export default class Selfie extends Component {
     trackerTask;
     context;
     Webcam;
+    tracker;
+    tracking;
 
     constructor() {
         super();
@@ -49,10 +51,19 @@ export default class Selfie extends Component {
         this.startVideo()
     }
 
+    myWebcam = {
+        webcam: window.Webcam,
+        start() {
+            this.webcam.attach(document.getElementById('canvas'));
+        },
+        stop() {
+            this.webcam.reset();
+        }
+    }
+
 
     startVideo = () => {
         // if (getDevice() === 'desktop') {
-            this.Webcam = window.Webcam;
             let img = document.getElementById('img');
             if (img) {
                 img.parentNode.removeChild(img);
@@ -61,19 +72,19 @@ export default class Selfie extends Component {
             let canvas = document.getElementById('canvas');
             video.style.display = 'block';
             canvas.style.visibility = 'visible';
-            this.Webcam.attach(document.getElementById('canvas'));
-            this.setState({ loadingVideo: false }, async () => {
+            window.Webcam.attach(document.getElementById('canvas'));
+            
+            this.setState({ loadingVideo: false }, () => {
                 var context = canvas.getContext('2d');
-                var tracking = window.tracking;
-                var tracker = new tracking.ObjectTracker('face');
-                tracker.setInitialScale(4);
-                tracker.setStepSize(2);
-                tracker.setEdgesDensity(0.1);
-                this.trackerTask = tracking.track('#video', tracker, { camera: true });
+                this.tracking = window.tracking;
+                this.tracker = new this.tracking.ObjectTracker('face');
+                this.tracker.setInitialScale(4);
+                this.tracker.setStepSize(2);
+                this.tracker.setEdgesDensity(0.1);
+                this.trackerTask = this.tracking.track('#video', this.tracker, { camera: true });
                 const that = this;
-                let xAxis = false;
                 this.setState({ xAxis: null });
-                tracker.on('track', function (event) {
+                this.tracker.on('track', function (event) {
                     that.setState({ xAxis: event.data.length })
                     context.clearRect(0, 0, canvas.width, canvas.height);
                     event.data.forEach(function (rect) {
@@ -81,7 +92,6 @@ export default class Selfie extends Component {
                         context.strokeRect(rect.x + 20, rect.y + 20, rect.width - 30, rect.height - 30);
                         context.font = '11px Helvetica';
                         context.fillStyle = "#fff";
-                        xAxis = rect.x
                     });
                 });
             })
@@ -182,6 +192,7 @@ export default class Selfie extends Component {
                 return
             }
             const path = response.data.response.payload.qstCatName.toLowerCase();
+            localStorage.setItem('selfie', true)
             if (!path) {
                 this.props.history.push('/generate_otp')
                 return
