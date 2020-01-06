@@ -176,8 +176,8 @@ class Generate_Otp extends Component {
 
                     <div className="generate-otp__grid">
                         <div>
-                            <p className="default_text">{this.state.displayMessage}</p>
                             <img src={otp_top_img} alt="Cell Phone" />
+                            <p className="default_text">{this.state.displayMessage}</p>
                             <h4 className="default_text">Enter 4 - Digit code</h4>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'center' }}>

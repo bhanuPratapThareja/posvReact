@@ -158,8 +158,9 @@ export default class Selfie extends Component {
         body.request.payload.imageFile = imgString;
         body.request.payload.fileExtension = type;
 
+        
         try {
-            const response = await axios.post(url, body);
+            const response = await axios.post(url, body)
             console.log('response: ', response)
             if (response.data && response.data.response && !response.data.response.payload.isImageValid) {
                 this.handleSnackbar(true, 'error', response.data.response.payload.businessMsg)
@@ -255,12 +256,12 @@ export default class Selfie extends Component {
                     <div>
                         <p>Position your face inside the frame and click on Take Selfie button</p>
 
-                        <Button disabled={this.state.submitting} onClick={(event) => this.takeSelfie(event)} variant="contained" id="selfie_button" className="default_button" style={{ width: '320px' }}>
+                        <Button disabled={this.state.submitting} onClick={(event) => this.takeSelfie(event)} variant="contained" id="selfie_button" className="default_button">
                             {buttonText}
                         </Button>
 
 
-                        <Button disabled={this.state.submitting || !this.state.pictureTaken} onClick={this.submitSelfie} variant="contained" className="default_button" style={{ width: '320px' }}>
+                        <Button disabled={this.state.submitting || !this.state.pictureTaken} onClick={this.submitSelfie} variant="contained" className="default_button">
                             Submit
                         </Button>
 
