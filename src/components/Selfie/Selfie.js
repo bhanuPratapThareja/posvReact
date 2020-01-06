@@ -22,7 +22,8 @@ export default class Selfie extends Component {
             snackbarMsgType: '',
             snackbarMsg: '',
             videoInterval: undefined,
-            loadingVideo: undefined
+            loadingVideo: undefined,
+            trackingColor: '#ffffff'
         }
     }
 
@@ -62,37 +63,48 @@ export default class Selfie extends Component {
     }
 
     startVideo = () => {
-        this.setState({ loadingVideo: false }, async () => {
-            var canvas = document.getElementById('canvas');
-            var context = canvas.getContext('2d');
+        if (getDevice() === 'desktop') {
+            // let video = document.getElementById('video');
+            // if(!video){
+            //     video = this.createVideoTag()
+            // }
+            this.setState({ loadingVideo: false }, async () => {
+                var canvas = document.getElementById('canvas');
+                var context = canvas.getContext('2d');
 
-            const tracking = window.tracking;
-            var tracker = new tracking.ObjectTracker('face');
-            tracker.setInitialScale(4);
-            tracker.setStepSize(2);
-            tracker.setEdgesDensity(0.1);
+                const tracking = window.tracking;
+                var tracker = new tracking.ObjectTracker('face');
+                tracker.setInitialScale(4);
+                tracker.setStepSize(2);
+                tracker.setEdgesDensity(0.1);
 
-            tracking.track('#video', tracker, { camera: true });
-
-            tracker.on('track', function (event) {
-                context.clearRect(0, 0, canvas.width, canvas.height);
-                let xAxis = false;
-                event.data.forEach(function (rect) {
-                    context.strokeStyle = '#FFFFFF';
-                    context.strokeRect(rect.x + 20, rect.y + 20, rect.width - 30, rect.height - 30);
-                    context.font = '11px Helvetica';
-                    context.fillStyle = "#fff";
-                    xAxis = (rect.x != null) ? true : false;
+                tracking.track('#video', tracker, { camera: true });
+                // console.log(context)
+                tracker.on('track', function (event) {
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    let xAxis = false;
+                    event.data.forEach(function (rect) {
+                        
+                        context.strokeStyle = '#fff';
+                        context.strokeRect(rect.x + 20, rect.y + 20, rect.width - 30, rect.height - 30);
+                        context.font = '11px Helvetica';
+                        context.fillStyle = "#fff";
+                        xAxis = (rect.x != null) ? true : false;
+                    });
                 });
-            });
-        })
+            })
+        }
     }
 
     takeSelfie = async () => {
+        console.log('1')
         if (this.state.pictureTaken) {
+            console.log('2')
             this.setState({ pictureTaken: false });
             if (getDevice() === 'desktop') {
-                this.initializeVideo();
+                console.log('3')
+                this.props.history.push('/')
+                this.props.history.push('/selfie')
             } else {
                 this.takeSelfieFromPhone();
             }
@@ -104,83 +116,21 @@ export default class Selfie extends Component {
             return;
         }
 
+        const that = this;
         window.Webcam.snap(function (imgData, event) {
-            console.log('event: ', event)
-            console.log(imgData)
             const video = document.getElementById('video');
-            const canvas = event;
-            const height = video.height;
-            const width = video.width;
+            const canvas = document.getElementById('canvas');;
             canvas.style.position = 'static';
-            var ctx = canvas.getContext('2d');
-            // ctx.drawImage(imgData, 0, 0, width, height);
-
-            var image = new Image();
-            image.onload = function () {
-                ctx.drawImage(image, 0, 0);
-            };
-            image.src = `${imgData}`;
+            const context = canvas.getContext('2d');
 
             const img = document.createElement('img');
-            video.append(image)
-            
-            // document.body.append(canvas);
-
-            // img.src = imgData;
-            // img.height = '320';
-            // img.width = '240';
-            // // const video = document.getElementById('video');
+            img.setAttribute('id', 'img');
+            img.src = imgData;
+            const booth = document.getElementById('booth');
+            booth.append(img);
             video.parentNode.removeChild(video);
-            // const booth = document.getElementById('booth');
-            // booth.append(img)
-
+            that.setState({ pictureTaken: true })
         })
-
-        // const video = document.getElementById('video');
-        // const canvas = document.getElementById('canvas');
-        // const context = canvas.getContext("2d");
-        // canvas.style.position = 'static';
-        // context.drawImage(video, 0, 0, video.width, video.height);
-        // let img = document.createElement('img');
-        // img.src = `${this.state.picture}.png`;
-        // img.height = '320';
-        // img.width = '240';
-        // console.log(img)
-        // const booth = document.getElementById('booth');
-        // booth.append(img);
-        // this.setState({ picture: base64 })
-
-        // if (this.state.pictureTaken) {
-        //     this.setState({ pictureTaken: false });
-        //     if (getDevice() === 'desktop') {
-        //         this.initializeVideo();
-        //     } else {
-        //         this.takeSelfieFromPhone();
-        //     }
-        //     return;
-        // }
-        // if (getDevice() === 'mobile') {
-        //     this.takeSelfieFromPhone();
-        //     return;
-        // }
-
-        // const video = document.getElementById('video');
-        // let canvas = document.querySelector('canvas');
-        // console.log('canvas: ', canvas)
-        // const height = video.height;
-        // const width = video.width;
-
-        // const tempVideo = video;
-        // video.parentNode.removeChild(video);
-        // this.setState({ pictureTaken: true, pictureTakenOnce: true }, () => {
-
-        //     canvas = document.getElementById('canvas');
-        //     canvas.style.position = 'static';
-        //     const context = canvas.getContext('2d');
-        //     context.drawImage(video, 0, 0, width, height);
-        //     const base64 = canvas.toDataURL();
-        //     this.setState({ picture: base64 })
-        // })
     }
 
     takeSelfieFromPhone = () => {
@@ -288,13 +238,9 @@ export default class Selfie extends Component {
             const imgStyles = { width: '320', height: '240' };
             return (
                 <>
-                    <video id="video" width="320" height="240" style={imgStyles} autoPlay loop
-                        muted></video>
-                    <canvas id="canvas" width="320" height="240" style={imgStyles}></canvas>
-                    <div className="my_camera" id="my_camera"
-                        style={{ width: '240px', height: '240px' }}></div>
-
-                    <input type="hidden" id="selfiImage" name="selfiImage" value="" />
+                    <video id="video" width="320" height="240" style={imgStyles} preload={'auto'} autoPlay loop muted></video>
+                    <canvas id="canvas" {...imgStyles}></canvas>
+                    <input type="hidden" name="txnId" value="" id="selfiImage" />
                 </>
             )
         }
@@ -319,8 +265,7 @@ export default class Selfie extends Component {
 
                 <div className="selfie_page" id="selfie_page" >
                     <div className="booth" id="booth">
-                        <video id="video" width="320" height="240" style={imgStyles} preload={'auto'} autoPlay loop muted></video>
-                        <canvas id="canvas" {...imgStyles}></canvas>
+                        {this.getHtml()}
                     </div>
                     <div>
                         <p>Position your face inside the frame and click on Take Selfie button</p>
