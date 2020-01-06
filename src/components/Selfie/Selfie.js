@@ -27,27 +27,20 @@ export default class Selfie extends Component {
             snackbarMsg: '',
             videoInterval: undefined,
             loadingVideo: undefined,
-            trackingColor: '#ffffff',
-            tracking: true
+            mediaSupport: true
         }
     }
 
     componentDidMount() {
-        // const script = document.createElement('script');
-        // document.head.append(script);
         window.scrollTo(0, 0);
         this.props.history.listen((location, action) => {
-            // alert(action)
             if (action === 'POP') {
                 this.props.history.push('/selfie')
             }
         });
-        // if (getDevice() === 'desktop') {
-            // this.props.manageLoader(true)
             this.setState({ loadingVideo: true }, () => {
                 this.initializeVideo();
             })
-        // }
     }
 
     initializeVideo = () => {
@@ -56,7 +49,10 @@ export default class Selfie extends Component {
 
 
     startVideo = () => {
-        // if (getDevice() === 'desktop') {
+        console.log(navigator)
+        console.log(navigator.mediaDevices)
+        console.log(navigator.mediaDevices.getUserMedia)
+        if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             let img = document.getElementById('img');
             if (img) {
                 img.parentNode.removeChild(img);
@@ -65,6 +61,8 @@ export default class Selfie extends Component {
             let canvas = document.getElementById('canvas');
             video.style.display = 'block';
             canvas.style.visibility = 'visible';
+            
+            window.Webcam.reset();
             window.Webcam.attach(document.getElementById('canvas'));
             
             this.setState({ loadingVideo: false }, () => {
@@ -88,26 +86,30 @@ export default class Selfie extends Component {
                     });
                 });
             })
-        // }
+        } else {
+            this.setState({ mediaSupport: false, loadingVideo: false })
+        }
     }
 
     takeSelfie = async () => {
         if (this.state.pictureTaken) {
             this.setState({ pictureTaken: false });
-            // if (getDevice() === 'desktop') {
+            if (this.state.mediaSupport) {
                 const img = document.getElementById('img');
-                img.parentNode.removeChild(img);
+                if(img){
+                    img.parentNode.removeChild(img);
+                }
                 this.startVideo();
-            // } else {
-            //     this.takeSelfieFromPhone();
-            // }
+            } else {
+                this.takeSelfieFromPhone();
+            }
             return;
         }
 
-        // if (getDevice() === 'mobile') {
-        //     this.takeSelfieFromPhone();
-        //     return;
-        // }
+        if (!this.state.mediaSupport) {
+            this.takeSelfieFromPhone();
+            return;
+        }
 
         if(!this.state.xAxis){
             this.handleSnackbar(true, 'error', 'Take selfie when blinking box appears on your face.')
@@ -167,7 +169,6 @@ export default class Selfie extends Component {
         body.request.payload.imageFile = imgString;
         body.request.payload.fileExtension = type;
 
-
         try {
             const response = await axios.post(url, body)
             if (response.data && response.data.response && !response.data.response.payload.isImageValid) {
@@ -175,9 +176,11 @@ export default class Selfie extends Component {
                 this.props.manageLoader(false)
                 this.setState({ submitting: false });
                 setTimeout(() => {
-                    if (getDevice() === 'desktop') {
+                    if (this.state.mediaSupport) {
                         const img = document.getElementById('img');
-                        img.parentNode.removeChild(img);
+                        if(img){
+                            img.parentNode.removeChild(img);
+                        }
                         this.setState({ pictureTaken: false });
                         this.initializeVideo();
                     }
@@ -227,7 +230,7 @@ export default class Selfie extends Component {
     }
 
     getHtml = () => {
-        if (getDevice() === 'mobile') {
+        if (this.state.mediaSupport) {
             const imgStyles = { width: '320', height: '240' };
             return (
                 <>
@@ -238,12 +241,9 @@ export default class Selfie extends Component {
                 </>
             )
         } else {
-            const imgStyles = { width: '320', height: '240' };
             return (
                 <>
-                    <video id="video" width="320" height="240" style={imgStyles} preload={'auto'} autoPlay loop muted></video>
-                    <canvas id="canvas" {...imgStyles}></canvas>
-                    <div id="my_cam"></div>
+                    <input type="file" accept="image/*" capture="camera" style={{ visibility: 'hidden', position: 'fixed', top: '0', left: '0' }} />
                 </>
             )
         }
