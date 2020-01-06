@@ -62,14 +62,25 @@ export default class Selfie extends Component {
         return video;
     }
 
+    createCanvas = () => {
+        const canvas = document.createElement('canvas');
+        canvas.setAttribute("width", "320px");
+        canvas.setAttribute("height", "240px");
+        canvas.setAttribute("id", "canvas");
+        const booth = document.getElementById('booth');
+        booth.prepend(canvas);
+        return canvas;
+    }
+
     startVideo = () => {
         if (getDevice() === 'desktop') {
-            // let video = document.getElementById('video');
-            // if(!video){
-            //     video = this.createVideoTag()
-            // }
+            let video = document.getElementById('video');
+            let canvas = document.getElementById('canvas');
+            if (!video) {
+                video = this.createVideoTag();
+                canvas = this.createCanvas();
+            }
             this.setState({ loadingVideo: false }, async () => {
-                var canvas = document.getElementById('canvas');
                 var context = canvas.getContext('2d');
 
                 const tracking = window.tracking;
@@ -84,7 +95,7 @@ export default class Selfie extends Component {
                     context.clearRect(0, 0, canvas.width, canvas.height);
                     let xAxis = false;
                     event.data.forEach(function (rect) {
-                        
+
                         context.strokeStyle = '#fff';
                         context.strokeRect(rect.x + 20, rect.y + 20, rect.width - 30, rect.height - 30);
                         context.font = '11px Helvetica';
@@ -97,14 +108,12 @@ export default class Selfie extends Component {
     }
 
     takeSelfie = async () => {
-        console.log('1')
         if (this.state.pictureTaken) {
-            console.log('2')
             this.setState({ pictureTaken: false });
             if (getDevice() === 'desktop') {
-                console.log('3')
-                this.props.history.push('/')
-                this.props.history.push('/selfie')
+                const img = document.getElementById('img');
+                img.parentNode.removeChild(img);
+                this.startVideo();
             } else {
                 this.takeSelfieFromPhone();
             }
@@ -121,15 +130,15 @@ export default class Selfie extends Component {
             const video = document.getElementById('video');
             const canvas = document.getElementById('canvas');;
             canvas.style.position = 'static';
-            const context = canvas.getContext('2d');
 
             const img = document.createElement('img');
             img.setAttribute('id', 'img');
             img.src = imgData;
+            video.parentNode.removeChild(video);
+            canvas.parentNode.removeChild(canvas);
             const booth = document.getElementById('booth');
             booth.append(img);
-            video.parentNode.removeChild(video);
-            that.setState({ pictureTaken: true })
+            that.setState({ pictureTaken: true, picture: imgData })
         })
     }
 
@@ -163,11 +172,9 @@ export default class Selfie extends Component {
     submitSelfie = async () => {
         this.props.manageLoader(true)
         await this.setState({ submitting: true })
-        // const canvas = document.getElementById('canvas');
         const base64 = this.state.picture
         const type = base64.substring(base64.indexOf('/') + 1, base64.indexOf(';base64'));
         const { url, body } = getApiData('verifyCustomerImage');
-        // const type = this.state.type;
         const imgString = this.state.picture.split(",")[1]
         body.request.payload.imageFile = imgString;
         body.request.payload.fileExtension = type;
@@ -178,9 +185,10 @@ export default class Selfie extends Component {
                 this.handleSnackbar(true, 'error', response.data.response.payload.businessMsg)
                 this.props.manageLoader(false)
                 this.setState({ submitting: false });
-                // this.initializeVideo();
                 setTimeout(() => {
                     if (getDevice() === 'desktop') {
+                        const img = document.getElementById('img');
+                        img.parentNode.removeChild(img);
                         this.setState({ pictureTaken: false });
                         this.initializeVideo();
                     }
