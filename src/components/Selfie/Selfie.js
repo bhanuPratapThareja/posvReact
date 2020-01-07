@@ -51,10 +51,6 @@ export default class Selfie extends Component {
 
 
     startVideo = () => {
-        console.log(navigator)
-        console.log(navigator.mediaDevices)
-        console.log(navigator.mediaDevices.getUserMedia)
-        console.log(getIfIOS())
         if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS()) {
             let img = document.getElementById('img');
             if (img) {
