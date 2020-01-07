@@ -3,6 +3,7 @@ import axios from 'axios';
 import './Verify.css';
 import { getApiData } from './../../api/api';
 import Error from './../Error/Error';
+import { getIfIOS } from './../../utils/getDevice';
 
 class Verify extends Component {
     constructor() {
