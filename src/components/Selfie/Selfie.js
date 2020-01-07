@@ -4,7 +4,7 @@ import Button from '@material-ui/core/Button';
 import axios from 'axios';
 import { getApiData } from './../../api/api';
 import Snackbar from './../Snackbar/Snackbar';
-import { getDevice } from './../../utils/getDevice';
+import { getDevice, getIfIOS } from './../../utils/getDevice';
 
 export default class Selfie extends Component {
     localStream;
@@ -15,7 +15,7 @@ export default class Selfie extends Component {
     tracker;
     tracking;
 
-    constructor() {
+    constructor(props) {
         super();
         this.state = {
             video: undefined,
@@ -29,15 +29,17 @@ export default class Selfie extends Component {
             loadingVideo: undefined,
             mediaSupport: true
         }
-    }
-
-    componentDidMount() {
-        window.scrollTo(0, 0);
-        this.props.history.listen((location, action) => {
+        props.history.listen((location, action) => {
+            console.log(location)
+            console.log(action)
             if (action === 'POP') {
                 this.props.history.push('/selfie')
             }
         });
+    }
+
+    componentDidMount() {
+        window.scrollTo(0, 0);
             this.setState({ loadingVideo: true }, () => {
                 this.initializeVideo();
             })
@@ -52,7 +54,8 @@ export default class Selfie extends Component {
         console.log(navigator)
         console.log(navigator.mediaDevices)
         console.log(navigator.mediaDevices.getUserMedia)
-        if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        console.log(getIfIOS())
+        if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS()) {
             let img = document.getElementById('img');
             if (img) {
                 img.parentNode.removeChild(img);
