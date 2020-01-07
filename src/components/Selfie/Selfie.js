@@ -82,6 +82,12 @@ export default class Selfie extends Component {
         }
     }
 
+    handleBoothClick = () => {
+        if(!(navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS())){
+           this.takeSelfie() 
+        }
+    }
+
     takeSelfie = async () => {
         if (this.state.pictureTaken) {
             this.setState({ pictureTaken: false });
@@ -186,6 +192,7 @@ export default class Selfie extends Component {
             }
             this.props.history.push(`/customer_feedback/${path}`)
         } catch (err) {
+            this.handleSnackbar(true, 'error', 'Something went wrong. Please try again.')
             this.props.manageLoader(false)
             this.setState({ submitting: false })
         }
@@ -228,27 +235,26 @@ export default class Selfie extends Component {
             const imgStyles = { width: '320', height: '240' };
             return (
                 <>
-                    {/* <input type="file" accept="image/*" capture="camera" style={{ visibility: 'hidden', position: 'fixed', top: '0', left: '0' }} /> */}
                     <video id="video" width="320" height="240" style={imgStyles} preload={'auto'} autoPlay loop muted></video>
                     <canvas id="canvas" {...imgStyles}></canvas>
-                    <div id="my_cam"></div>
                 </>
             )
         } else {
             return (
                 <>
                     <input type="file" accept="image/*" capture="camera" style={{ visibility: 'hidden', position: 'fixed', top: '0', left: '0' }} />
+                    <div className="camera_text">
+                        Click here to open camera
+                    </div>
                 </>
             )
         }
     }
 
     render() {
-        const imgStyles = { width: '320', height: '240' };
         const buttonText = !this.state.pictureTaken ? 'Take Selfie' : 'Retake Selfie';
         return (
             <>
-
                 <div className="display_text" style={{ visibility: this.state.loadingVideo ? 'visible' : 'hidden' }}>
                     Please wait ...
                 </div>
@@ -259,26 +265,19 @@ export default class Selfie extends Component {
                     snackbarMsg={this.state.snackbarMsg}
                 /> : null}
 
-
                 <div className="selfie_page" id="selfie_page" >
-                    <div className="booth" id="booth">
+                    <div className="booth" id="booth" onClick={this.handleBoothClick}>
                         {this.getHtml()}
                     </div>
                     <div>
                         <p>Position your face inside the frame and click on Take Selfie button</p>
-
                         <Button disabled={this.state.submitting} onClick={(event) => this.takeSelfie(event)} variant="contained" id="selfie_button" className="default_button">
                             {buttonText}
                         </Button>
-
-
                         <Button disabled={this.state.submitting || !this.state.pictureTaken} onClick={this.submitSelfie} variant="contained" className="default_button">
                             Submit
                         </Button>
-
                     </div>
-
-
                 </div>
             </>
         )

@@ -1,6 +1,7 @@
 .cust_feedback--page {
     margin-top: 2rem;
     /* transition: transform 0.5s ease-out; */
+    padding-bottom: 20px;
 }
 
 .button_div {

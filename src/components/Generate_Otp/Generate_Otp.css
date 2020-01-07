@@ -19,6 +19,7 @@
     -moz-transform: translate(-50%, 20%);
     -ms-transform: translate(-50%, 20%);
     max-width: 70%;
+    padding-bottom: 20px;
 }
 
 .generate-otp__grid {
