@@ -82,6 +82,12 @@ export default class Selfie extends Component {
         }
     }
 
+    handleBoothClick = () => {
+        if(!(navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS())){
+           this.takeSelfie() 
+        }
+    }
+
     takeSelfie = async () => {
         if (this.state.pictureTaken) {
             this.setState({ pictureTaken: false });
@@ -234,12 +240,18 @@ export default class Selfie extends Component {
                 </>
             )
         } else {
-            return <input type="file" accept="image/*" capture="camera" style={{ visibility: 'hidden', position: 'fixed', top: '0', left: '0' }} />
+            return (
+                <>
+                    <input type="file" accept="image/*" capture="camera" style={{ visibility: 'hidden', position: 'fixed', top: '0', left: '0' }} />
+                    <div className="camera_text">
+                        Click here to open camera
+                    </div>
+                </>
+            )
         }
     }
 
     render() {
-        const imgStyles = { width: '320', height: '240' };
         const buttonText = !this.state.pictureTaken ? 'Take Selfie' : 'Retake Selfie';
         return (
             <>
@@ -254,7 +266,7 @@ export default class Selfie extends Component {
                 /> : null}
 
                 <div className="selfie_page" id="selfie_page" >
-                    <div className="booth" id="booth">
+                    <div className="booth" id="booth" onClick={this.handleBoothClick}>
                         {this.getHtml()}
                     </div>
                     <div>
