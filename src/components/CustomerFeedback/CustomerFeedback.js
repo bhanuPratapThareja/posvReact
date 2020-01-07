@@ -345,7 +345,7 @@ export default class CustomerFeedback extends Component {
                             disabled={this.state.disableButtons || !this.state.qstCatNamePrevious}
                             onClick={() => this.gotToPage('previous')}>
                             <ChevronLeftTwoToneIcon />
-                            Pervious
+                            Previous
                          </Fab>
 
                         <Fab

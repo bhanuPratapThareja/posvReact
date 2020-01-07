@@ -101,3 +101,9 @@ form fieldset {
 input[type=number] {
     -moz-appearance:textfield !important;
 }
+input:focus{
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-input:none;
+}
