@@ -7,13 +7,7 @@ import Snackbar from './../Snackbar/Snackbar';
 import { getDevice, getIfIOS } from './../../utils/getDevice';
 
 export default class Selfie extends Component {
-    localStream;
-    videoInterval;
     trackerTask;
-    context;
-    Webcam;
-    tracker;
-    tracking;
 
     constructor(props) {
         super();
@@ -25,15 +19,13 @@ export default class Selfie extends Component {
             showSnackbar: false,
             snackbarMsgType: '',
             snackbarMsg: '',
-            videoInterval: undefined,
             loadingVideo: undefined,
             mediaSupport: true
         }
         props.history.listen((location, action) => {
-            console.log(location)
-            console.log(action)
             if (action === 'POP') {
-                this.props.history.push('/selfie')
+                this.props.history.push('/selfie');
+                this.props.manageLoader(false);
             }
         });
     }
@@ -51,10 +43,6 @@ export default class Selfie extends Component {
 
 
     startVideo = () => {
-        console.log(navigator)
-        console.log(navigator.mediaDevices)
-        console.log(navigator.mediaDevices.getUserMedia)
-        console.log(getIfIOS())
         if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS()) {
             let img = document.getElementById('img');
             if (img) {
@@ -70,15 +58,15 @@ export default class Selfie extends Component {
             
             this.setState({ loadingVideo: false }, () => {
                 var context = canvas.getContext('2d');
-                this.tracking = window.tracking;
-                this.tracker = new this.tracking.ObjectTracker('face');
-                this.tracker.setInitialScale(4);
-                this.tracker.setStepSize(2);
-                this.tracker.setEdgesDensity(0.1);
-                this.trackerTask = this.tracking.track('#video', this.tracker, { camera: true });
+                const tracking = window.tracking;
+                const tracker = new tracking.ObjectTracker('face');
+                tracker.setInitialScale(4);
+                tracker.setStepSize(2);
+                tracker.setEdgesDensity(0.1);
+                this.trackerTask = tracking.track('#video', tracker, { camera: true });
                 const that = this;
                 this.setState({ xAxis: null });
-                this.tracker.on('track', function (event) {
+                tracker.on('track', function (event) {
                     that.setState({ xAxis: event.data.length })
                     context.clearRect(0, 0, canvas.width, canvas.height);
                     event.data.forEach(function (rect) {
@@ -126,7 +114,8 @@ export default class Selfie extends Component {
             const canvas = document.getElementById('canvas');
             canvas.style.visibility = 'hidden';
             video.style.display = 'none';
-            const img = document.createElement('img');
+            const img = new Image();
+            // const img = document.createElement('img');
             img.setAttribute('id', 'img');
             img.src = imgData;
             const booth = document.getElementById('booth');
@@ -203,7 +192,7 @@ export default class Selfie extends Component {
     }
 
     componentWillUnmount() {
-        if (getDevice() === 'desktop') {
+        if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS()) {
             this.closeWebcam();
         }
     }
@@ -212,7 +201,9 @@ export default class Selfie extends Component {
         const video = document.getElementById('video')
         setTimeout(function () { 
             window.Webcam.reset();
-            video.pause(); video.srcObject.getVideoTracks()[0].stop(); 
+            if(video && video.srcObject){
+                video.pause(); video.srcObject.getVideoTracks()[0].stop(); 
+            }
         }, 100);
         
     }

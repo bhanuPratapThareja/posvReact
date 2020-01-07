@@ -35,6 +35,7 @@ export default class CustomerFeedback extends Component {
     }
 
     componentDidMount() {
+        console.log('component mounted')
         const qstCatName = this.props.location.pathname.split('/')[2].toUpperCase();
         this.getQuestions(null, qstCatName);
     }
