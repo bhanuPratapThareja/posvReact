@@ -249,10 +249,6 @@ export default class CustomerFeedback extends Component {
             this.setState({ errorMsg: isValid.error })
             return
         }
-
-        this.state.questions.forEach(question => {
-            console.log(question)
-        })
         
         const { url, body } = getApiData('saveCustomerResponse')
         const { qstCatName } = this.state;
