@@ -82,6 +82,13 @@ canvas {
     position: absolute !important;
 }
 
+.selfie_camera--image {
+    visibility: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
 .camera_text {
     position: absolute;
     top: 50%;
