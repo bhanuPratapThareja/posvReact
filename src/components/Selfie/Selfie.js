@@ -22,6 +22,7 @@ export default class Selfie extends Component {
             loadingVideo: undefined,
             mediaSupport: true
         }
+        
         props.history.listen((location, action) => {
             if (action === 'POP') {
                 this.props.history.push('/selfie');
@@ -30,7 +31,7 @@ export default class Selfie extends Component {
         });
     }
 
-    componentDidMount() {
+    componentDidMount() {      
         window.scrollTo(0, 0);
         this.setState({ loadingVideo: true }, () => {
             this.initializeVideo();
