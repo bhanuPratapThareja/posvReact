@@ -126,16 +126,20 @@ export default class Selfie extends Component {
             const canvas = document.getElementById('canvas');
             canvas.style.visibility = 'hidden';
             video.style.display = 'none';
-            const img = document.createElement('img');
+            const img = new Image();
             img.setAttribute('id', 'img');
             img.src = imgData;
             const booth = document.getElementById('booth');
-            if(getDevice() === 'mobile'){
-                booth.style.border = 'none';
-                img.style.border = '8px solid lightgrey';
+            img.onload = () => {
+                if (getDevice() === 'mobile') {
+                    booth.style.width = img.width;
+                    booth.style.height = img.height;
+                    booth.style.border = 'none';
+                    img.style.border = '8px solid lightgrey';
+                }
+                booth.append(img);
+                that.setState({ pictureTaken: true, picture: imgData })
             }
-            booth.append(img);
-            that.setState({ pictureTaken: true, picture: imgData })
         })
     }
 
@@ -165,11 +169,11 @@ export default class Selfie extends Component {
                         img.style.border = '8px solid lightgrey';
                         booth.append(img);
                         const images = document.querySelectorAll('#selfie');
-                        console.log(images.length)
-                        if(images.length > 1){
+                        if (images.length > 1) {
                             const rmImage = images[1];
                             rmImage.parentNode.removeChild(rmImage)
                         }
+                        that.setState({ pictureTaken: true })
                     }
                 })
             }
