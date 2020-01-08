@@ -60,6 +60,10 @@ export default class Selfie extends Component {
             canvas.style.visibility = 'visible';
 
             window.Webcam.reset();
+            window.Webcam.set({
+                width: 320,
+                height: 240
+            })
             window.Webcam.attach(document.getElementById('canvas'));
 
             this.setState({ loadingVideo: false }, () => {
