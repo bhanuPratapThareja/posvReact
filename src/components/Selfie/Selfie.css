@@ -27,10 +27,7 @@
 
 
 .booth {
-   margin-top: 20px;
    border: 8px solid lightgray;
-   /* height: 240px;
-   width: 320px; */
    overflow: hidden;
 }
 
