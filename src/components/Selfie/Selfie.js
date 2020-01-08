@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import './Selfie.css';
-import Button from '@material-ui/core/Button';
 import axios from 'axios';
-import { getApiData } from './../../api/api';
 import Snackbar from './../Snackbar/Snackbar';
-import { getDevice, getIfIOS } from './../../utils/getDevice';
+import Button from '@material-ui/core/Button';
+import { getApiData } from './../../api/api';
+import { getIfIOS } from './../../utils/getDevice';
+import './Selfie.css';
 
 export default class Selfie extends Component {
     trackerTask;
