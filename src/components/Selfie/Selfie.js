@@ -3,7 +3,7 @@ import axios from 'axios';
 import Snackbar from './../Snackbar/Snackbar';
 import Button from '@material-ui/core/Button';
 import { getApiData } from './../../api/api';
-import { getIfIOS } from './../../utils/getDevice';
+import { getDevice, getIfIOS } from './../../utils/getDevice';
 import './Selfie.css';
 
 export default class Selfie extends Component {
@@ -36,6 +36,9 @@ export default class Selfie extends Component {
     componentDidMount() {
         window.scrollTo(0, 0);
         this.setState({ loadingVideo: true }, () => {
+            // if(getDevice() === 'mobile'){
+            //     this.setState({ boothWidth: '50%', boothHeight: '50%' })
+            // }
             this.initializeVideo();
         })
     }
@@ -123,11 +126,14 @@ export default class Selfie extends Component {
             const canvas = document.getElementById('canvas');
             canvas.style.visibility = 'hidden';
             video.style.display = 'none';
-            // const img = new Image();
             const img = document.createElement('img');
             img.setAttribute('id', 'img');
             img.src = imgData;
             const booth = document.getElementById('booth');
+            if(getDevice() === 'mobile'){
+                booth.style.border = 'none';
+                img.style.border = '8px solid lightgrey';
+            }
             booth.append(img);
             that.setState({ pictureTaken: true, picture: imgData })
         })
@@ -145,23 +151,25 @@ export default class Selfie extends Component {
             const that = this;
             function readSuccess(evt) {
                 that.setState({ picture: evt.target.result }, () => {
+                    const booth = document.getElementById('booth');
+                    booth.style.border = 'none';
                     let img = document.getElementById('selfie');
-                    if(img){
+                    if (img) {
                         img.parentNode.removeChild(img)
                     }
                     img = new Image();
                     img.src = that.state.picture;
                     img.alt = 'Selfie';
                     img.setAttribute('id', 'selfie');
-                    
                     img.onload = () => {
-                        const booth = document.getElementById('booth');
+                        img.style.border = '8px solid lightgrey';
                         booth.append(img);
-                        that.setState({
-                            boothWidth: `${img.width}px`,
-                            boothHeight: `${img.height}px`,
-                            pictureTaken: true
-                        })
+                        const images = document.querySelectorAll('#selfie');
+                        console.log(images.length)
+                        if(images.length > 1){
+                            const rmImage = images[1];
+                            rmImage.parentNode.removeChild(rmImage)
+                        }
                     }
                 })
             }
