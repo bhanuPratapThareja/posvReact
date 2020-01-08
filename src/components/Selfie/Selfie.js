@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import './Selfie.css';
-import Button from '@material-ui/core/Button';
 import axios from 'axios';
-import { getApiData } from './../../api/api';
 import Snackbar from './../Snackbar/Snackbar';
-import { getDevice, getIfIOS } from './../../utils/getDevice';
+import Button from '@material-ui/core/Button';
+import { getApiData } from './../../api/api';
+import { getIfIOS } from './../../utils/getDevice';
+import './Selfie.css';
 
 export default class Selfie extends Component {
     trackerTask;
@@ -20,8 +20,11 @@ export default class Selfie extends Component {
             snackbarMsgType: '',
             snackbarMsg: '',
             loadingVideo: undefined,
-            mediaSupport: true
+            mediaSupport: true,
+            boothWidth: '320px',
+            boothHeight: '240px'
         }
+        
         props.history.listen((location, action) => {
             if (action === 'POP') {
                 this.props.history.push('/selfie');
@@ -30,7 +33,7 @@ export default class Selfie extends Component {
         });
     }
 
-    componentDidMount() {
+    componentDidMount() {      
         window.scrollTo(0, 0);
         this.setState({ loadingVideo: true }, () => {
             this.initializeVideo();
@@ -90,8 +93,8 @@ export default class Selfie extends Component {
 
     takeSelfie = async () => {
         if (this.state.pictureTaken) {
-            this.setState({ pictureTaken: false });
             if (this.state.mediaSupport) {
+                this.setState({ pictureTaken: false });
                 const img = document.getElementById('img');
                 if (img) {
                     img.parentNode.removeChild(img);
@@ -120,8 +123,8 @@ export default class Selfie extends Component {
             const canvas = document.getElementById('canvas');
             canvas.style.visibility = 'hidden';
             video.style.display = 'none';
-            const img = new Image();
-            // const img = document.createElement('img');
+            // const img = new Image();
+            const img = document.createElement('img');
             img.setAttribute('id', 'img');
             img.src = imgData;
             const booth = document.getElementById('booth');
@@ -134,6 +137,9 @@ export default class Selfie extends Component {
         const cameraInput = document.querySelector("[capture='camera']");
         cameraInput.click();
         cameraInput.addEventListener('change', (event) => {
+           if(!event.target.value){
+               return
+           }
             var reader = new FileReader(event.srcElement.files[0]);
             reader.onload = readSuccess;
             const that = this;
@@ -141,13 +147,15 @@ export default class Selfie extends Component {
                 that.setState({ picture: evt.target.result }, () => {
                     let img = document.getElementById('selfie');
                     if (!img) {
-                        img = document.createElement('img');
+                        img = new Image();
                     }
                     img.setAttribute('id', 'selfie');
                     img.src = that.state.picture;
                     img.alt = 'Selfie';
-                    img.width = '320';
-                    img.height = '240';
+                    that.setState({ 
+                        boothWidth: `${img.clientWidth}px`,
+                        boothHeight: `${img.clientHeight}px`
+                    })
                     const booth = document.getElementById('booth');
                     booth.append(img);
                     that.setState({ pictureTaken: true })
@@ -231,7 +239,7 @@ export default class Selfie extends Component {
     }
 
     getHtml = () => {
-        const camTextStyle = { display: this.state.pictureTaken ? 'none' : 'block' }
+        const camTextStyle = { display: this.state.picture ? 'none' : 'block' }
         if (this.state.mediaSupport) {
             const imgStyles = { width: '320', height: '240' };
             return (
@@ -254,6 +262,7 @@ export default class Selfie extends Component {
 
     render() {
         const buttonText = !this.state.pictureTaken ? 'Take Selfie' : 'Retake Selfie';
+        const boothStyles = { width: this.state.boothWidth, height: this.state.boothHeight }
         return (
             <>
                 <div className="display_text" style={{ visibility: this.state.loadingVideo ? 'visible' : 'hidden' }}>
@@ -267,7 +276,7 @@ export default class Selfie extends Component {
                 /> : null}
 
                 <div className="selfie_page" id="selfie_page" >
-                    <div className="booth" id="booth" onClick={this.handleBoothClick}>
+                    <div className="booth" style={boothStyles} id="booth" onClick={this.handleBoothClick}>
                         {this.getHtml()}
                     </div>
                     <div>
