@@ -32,9 +32,9 @@ export default class Selfie extends Component {
 
     componentDidMount() {
         window.scrollTo(0, 0);
-            this.setState({ loadingVideo: true }, () => {
-                this.initializeVideo();
-            })
+        this.setState({ loadingVideo: true }, () => {
+            this.initializeVideo();
+        })
     }
 
     initializeVideo = () => {
@@ -52,10 +52,10 @@ export default class Selfie extends Component {
             let canvas = document.getElementById('canvas');
             video.style.display = 'block';
             canvas.style.visibility = 'visible';
-            
+
             window.Webcam.reset();
             window.Webcam.attach(document.getElementById('canvas'));
-            
+
             this.setState({ loadingVideo: false }, () => {
                 var context = canvas.getContext('2d');
                 const tracking = window.tracking;
@@ -83,8 +83,8 @@ export default class Selfie extends Component {
     }
 
     handleBoothClick = () => {
-        if(!(navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS())){
-           this.takeSelfie() 
+        if (!(navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS())) {
+            this.takeSelfie()
         }
     }
 
@@ -93,7 +93,7 @@ export default class Selfie extends Component {
             this.setState({ pictureTaken: false });
             if (this.state.mediaSupport) {
                 const img = document.getElementById('img');
-                if(img){
+                if (img) {
                     img.parentNode.removeChild(img);
                 }
                 this.startVideo();
@@ -108,7 +108,7 @@ export default class Selfie extends Component {
             return;
         }
 
-        if(!this.state.xAxis){
+        if (!this.state.xAxis) {
             this.handleSnackbar(true, 'error', 'Take selfie when blinking box appears on your face.')
             return;
         }
@@ -176,7 +176,7 @@ export default class Selfie extends Component {
                 setTimeout(() => {
                     if (this.state.mediaSupport) {
                         const img = document.getElementById('img');
-                        if(img){
+                        if (img) {
                             img.parentNode.removeChild(img);
                         }
                         this.setState({ pictureTaken: false });
@@ -206,13 +206,13 @@ export default class Selfie extends Component {
 
     closeWebcam = () => {
         const video = document.getElementById('video')
-        setTimeout(function () { 
+        setTimeout(function () {
             window.Webcam.reset();
-            if(video && video.srcObject){
-                video.pause(); video.srcObject.getVideoTracks()[0].stop(); 
+            if (video && video.srcObject) {
+                video.pause(); video.srcObject.getVideoTracks()[0].stop();
             }
         }, 100);
-        
+
     }
 
     handleSnackbar = (showSnackbar, snackbarMsgType, snackbarMsg) => {
@@ -231,6 +231,7 @@ export default class Selfie extends Component {
     }
 
     getHtml = () => {
+        const camTextStyle = { display: this.state.pictureTaken ? 'none' : 'block' }
         if (this.state.mediaSupport) {
             const imgStyles = { width: '320', height: '240' };
             return (
@@ -243,7 +244,7 @@ export default class Selfie extends Component {
             return (
                 <>
                     <input type="file" accept="image/*" capture="camera" className="selfie_camera--image" />
-                    <div className="camera_text" style={{ display: this.state.pictureTaken ? 'none': 'block' }}>
+                    <div className="camera_text" style={camTextStyle}>
                         Click here to open camera
                     </div>
                 </>
