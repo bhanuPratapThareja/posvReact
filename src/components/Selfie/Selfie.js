@@ -24,7 +24,7 @@ export default class Selfie extends Component {
             boothWidth: '320px',
             boothHeight: '240px'
         }
-        
+
         props.history.listen((location, action) => {
             if (action === 'POP') {
                 this.props.history.push('/selfie');
@@ -33,7 +33,7 @@ export default class Selfie extends Component {
         });
     }
 
-    componentDidMount() {      
+    componentDidMount() {
         window.scrollTo(0, 0);
         this.setState({ loadingVideo: true }, () => {
             this.initializeVideo();
@@ -137,28 +137,32 @@ export default class Selfie extends Component {
         const cameraInput = document.querySelector("[capture='camera']");
         cameraInput.click();
         cameraInput.addEventListener('change', (event) => {
-           if(!event.target.value){
-               return
-           }
+            if (!event.target.value) {
+                return
+            }
             var reader = new FileReader(event.srcElement.files[0]);
             reader.onload = readSuccess;
             const that = this;
             function readSuccess(evt) {
                 that.setState({ picture: evt.target.result }, () => {
                     let img = document.getElementById('selfie');
-                    if (!img) {
-                        img = new Image();
+                    if(img){
+                        img.parentNode.removeChild(img)
                     }
-                    img.setAttribute('id', 'selfie');
+                    img = new Image();
                     img.src = that.state.picture;
                     img.alt = 'Selfie';
-                    that.setState({ 
-                        boothWidth: `${img.clientWidth}px`,
-                        boothHeight: `${img.clientHeight}px`
-                    })
-                    const booth = document.getElementById('booth');
-                    booth.append(img);
-                    that.setState({ pictureTaken: true })
+                    img.setAttribute('id', 'selfie');
+                    
+                    img.onload = () => {
+                        const booth = document.getElementById('booth');
+                        booth.append(img);
+                        that.setState({
+                            boothWidth: `${img.width}px`,
+                            boothHeight: `${img.height}px`,
+                            pictureTaken: true
+                        })
+                    }
                 })
             }
             reader.readAsDataURL(event.srcElement.files[0]);
