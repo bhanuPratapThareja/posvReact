@@ -24,7 +24,7 @@ export default class CustomerFeedback extends Component {
             qstCatNameNext: '',
             qstCatNamePrevious: '',
             errorMsg: '',
-            mandatoryError: 'All fields are mandatory',
+            mandatoryError: 'Please answer all the mandatory questions (marked with *)',
             loading: false,
             disableButtons: false
         }

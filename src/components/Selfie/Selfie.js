@@ -242,8 +242,8 @@ export default class Selfie extends Component {
         } else {
             return (
                 <>
-                    <input type="file" accept="image/*" capture="camera" style={{ visibility: 'hidden', position: 'fixed', top: '0', left: '0' }} />
-                    <div className="camera_text">
+                    <input type="file" accept="image/*" capture="camera" className="selfie_camera--image" />
+                    <div className="camera_text" style={{ display: this.state.pictureTaken ? 'none': 'block' }}>
                         Click here to open camera
                     </div>
                 </>
