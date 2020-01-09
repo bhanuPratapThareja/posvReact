@@ -4,7 +4,6 @@ import Snackbar from './../Snackbar/Snackbar';
 import Button from '@material-ui/core/Button';
 import { getApiData } from './../../api/api';
 import { getDevice, getIfIOS } from './../../utils/getDevice';
-import { getBlob } from './../../utils/toBlob';
 import './Selfie.css';
 
 export default class Selfie extends Component {
@@ -62,7 +61,7 @@ export default class Selfie extends Component {
             canvas.style.visibility = 'visible';
 
             window.Webcam.reset();
-            window.Webcam.attach(document.getElementById('canvas'));
+            window.Webcam.attach( '#my_camera' );
             window.Webcam.set({
                 width: 320,
                 height: 240,
@@ -190,7 +189,7 @@ export default class Selfie extends Component {
                         canvas.height = img.height;
                         
                         img.style.border = '8px solid lightgrey';
-                        
+
                         booth.append(img);
                         const images = document.querySelectorAll('#selfie');
                         if (images.length > 1) {
@@ -307,6 +306,7 @@ export default class Selfie extends Component {
                     <div className="camera_text" style={camTextStyle}>
                         Click here to open camera
                     </div>
+                    <div id="my_camera" style={imgStyles}></div>
                 </>
             )
         }
