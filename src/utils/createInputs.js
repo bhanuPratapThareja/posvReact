@@ -9,10 +9,10 @@ const handleChange = (e, qstId, type) => {
     if (type === 'text') {
         console.log('text')
     }
-    // if ((type === 'number' && value.length === 1 && value === '0') || (type === 'number' && isNaN(Number(value)))) {
-    //     console.log('number')
-    //     value = value.slice(0, -1)
-    // }
+    if ((type === 'number' && value.length === 1 && value === '0') || (type === 'number' && isNaN(Number(value)))) {
+        console.log('number')
+        value = value.slice(0, -1)
+    }
     var event = new CustomEvent("emitted", { "detail": { qstId, value } });
     document.dispatchEvent(event);
 }
@@ -35,20 +35,6 @@ export default function createInput(field) {
                     <input type="radio" name={qstId} value="No" checked={field.question.customerResponse === 'No' ? true : false} onChange={(event) => handleChange(event, qstId)} /> <label>No</label>
                 </fieldset>
             )
-        case 'text':
-        case 'tel':
-            return (
-                <fieldset>
-                    <input
-                        type={qstOptType}
-                        name={qstId}
-                        style={{ marginTop: '16px' }}
-                        placeholder={qstText}
-                        value={customerResponse}
-                        required
-                        onChange={(event) => handleChange(event, qstId, qstOptType)} />
-                </fieldset>
-            )
         case 'number':
             return (
                 <fieldset>
@@ -63,6 +49,21 @@ export default function createInput(field) {
                         onChange={(event) => handleChange(event, qstId, qstOptType)} />
                 </fieldset>
             )
+        case 'text':
+        case 'tel':
+            return (
+                <fieldset>
+                    <input
+                        type={qstOptType}
+                        name={qstId}
+                        style={{ marginTop: '16px' }}
+                        placeholder={qstText}
+                        value={customerResponse}
+                        required
+                        onChange={(event) => handleChange(event, qstId, qstOptType)} />
+                </fieldset>
+            )
+
         case 'dropdown':
             // console.log('field: ', field)
             const selectedValue = customerResponse ? customerResponse : 'default';

@@ -205,9 +205,9 @@ export default class CustomerFeedback extends Component {
                 })
             }
         })
-        // setTimeout(() => {
-        //     console.log(this.state)
-        // }, 1000);
+        setTimeout(() => {
+            console.log(this.state)
+        }, 1000);
     }
 
     submitAnswers = async () => {
