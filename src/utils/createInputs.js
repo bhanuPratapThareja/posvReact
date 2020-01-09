@@ -6,12 +6,12 @@ const handleChange = (e, qstId, type) => {
     if (type === 'checkbox') {
         value === true ? value = 'Yes' : value = 'No'
     }
-    // if ((type === 'number' && value.length === 1 && value === '0') || (type === 'number' && isNaN(Number(value)))) {
-    //     console.log('number')
-    //     value = value.slice(0, -1)
-    // }
-    if(type === 'text'){
+    if (type === 'text') {
         console.log('text')
+    }
+    if ((type === 'number' && value.length === 1 && value === '0') || (type === 'number' && isNaN(Number(value)))) {
+        console.log('number')
+        value = value.slice(0, -1)
     }
     var event = new CustomEvent("emitted", { "detail": { qstId, value } });
     document.dispatchEvent(event);
