@@ -152,7 +152,7 @@ export default class Selfie extends Component {
     takeSelfieFromPhone = () => {
         const cameraInput = document.querySelector("[capture='camera']");
         cameraInput.click();
-        cameraInput.addEventListener('change', async (event) => {
+        cameraInput.addEventListener('change', (event) => {
             if (!event.target.value) {
                 return
             }
