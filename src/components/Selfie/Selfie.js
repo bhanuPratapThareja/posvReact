@@ -98,8 +98,11 @@ export default class Selfie extends Component {
                 height: 240,
                 image_format: 'jpeg',
                 jpeg_quality: 90,
-                force_flash: false
+                enable_flash: false,
+                force_flash: false,
+                flip_horiz: true
             });
+            console.log(window.Webcam)
             this.setState({ mediaSupport: false, loadingVideo: false })
         }
     }
