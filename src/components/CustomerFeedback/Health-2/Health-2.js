@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form';
-import CreateInput from '../../../utils/createInputs';
+import createInput from '../../../utils/createInputs';
 
 class Health2 extends Component {
 
@@ -31,7 +31,7 @@ class Health2 extends Component {
                                 type={question.qstOptType}
                                 key={question.qstId}
                                 question={question}
-                                component={CreateInput}
+                                component={createInput}
                                 customProps={this.props.onUserAnswer}
                             />
                         )

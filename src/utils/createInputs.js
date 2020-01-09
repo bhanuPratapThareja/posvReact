@@ -6,9 +6,12 @@ const handleChange = (e, qstId, type) => {
     if (type === 'checkbox') {
         value === true ? value = 'Yes' : value = 'No'
     }
+    if ((type === 'number' && value.length === 1 && value === '0') || (type === 'number' && isNaN(Number(value)))) {
+        console.log('number')
+        value = value.slice(0, -1)
+    }
     var event = new CustomEvent("emitted", { "detail": { qstId, value } });
     document.dispatchEvent(event);
-
 }
 
 
@@ -31,10 +34,30 @@ export default function createInput(field) {
             )
         case 'text':
         case 'tel':
+            return (
+                <fieldset>
+                    <input
+                        type={qstOptType}
+                        name={qstId}
+                        style={{ marginTop: '16px' }}
+                        placeholder={qstText}
+                        value={customerResponse}
+                        required
+                        onChange={(event) => handleChange(event, qstId, qstOptType)} />
+                </fieldset>
+            )
         case 'number':
             return (
                 <fieldset>
-                    <input type={qstOptType} name={qstId} style={{ marginTop: '16px' }} placeholder={qstText} value={customerResponse} required onChange={(event) => handleChange(event, qstId)} />
+                    <input
+                        type={'text'}
+                        name={qstId}
+                        pattern="/^\d*[1-9]\d*$/"
+                        style={{ marginTop: '16px' }}
+                        placeholder={qstText}
+                        value={customerResponse}
+                        required
+                        onChange={(event) => handleChange(event, qstId, qstOptType)} />
                 </fieldset>
             )
         case 'dropdown':
