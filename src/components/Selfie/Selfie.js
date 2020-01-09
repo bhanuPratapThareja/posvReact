@@ -86,10 +86,6 @@ export default class Selfie extends Component {
                 });
             })
         } else {
-            const constraints = { audio: false, video: { facingMode: "user" } }
-            window.Webcam.attach(document.querySelector('canvas'));
-            window.Webcam.set({ constraints });
-            console.log(window.Webcam)
             this.setState({ mediaSupport: false, loadingVideo: false })
         }
     }
@@ -154,6 +150,15 @@ export default class Selfie extends Component {
         cameraInput.click();
         cameraInput.addEventListener('change', (event) => {
             event.stopImmediatePropagation();
+            const booth = document.getElementById('booth');
+            const div = document.createElement('div');
+            div.setAttribute('id', '#my_camera');
+            div.style.display = 'none';
+            // booth.append(div)
+            const constraints = { audio: false, video: { facingMode: "user" } };
+            // window.Webcam.attach('#my_camera');
+            window.Webcam.set({ constraints });
+            console.log(window.Webcam)
             if (!event.target.value) {
                 return
             }
