@@ -35,27 +35,16 @@ export default function createInput(field) {
                     <input type="radio" name={qstId} value="No" checked={field.question.customerResponse === 'No' ? true : false} onChange={(event) => handleChange(event, qstId)} /> <label>No</label>
                 </fieldset>
             )
-        case 'number':
-            return (
-                <fieldset>
-                    <input
-                        type={'text'}
-                        name={qstId}
-                        pattern="/^\d*[1-9]\d*$/"
-                        style={{ marginTop: '16px' }}
-                        placeholder={qstText}
-                        value={customerResponse}
-                        required
-                        onChange={(event) => handleChange(event, qstId, qstOptType)} />
-                </fieldset>
-            )
         case 'text':
         case 'tel':
+        case 'number':
+            const pattern = qstOptType === 'number' ? '/^\d*[1-9]\d*$/' : '';
             return (
                 <fieldset>
                     <input
                         type={qstOptType}
                         name={qstId}
+                        pattern={pattern}
                         style={{ marginTop: '16px' }}
                         placeholder={qstText}
                         value={customerResponse}
