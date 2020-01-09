@@ -62,13 +62,7 @@ export default class Selfie extends Component {
 
             window.Webcam.reset();
             window.Webcam.attach(document.querySelector('canvas'));
-            window.Webcam.set({
-                width: 320,
-                height: 240,
-                image_format: 'jpeg',
-                jpeg_quality: 90,
-                force_flash: false
-            });
+            window.Webcam.set({});
 
             this.setState({ loadingVideo: false }, () => {
                 var context = canvas.getContext('2d');
@@ -92,16 +86,9 @@ export default class Selfie extends Component {
                 });
             })
         } else {
+            const constraints = { audio: false, video: { facingMode: "user" } }
             window.Webcam.attach(document.querySelector('canvas'));
-            window.Webcam.set({
-                width: 320,
-                height: 240,
-                image_format: 'jpeg',
-                jpeg_quality: 90,
-                enable_flash: false,
-                force_flash: false,
-                flip_horiz: true
-            });
+            window.Webcam.set({ constraints });
             console.log(window.Webcam)
             this.setState({ mediaSupport: false, loadingVideo: false })
         }
@@ -175,9 +162,7 @@ export default class Selfie extends Component {
             reader.onload = readSuccess;
             const that = this;
             function readSuccess(evt) {
-
                 that.setState({ picture: evt.target.result }, () => {
-
 
                     const booth = document.getElementById('booth');
                     booth.style.border = 'none';
