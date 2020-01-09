@@ -153,7 +153,7 @@ export default class Selfie extends Component {
         const cameraInput = document.querySelector("[capture='camera']");
         cameraInput.click();
         cameraInput.addEventListener('change', async (event) => {
-            // event.stopImmediatePropagation();
+            event.stopImmediatePropagation();
             const booth = document.getElementById('booth');
             const div = document.createElement('div');
             div.setAttribute('id', '#my_camera');
