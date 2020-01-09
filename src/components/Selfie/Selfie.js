@@ -154,10 +154,20 @@ export default class Selfie extends Component {
             const div = document.createElement('div');
             div.setAttribute('id', '#my_camera');
             div.style.display = 'none';
-            // booth.append(div)
+            booth.append(div)
             const constraints = { audio: false, video: { facingMode: "user" } };
-            // window.Webcam.attach('#my_camera');
-            window.Webcam.set({ constraints });
+            window.Webcam.attach('#my_camera');
+            window.Webcam.set({ 
+                constraints, 
+                width: 320,
+                height: 240,
+                dest_width: 640,
+                dest_height: 480,
+                image_format: 'jpeg',
+                jpeg_quality: 90,
+                enable_flash:false, 
+                force_flash: false 
+            });
             console.log(window.Webcam)
             if (!event.target.value) {
                 return
@@ -305,7 +315,6 @@ export default class Selfie extends Component {
                     <div className="camera_text" style={camTextStyle}>
                         Click here to open camera
                     </div>
-                    <canvas id="canvas" {...imgStyles}></canvas>
                 </>
             )
         }
