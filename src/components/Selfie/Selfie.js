@@ -148,7 +148,7 @@ export default class Selfie extends Component {
     takeSelfieFromPhone = () => {
         const cameraInput = document.querySelector("[capture='camera']");
         cameraInput.click();
-        cameraInput.addEventListener('change', (event) => {
+        cameraInput.addEventListener('change', async (event) => {
             event.stopImmediatePropagation();
             const booth = document.getElementById('booth');
             const div = document.createElement('div');
@@ -156,8 +156,7 @@ export default class Selfie extends Component {
             div.style.display = 'none';
             booth.append(div)
             const constraints = { audio: false, video: { facingMode: "user" } };
-            window.Webcam.attach('#my_camera');
-            window.Webcam.set({ 
+            await window.Webcam.set({ 
                 constraints, 
                 width: 320,
                 height: 240,
@@ -168,6 +167,8 @@ export default class Selfie extends Component {
                 enable_flash:false, 
                 force_flash: false 
             });
+            await window.Webcam.attach('#my_camera');
+            
             console.log(window.Webcam)
             if (!event.target.value) {
                 return
