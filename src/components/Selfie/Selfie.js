@@ -61,7 +61,7 @@ export default class Selfie extends Component {
             canvas.style.visibility = 'visible';
 
             window.Webcam.reset();
-            window.Webcam.attach('canvas');
+            window.Webcam.attach(document.querySelector('canvas'));
             window.Webcam.set({
                 width: 320,
                 height: 240,
@@ -304,6 +304,7 @@ export default class Selfie extends Component {
                     <div className="camera_text" style={camTextStyle}>
                         Click here to open camera
                     </div>
+                    <canvas id="canvas" {...imgStyles}></canvas>
                 </>
             )
         }
