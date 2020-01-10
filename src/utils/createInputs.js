@@ -2,17 +2,14 @@ import React from 'react';
 import MaskedInput from 'react-maskedinput';
 
 const handleChange = (e, qstId, type) => {
-    console.log(e, qstId, type)
     let value = type === 'checkbox' ? e.target.checked : e.target.value;
     if (type === 'checkbox') {
         value === true ? value = 'Yes' : value = 'No'
     }
-    console.log('value: ', e)
-    console.log(isNaN(Number(value)))
-    // if ((type === 'number' && value.length === 1 && value === '0') || (type === 'number' && isNaN(Number(value)))) {
-    //     console.log('number')
-    //     value = value.slice(0, -1)
-    // }
+    
+    if ((type === 'number' && value.length === 1 && value === '0') || (type === 'number' && isNaN(Number(value)))) {
+        value = value.slice(0, -1)
+    }
     var event = new CustomEvent("emitted", { detail: { qstId, value } });
     document.dispatchEvent(event);
 }
@@ -38,13 +35,13 @@ export default function createInput(field) {
         case 'text':
         case 'tel':
         case 'number':
-            // qstOptType = 'number';
-            // const pattern = qstOptType === 'number' ? '/^[1-9]\d*$/g' : '';
+            const pattern = qstOptType === 'number' ? '/^[1-9]\d*$/g' : '';
             return (
                 <fieldset>
                     <input
                         type={qstOptType}
                         name={qstId}
+                        pattern={pattern}
                         style={{ marginTop: '16px' }}
                         placeholder={qstText}
                         value={customerResponse}
@@ -54,7 +51,6 @@ export default function createInput(field) {
             )
 
         case 'dropdown':
-            // console.log('field: ', field)
             const selectedValue = customerResponse ? customerResponse : 'default';
             return (
                 <fieldset>
