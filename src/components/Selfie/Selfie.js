@@ -3,7 +3,7 @@ import axios from 'axios';
 import Snackbar from './../Snackbar/Snackbar';
 import Button from '@material-ui/core/Button';
 import { getApiData } from './../../api/api';
-import { getDevice, getIfIOS } from './../../utils/getDevice';
+import { getDevice } from './../../utils/getDevice';
 import './Selfie.css';
 
 export default class Selfie extends Component {
@@ -50,7 +50,7 @@ export default class Selfie extends Component {
 
 
     startVideo = () => {
-        if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS()) {
+        if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             let img = document.getElementById('img');
             if (img) {
                 img.parentNode.removeChild(img);
@@ -91,7 +91,7 @@ export default class Selfie extends Component {
     }
 
     handleBoothClick = () => {
-        if (!(navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS())) {
+        if (!(navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
             this.takeSelfie()
         }
     }
@@ -251,7 +251,7 @@ export default class Selfie extends Component {
     }
 
     componentWillUnmount() {
-        if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS()) {
+        if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             this.closeWebcam();
         }
     }
