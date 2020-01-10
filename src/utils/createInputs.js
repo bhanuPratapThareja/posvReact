@@ -9,10 +9,10 @@ const handleChange = (e, qstId, type) => {
     }
     console.log('value: ', e)
     console.log(isNaN(Number(value)))
-    if ((type === 'number' && value.length === 1 && value === '0') || (type === 'number' && isNaN(Number(value)))) {
-        console.log('number')
-        value = value.slice(0, -1)
-    }
+    // if ((type === 'number' && value.length === 1 && value === '0') || (type === 'number' && isNaN(Number(value)))) {
+    //     console.log('number')
+    //     value = value.slice(0, -1)
+    // }
     var event = new CustomEvent("emitted", { detail: { qstId, value } });
     document.dispatchEvent(event);
 }
