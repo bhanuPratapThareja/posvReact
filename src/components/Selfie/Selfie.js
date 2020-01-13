@@ -176,7 +176,7 @@ export default class Selfie extends Component {
 
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext("2d");
-
+                    ctx.scale(-1, 1);
                     img.onload = () => {
                         canvas.width = img.width;
                         canvas.height = img.height;
