@@ -199,7 +199,7 @@ export default class Selfie extends Component {
                             var sizeInBytes = 4 * Math.ceil((stringLength / 3)) * 0.5624896334383812;
                             var sizeInKb = sizeInBytes / 1024;
                             console.log('sizeInBytes: ', sizeInBytes)
-                            alert(sizeInKb)
+                            // alert(sizeInKb)
                             that.setState({ phonePicture })
                         })
                     }
