@@ -176,11 +176,12 @@ export default class Selfie extends Component {
 
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext("2d");
-                    ctx.scale(-1, 1);
                     img.onload = () => {
+                        ctx.translate(img.width, 0);
+                        ctx.scale(-1, 1);
                         canvas.width = img.width;
                         canvas.height = img.height;
-                        
+
                         img.style.border = '8px solid lightgrey';
 
                         booth.append(img);
@@ -198,7 +199,7 @@ export default class Selfie extends Component {
                             var sizeInBytes = 4 * Math.ceil((stringLength / 3)) * 0.5624896334383812;
                             var sizeInKb = sizeInBytes / 1024;
                             console.log('sizeInBytes: ', sizeInBytes)
-                            console.log('sizeInKb: ', sizeInKb)
+                            alert('sizeInKb: ', sizeInKb)
                             that.setState({ phonePicture })
                         })
                     }
