@@ -276,7 +276,9 @@ export default class CustomerFeedback extends Component {
 
     gotToPage = (direction) => {
         if (direction === 'previous') {
-            this.getQuestions(this.state.qstCatNamePrevious, null, direction)
+            this.setState({ errorMsg: '' }, () => {
+                this.getQuestions(this.state.qstCatNamePrevious, null, direction)
+            })
         } else {
             this.submitAnswers()
         }
