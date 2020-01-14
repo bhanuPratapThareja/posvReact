@@ -22,7 +22,8 @@ export default class Selfie extends Component {
             loadingVideo: undefined,
             mediaSupport: true,
             boothWidth: '320px',
-            boothHeight: '240px'
+            boothHeight: '240px',
+            gotEvent: false
         }
 
         props.history.listen((location, action) => {
@@ -60,7 +61,8 @@ export default class Selfie extends Component {
             canvas.style.visibility = 'visible';
 
             window.Webcam.reset();
-            window.Webcam.attach(document.getElementById('canvas'));
+            window.Webcam.attach(document.querySelector('canvas'));
+            window.Webcam.set({});
 
             this.setState({ loadingVideo: false }, () => {
                 var context = canvas.getContext('2d');
@@ -143,6 +145,10 @@ export default class Selfie extends Component {
         })
     }
 
+    handleOnCheange = () => {
+
+    }
+
     takeSelfieFromPhone = () => {
         const cameraInput = document.querySelector("[capture='camera']");
         cameraInput.click();
@@ -151,10 +157,12 @@ export default class Selfie extends Component {
                 return
             }
             var reader = new FileReader(event.srcElement.files[0]);
+
             reader.onload = readSuccess;
             const that = this;
             function readSuccess(evt) {
                 that.setState({ picture: evt.target.result }, () => {
+
                     const booth = document.getElementById('booth');
                     booth.style.border = 'none';
                     let img = document.getElementById('selfie');
@@ -162,18 +170,38 @@ export default class Selfie extends Component {
                         img.parentNode.removeChild(img)
                     }
                     img = new Image();
-                    img.src = that.state.picture;
                     img.alt = 'Selfie';
                     img.setAttribute('id', 'selfie');
+                    img.src = that.state.picture;
+
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext("2d");
                     img.onload = () => {
+                        ctx.translate(img.width, 0);
+                        ctx.scale(-1, 1);
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+
                         img.style.border = '8px solid lightgrey';
+
                         booth.append(img);
                         const images = document.querySelectorAll('#selfie');
                         if (images.length > 1) {
                             const rmImage = images[1];
                             rmImage.parentNode.removeChild(rmImage)
                         }
-                        that.setState({ pictureTaken: true })
+                        that.setState({ pictureTaken: true }, () => {
+                            let base64 = img.src;
+                            const type = base64.substring(base64.indexOf('/') + 1, base64.indexOf(';base64'));
+                            ctx.drawImage(img, 0, 0, img.width, img.height);
+                            const phonePicture = canvas.toDataURL(`image/${type}`, 0.2);
+                            var stringLength = phonePicture.length - `data:image/${type};base64,`.length;
+                            var sizeInBytes = 4 * Math.ceil((stringLength / 3)) * 0.5624896334383812;
+                            var sizeInKb = sizeInBytes / 1024;
+                            console.log('sizeInKb: ', sizeInKb)
+                            // alert(sizeInKb)
+                            that.setState({ phonePicture })
+                        })
                     }
                 })
             }
@@ -184,13 +212,14 @@ export default class Selfie extends Component {
     submitSelfie = async () => {
         this.props.manageLoader(true)
         await this.setState({ submitting: true })
-        const base64 = this.state.picture
+
+        const base64 = this.state.phonePicture ? this.state.phonePicture : this.state.picture;
         const type = base64.substring(base64.indexOf('/') + 1, base64.indexOf(';base64'));
         const { url, body } = getApiData('verifyCustomerImage');
         const imgString = this.state.picture.split(",")[1]
         body.request.payload.imageFile = imgString;
         body.request.payload.fileExtension = type;
-
+        console.log(body)
         try {
             const response = await axios.post(url, body)
             if (response.data && response.data.response && !response.data.response.payload.isImageValid) {
@@ -219,6 +248,7 @@ export default class Selfie extends Component {
             this.handleSnackbar(true, 'error', 'Something went wrong. Please try again.')
             this.props.manageLoader(false)
             this.setState({ submitting: false })
+            console.log(err)
         }
     }
 
@@ -256,8 +286,8 @@ export default class Selfie extends Component {
 
     getHtml = () => {
         const camTextStyle = { display: this.state.picture ? 'none' : 'block' }
+        const imgStyles = { width: '320', height: '240' };
         if (this.state.mediaSupport) {
-            const imgStyles = { width: '320', height: '240' };
             return (
                 <>
                     <video id="video" width="320" height="240" style={imgStyles} preload={'auto'} autoPlay loop muted></video>

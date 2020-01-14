@@ -98,12 +98,12 @@ form fieldset {
     width: 100%;
 }
 
-input[type=number] {
+/* input[type=number] {
     -moz-appearance:textfield !important;
-}
-input:focus{
+} */
+/* input:focus{
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -webkit-user-input:none;
-}
+} */

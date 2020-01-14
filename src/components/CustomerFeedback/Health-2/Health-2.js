@@ -13,6 +13,7 @@ class Health2 extends Component {
     }
 
     updateFunction = (event) => {
+        console.log(event)
         const { qstId, value } = event.detail;
         this.props.onUserAnswer(qstId, value)
     }

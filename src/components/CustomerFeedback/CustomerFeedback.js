@@ -35,7 +35,6 @@ export default class CustomerFeedback extends Component {
     }
 
     componentDidMount() {
-        console.log('component mounted')
         const qstCatName = this.props.location.pathname.split('/')[2].toUpperCase();
         this.getQuestions(null, qstCatName);
     }
@@ -211,7 +210,6 @@ export default class CustomerFeedback extends Component {
     }
 
     submitAnswers = async () => {
-        this.setState({ errorMsg: '' })
         const mandatoryArray = [];
         const customerResponseArray = [];
 
@@ -257,6 +255,7 @@ export default class CustomerFeedback extends Component {
         body.request.payload.customerResponse.qst = [...this.state.questions];
         this.setState({ disableButtons: true })
         try {
+            this.setState({ errorMsg: '' })
             this.props.manageLoader(true)
             const response = await axios.post(url, body)
             this.handleRsponse(response)
@@ -277,7 +276,9 @@ export default class CustomerFeedback extends Component {
 
     gotToPage = (direction) => {
         if (direction === 'previous') {
-            this.getQuestions(this.state.qstCatNamePrevious, null, direction)
+            this.setState({ errorMsg: '' }, () => {
+                this.getQuestions(this.state.qstCatNamePrevious, null, direction)
+            })
         } else {
             this.submitAnswers()
         }

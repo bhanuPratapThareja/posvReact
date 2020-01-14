@@ -6,12 +6,12 @@ const handleChange = (e, qstId, type) => {
     if (type === 'checkbox') {
         value === true ? value = 'Yes' : value = 'No'
     }
+    
     if ((type === 'number' && value.length === 1 && value === '0') || (type === 'number' && isNaN(Number(value)))) {
         value = value.slice(0, -1)
     }
-    var event = new CustomEvent("emitted", { "detail": { qstId, value, type } });
+    var event = new CustomEvent("emitted", { detail: { qstId, value } });
     document.dispatchEvent(event);
-
 }
 
 
@@ -34,11 +34,14 @@ export default function createInput(field) {
             )
         case 'text':
         case 'tel':
+        case 'number':
+            const pattern = qstOptType === 'number' ? '/^[1-9]\d*$/g' : '';
             return (
                 <fieldset>
                     <input
                         type={qstOptType}
                         name={qstId}
+                        pattern={pattern}
                         style={{ marginTop: '16px' }}
                         placeholder={qstText}
                         value={customerResponse}
@@ -46,22 +49,8 @@ export default function createInput(field) {
                         onChange={(event) => handleChange(event, qstId, qstOptType)} />
                 </fieldset>
             )
-        case 'number':
-            return (
-                <fieldset>
-                    <input
-                        type={'text'}
-                        name={qstId}
-                        pattern="/^\d*[1-9]\d*$/"
-                        style={{ marginTop: '16px' }}
-                        placeholder={qstText}
-                        value={customerResponse}
-                        required
-                        onChange={(event) => handleChange(event, qstId, qstOptType)} />
-                </fieldset>
-            )
+
         case 'dropdown':
-            // console.log('field: ', field)
             const selectedValue = customerResponse ? customerResponse : 'default';
             return (
                 <fieldset>
