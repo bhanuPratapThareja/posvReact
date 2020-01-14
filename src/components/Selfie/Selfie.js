@@ -3,7 +3,7 @@ import axios from 'axios';
 import Snackbar from './../Snackbar/Snackbar';
 import Button from '@material-ui/core/Button';
 import { getApiData } from './../../api/api';
-import { getDevice, getIfIOS } from './../../utils/getDevice';
+import { getDevice, isIOSDevice } from './../../utils/getDevice';
 import './Selfie.css';
 
 export default class Selfie extends Component {
@@ -23,7 +23,7 @@ export default class Selfie extends Component {
             boothWidth: '320px',
             boothHeight: '240px',
             gotEvent: false,
-            mediaSupport: navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS()
+            mediaSupport: navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !isIOSDevice()
         }
 
         props.history.listen((location, action) => {

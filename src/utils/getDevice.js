@@ -14,7 +14,7 @@ export const getDevice = () => {
         return device
 }
 
-export const getIfIOS = () => {
+export const isIOSDevice = () => {
     const iOS = /iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     return iOS;
 }
