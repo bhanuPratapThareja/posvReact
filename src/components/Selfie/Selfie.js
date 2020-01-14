@@ -198,7 +198,7 @@ export default class Selfie extends Component {
                             var stringLength = phonePicture.length - `data:image/${type};base64,`.length;
                             var sizeInBytes = 4 * Math.ceil((stringLength / 3)) * 0.5624896334383812;
                             var sizeInKb = sizeInBytes / 1024;
-                            console.log('sizeInBytes: ', sizeInBytes)
+                            console.log('sizeInKb: ', sizeInKb)
                             // alert(sizeInKb)
                             that.setState({ phonePicture })
                         })
@@ -219,7 +219,7 @@ export default class Selfie extends Component {
         const imgString = this.state.picture.split(",")[1]
         body.request.payload.imageFile = imgString;
         body.request.payload.fileExtension = type;
-
+        console.log(body)
         try {
             const response = await axios.post(url, body)
             if (response.data && response.data.response && !response.data.response.payload.isImageValid) {
@@ -248,6 +248,7 @@ export default class Selfie extends Component {
             this.handleSnackbar(true, 'error', 'Something went wrong. Please try again.')
             this.props.manageLoader(false)
             this.setState({ submitting: false })
+            console.log(err)
         }
     }
 

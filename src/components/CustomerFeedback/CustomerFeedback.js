@@ -210,7 +210,6 @@ export default class CustomerFeedback extends Component {
     }
 
     submitAnswers = async () => {
-        this.setState({ errorMsg: '' })
         const mandatoryArray = [];
         const customerResponseArray = [];
 
@@ -256,6 +255,7 @@ export default class CustomerFeedback extends Component {
         body.request.payload.customerResponse.qst = [...this.state.questions];
         this.setState({ disableButtons: true })
         try {
+            this.setState({ errorMsg: '' })
             this.props.manageLoader(true)
             const response = await axios.post(url, body)
             this.handleRsponse(response)
