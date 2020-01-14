@@ -20,10 +20,10 @@ export default class Selfie extends Component {
             snackbarMsgType: '',
             snackbarMsg: '',
             loadingVideo: undefined,
-            mediaSupport: true,
             boothWidth: '320px',
             boothHeight: '240px',
-            gotEvent: false
+            gotEvent: false,
+            mediaSupport: navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS()
         }
 
         props.history.listen((location, action) => {
@@ -32,6 +32,7 @@ export default class Selfie extends Component {
                 this.props.manageLoader(false);
             }
         });
+        console.log(this.state.mediaSupport)
     }
 
     componentDidMount() {
@@ -50,7 +51,7 @@ export default class Selfie extends Component {
 
 
     startVideo = () => {
-        if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS()) {
+        if (this.state.mediaSupport) {
             let img = document.getElementById('img');
             if (img) {
                 img.parentNode.removeChild(img);
@@ -86,12 +87,14 @@ export default class Selfie extends Component {
                 });
             })
         } else {
-            this.setState({ mediaSupport: false, loadingVideo: false })
+            const cameraInput = document.querySelector("[capture='camera']");
+            cameraInput.addEventListener('change', event => this.handleOnChange(event));
+            this.setState({ loadingVideo: false })
         }
     }
 
     handleBoothClick = () => {
-        if (!(navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS())) {
+        if (!this.state.mediaSupport) {
             this.takeSelfie()
         }
     }
@@ -145,68 +148,67 @@ export default class Selfie extends Component {
         })
     }
 
-    handleOnCheange = () => {
+    handleOnChange = event => {
+        // console.log('event: ', event)
+        event.stopImmediatePropagation();
+        if (!event.target.value) {
+            return
+        }
+        var reader = new FileReader(event.srcElement.files[0]);
 
+        reader.onload = readSuccess;
+        const that = this;
+        function readSuccess(evt) {
+            that.setState({ picture: evt.target.result }, () => {
+
+                const booth = document.getElementById('booth');
+                booth.style.border = 'none';
+                let img = document.getElementById('selfie');
+                if (img) {
+                    img.parentNode.removeChild(img)
+                }
+                img = new Image();
+                img.alt = 'Selfie';
+                img.setAttribute('id', 'selfie');
+                img.src = that.state.picture;
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext("2d");
+                img.onload = () => {
+                    ctx.translate(img.width, 0);
+                    ctx.scale(-1, 1);
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    img.style.border = '8px solid lightgrey';
+
+                    booth.append(img);
+                    const images = document.querySelectorAll('#selfie');
+                    if (images.length > 1) {
+                        const rmImage = images[1];
+                        rmImage.parentNode.removeChild(rmImage)
+                    }
+                    that.setState({ pictureTaken: true }, () => {
+                        let base64 = img.src;
+                        const type = base64.substring(base64.indexOf('/') + 1, base64.indexOf(';base64'));
+                        ctx.drawImage(img, 0, 0, img.width, img.height);
+                        const phonePicture = canvas.toDataURL(`image/${type}`, 0.2);
+                        var stringLength = phonePicture.length - `data:image/${type};base64,`.length;
+                        var sizeInBytes = 4 * Math.ceil((stringLength / 3)) * 0.5624896334383812;
+                        var sizeInKb = sizeInBytes / 1024;
+                        console.log('sizeInKb: ', sizeInKb)
+                        // alert(sizeInKb)
+                        that.setState({ phonePicture })
+                    })
+                }
+            })
+        }
+        reader.readAsDataURL(event.srcElement.files[0]);
     }
 
     takeSelfieFromPhone = () => {
         const cameraInput = document.querySelector("[capture='camera']");
         cameraInput.click();
-        cameraInput.addEventListener('change', (event) => {
-            if (!event.target.value) {
-                return
-            }
-            var reader = new FileReader(event.srcElement.files[0]);
-
-            reader.onload = readSuccess;
-            const that = this;
-            function readSuccess(evt) {
-                that.setState({ picture: evt.target.result }, () => {
-
-                    const booth = document.getElementById('booth');
-                    booth.style.border = 'none';
-                    let img = document.getElementById('selfie');
-                    if (img) {
-                        img.parentNode.removeChild(img)
-                    }
-                    img = new Image();
-                    img.alt = 'Selfie';
-                    img.setAttribute('id', 'selfie');
-                    img.src = that.state.picture;
-
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext("2d");
-                    img.onload = () => {
-                        ctx.translate(img.width, 0);
-                        ctx.scale(-1, 1);
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-
-                        img.style.border = '8px solid lightgrey';
-
-                        booth.append(img);
-                        const images = document.querySelectorAll('#selfie');
-                        if (images.length > 1) {
-                            const rmImage = images[1];
-                            rmImage.parentNode.removeChild(rmImage)
-                        }
-                        that.setState({ pictureTaken: true }, () => {
-                            let base64 = img.src;
-                            const type = base64.substring(base64.indexOf('/') + 1, base64.indexOf(';base64'));
-                            ctx.drawImage(img, 0, 0, img.width, img.height);
-                            const phonePicture = canvas.toDataURL(`image/${type}`, 0.2);
-                            var stringLength = phonePicture.length - `data:image/${type};base64,`.length;
-                            var sizeInBytes = 4 * Math.ceil((stringLength / 3)) * 0.5624896334383812;
-                            var sizeInKb = sizeInBytes / 1024;
-                            console.log('sizeInKb: ', sizeInKb)
-                            // alert(sizeInKb)
-                            that.setState({ phonePicture })
-                        })
-                    }
-                })
-            }
-            reader.readAsDataURL(event.srcElement.files[0]);
-        });
     }
 
     submitSelfie = async () => {
@@ -253,8 +255,11 @@ export default class Selfie extends Component {
     }
 
     componentWillUnmount() {
-        if (navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && !getIfIOS()) {
+        if (this.state.mediaSupport) {
             this.closeWebcam();
+        } else {
+            const cameraInput = document.querySelector("[capture='camera']");
+            cameraInput.removeEventListener('change', event => this.handleOnChange(event));
         }
     }
 
